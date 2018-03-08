@@ -1,27 +1,25 @@
 language: java
 sudo: required
 jdk:
-  - oraclejdk8
-env:  
-  global:  
-    - DISPLAY=:99.0  
-cache:  
-  directories:  
-   - $HOME/.m2  
-
-# Handle git submodules yourself
+- oraclejdk8
+env:
+  global:
+  - DISPLAY=:99.0
+cache:
+  directories:
+  - "$HOME/.m2"
 git:
-    submodules: false
-
-# Enable UI
+  submodules: false
 before_install:
-    - sh -e /etc/init.d/xvfb start - sleep 10
-    - git clone --depth 1 https://github.com/kit-sdq/BuildUtilities.git /tmp/BuildUtilities
-    - . /tmp/BuildUtilities/travis-ci/installMaven.sh
-    - "echo \"export MAVEN_OPTS='-Dmaven.repo.local=$HOME/.m2/repository -Xmx2g'\" > ~/.mavenrc"
+- sh -e /etc/init.d/xvfb start - sleep 10
+- git clone --depth 1 https://github.com/kit-sdq/BuildUtilities.git /tmp/BuildUtilities
+- ". /tmp/BuildUtilities/travis-ci/installMaven.sh"
+- echo "export MAVEN_OPTS='-Dmaven.repo.local=$HOME/.m2/repository -Xmx2g'" > ~/.mavenrc
 install: true
-
 script: mvn clean verify
-
 after_success:
-- . /tmp/BuildUtilities/travis-ci/deploy.sh framework releng/edu.kit.ipd.sdq.kamp.updatesite.aggregated final MartinLoeper updatesite
+- ". /tmp/BuildUtilities/travis-ci/deploy.sh framework releng/edu.kit.ipd.sdq.kamp.updatesite.aggregated
+  final MartinLoeper updatesite"
+notifications:
+  slack:
+    secure: XUd49PQjlsGc/ODyhCevgVkkiMT5S4HkkAJtytgSKuIuaZGviVWPshNboFUnAkshe+SKvWDIVIR61JetDMA9qyFo+ENhiUsEkCmxkbXpSKmMzmG/pp0zqkXw6gQw0I6ousB5k6a2dfd20IIw2yHKIS4P0Rp/oq9Y1yZuJdYVljNb+D7z25H6kHolw5v3M+mUPWCeiBJHk6obOIQfrBA6qe1vTw8AFIiHGBNzAs4h26BnoJ9YHbtbfT+DCllqgrfpsrrVBb3vW6/EjtWK/ypZjchXPonilMjZWrOjey0eIf62XgTHkjTMF5gaQDghgItcfoxgi3rLuJwVurlIdVEFF+YspW/aXW8GDOrW41DaEyjKnUNDwHKLUU5alMDCfkTK+JNsc2MYoqyaduQPqT/Nr3ey26fvC1gXht1+vJaxcE1x/QZl+m1FCKo/ftNmSmxVBN+Df3HBqTJmtSRTA0OGuusJg500scG6kuT2vep5GL5X657J21a6mfXDvNWakjLlnY5ExHu9hwT3y2tyVF0IRpc+nyrVkvmzx/x1gsDftyQKrFzJQTAMEiLVgp5LJyuI3Pw6TKwz8vr+TFwLF+hXCtbCLrEWnaVB+h5p57CPcwV8q9lkLgXPCL/5qZgPvb6+aig5bCtVVFOuROZGiKpZK6BSktSpHBmvLrJyvOrc+OI=
