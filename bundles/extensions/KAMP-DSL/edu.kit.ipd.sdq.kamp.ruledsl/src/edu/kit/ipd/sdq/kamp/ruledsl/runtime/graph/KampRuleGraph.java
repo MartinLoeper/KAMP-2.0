@@ -29,11 +29,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 
-import org.apache.batik.transcoder.TranscoderInput;
-import org.apache.batik.transcoder.TranscoderOutput;
-import org.apache.batik.transcoder.image.JPEGTranscoder;
-import org.apache.batik.transcoder.image.PNGTranscoder;
-
 import edu.kit.ipd.sdq.kamp.ruledsl.support.KampRuleStub;
 
 
@@ -241,73 +236,7 @@ public class KampRuleGraph implements Iterable<KampRuleVertex> {
 		    p.waitFor();
 		}
 		else {
-			String urlParameters;
-			try {
-				urlParameters = "dot=" + URLEncoder.encode(dot, "UTF-8");
-			} catch (UnsupportedEncodingException e1) {
-				return;
-			}
-			HttpURLConnection connection = null;  
-			  try {
-			    //Create connection
-			    URL url = new URL("http://dot-graphics1.appspot.com/dotgraphicstest");
-			    connection = (HttpURLConnection)url.openConnection();
-			    connection.setRequestMethod("POST");
-			    connection.setRequestProperty("Content-Type", 
-			        "application/x-www-form-urlencoded");
-
-			    connection.setRequestProperty("Content-Length", 
-			        Integer.toString(urlParameters.getBytes().length));
-			    connection.setRequestProperty("Content-Language", "en-US");  
-
-			    connection.setUseCaches(false);
-			    connection.setDoOutput(true);
-
-			    //Send request
-			    DataOutputStream wr = new DataOutputStream (
-			        connection.getOutputStream());
-			    wr.writeBytes(urlParameters);
-			    wr.close();
-
-			    //Get Response  
-			    InputStream is = connection.getInputStream();
-			    BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-			    StringBuilder response = new StringBuilder();
-			    String line;
-			    while((line = rd.readLine()) != null) {
-			      response.append(line);
-			      response.append('\r');
-			    }
-			    rd.close();
-
-			    // Create a JPEG transcoder
-		        PNGTranscoder t = new PNGTranscoder();
-
-		        // Set the transcoding hints.
-		        t.addTranscodingHint(JPEGTranscoder.KEY_QUALITY,
-		                   new Float(1.0));
-
-		        // Create the transcoder input
-		        TranscoderInput input = new TranscoderInput(new ByteArrayInputStream(response.toString().getBytes(StandardCharsets.UTF_8)));
-
-		        // Create the transcoder output.
-		        OutputStream ostream = new FileOutputStream(path + outFile);
-		        TranscoderOutput output = new TranscoderOutput(ostream);
-
-		        // Save the image.
-		        t.transcode(input, output);
-
-		        // Flush and close the stream.
-		        ostream.flush();
-		        ostream.close();
-		        
-			  } catch (Exception e) {
-				  throw new IOException("Error, creating graph on server. Do you have an internet connection?");
-			  } finally {
-			    if(connection != null) {
-			      connection.disconnect(); 
-			    }
-			  }			
+			throw new UnsupportedOperationException("The online graph creation was removed. Use the local binary instead by passing a path as string argument.");
 		}
 		
 		new Thread(() -> {
