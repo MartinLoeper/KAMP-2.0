@@ -472,13 +472,6 @@ limitations under the License.
          unpack="false"/>
 
    <plugin
-         id="toometa.requirements.tests"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="de.uka.ipd.sdq.namedelement"
          download-size="0"
          install-size="0"
