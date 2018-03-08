@@ -15,6 +15,8 @@
 
 	<modules>
 		<module>edu.kit.ipd.sdq.kamp.framework.feature</module>
+		<module>edu.kit.ipd.sdq.kamp.extensions.kamp4bp.feature</module>
+		<module>edu.kit.ipd.sdq.kamp.extensions.kamp4is.feature</module>
 	</modules>
 
 </project>

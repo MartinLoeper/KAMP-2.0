@@ -3,6 +3,12 @@
    <feature url="features/edu.kit.ipd.sdq.kamp.framework.feature_1.0.0.qualifier.jar" id="edu.kit.ipd.sdq.kamp.framework.feature" version="1.0.0.qualifier">
       <category name="kamp"/>
    </feature>
+   <feature url="features/edu.kit.ipd.sdq.kamp.extensions.kamp4bp.feature_1.0.0.qualifier.jar" id="edu.kit.ipd.sdq.kamp.extensions.kamp4bp.feature" version="1.0.0.qualifier">
+      <category name="kamp"/>
+   </feature>
+   <feature url="features/edu.kit.ipd.sdq.kamp.extensions.kamp4is.feature_1.0.0.qualifier.jar" id="edu.kit.ipd.sdq.kamp.extensions.kamp4is.feature" version="1.0.0.qualifier">
+      <category name="kamp"/>
+   </feature>
    <category-def name="kamp" label="KAMP">
       <description>
          The KAMP framework, including the essential core and optional extensions
