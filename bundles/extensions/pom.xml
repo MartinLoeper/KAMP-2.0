@@ -14,7 +14,7 @@
 	<name>Extensions Modules</name>
 
 	<modules>
-		
+		<module>KAMP-DSL</module>
 		<module>KAMP4BP</module>
 		<module>KAMP4IS</module>
 		<module>KAMP4REQ</module>
