@@ -549,13 +549,6 @@ limitations under the License.
          unpack="false"/>
 
    <plugin
-         id="de.uka.ipd.sdq.dsexplore.qml.contracttype.tests"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="de.uka.ipd.sdq.dsexplore.qml.declarations"
          download-size="0"
          install-size="0"
@@ -571,13 +564,6 @@ limitations under the License.
 
    <plugin
          id="de.uka.ipd.sdq.dsexplore.qml.declarations.editor"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="de.uka.ipd.sdq.dsexplore.qml.declarations.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -605,13 +591,6 @@ limitations under the License.
          unpack="false"/>
 
    <plugin
-         id="de.uka.ipd.sdq.dsexplore.qml.dimensions.tests"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="de.uka.ipd.sdq.dsexplore.qml.dimensiontypes"
          download-size="0"
          install-size="0"
@@ -627,13 +606,6 @@ limitations under the License.
 
    <plugin
          id="de.uka.ipd.sdq.dsexplore.qml.dimensiontypes.editor"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="de.uka.ipd.sdq.dsexplore.qml.dimensiontypes.tests"
          download-size="0"
          install-size="0"
          version="0.0.0"
