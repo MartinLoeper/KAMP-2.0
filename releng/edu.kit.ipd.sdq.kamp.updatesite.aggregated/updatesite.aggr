@@ -13,16 +13,7 @@
         <features name="org.eclipse.xtend.sdk.feature.group" versionRange="2.12.0"/>
       </repositories>
       <repositories location="https://sdqweb.ipd.kit.edu/eclipse/palladiosimulator/nightly">
-        <features name="org.palladiosimulator.editors.commons.feature.feature.group" versionRange="2.1.1.201803070734"/>
-        <features name="org.palladiosimulator.editors.gmf.feature.feature.group" versionRange="4.1.0.201803070850"/>
-        <features name="org.palladiosimulator.editors.sirius.feature.feature.group" versionRange="4.1.0.201803072323"/>
-        <features name="org.palladiosimulator.editors.tree.feature.feature.group" versionRange="4.1.0.201803070504"/>
-        <features name="org.palladiosimulator.protocom.feature.feature.group" versionRange="4.1.0.201709282233"/>
-        <features name="org.palladiosimulator.protocom.javaee.feature.feature.group" versionRange="1.0.0.201709282233"/>
-        <features name="org.palladiosimulator.reliability.feature.feature.group" versionRange="1.0.0.201607082239"/>
-        <features name="org.palladiosimulator.pcm.feature.feature.group" versionRange="4.1.0.201712111652"/>
-        <features name="org.palladiosimulator.simucom.feature.feature.group" versionRange="4.1.0.201712081107"/>
-        <features name="org.palladiosimulator.solver.feature.feature.group" versionRange="4.1.0.201709290912"/>
+        <categories name="org.palladiosimulator.corefeatures.category" versionRange="0.0.0.7R21cPpsE67gKWDLOfyVBrs"/>
       </repositories>
     </contributions>
   </validationSets>
