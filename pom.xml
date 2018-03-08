@@ -66,8 +66,22 @@
 
 	<build>
 		<plugins>
-
 			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-maven-plugin</artifactId>
+				<version>${tycho.version}</version>
+				<extensions>true</extensions>
+				<configuration>
+					<argLine>-Xmx4096m</argLine>
+					<argLine>-Xms2048m</argLine>
+				</configuration>
+			</plugin>
+		</plugins>
+		
+		<pluginManagement>
+			
+			<plugins>
+				<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.3</version>
@@ -126,17 +140,6 @@
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-maven-plugin</artifactId>
-				<version>${tycho.version}</version>
-				<extensions>true</extensions>
-				<configuration>
-					<argLine>-Xmx4096m</argLine>
-					<argLine>-Xms2048m</argLine>
-				</configuration>
 			</plugin>
 			
 			<!-- Creates source versions of bundles -->
@@ -221,8 +224,9 @@
 					</environments>
 				</configuration>
 			</plugin>
-
-		</plugins>
+					
+			</plugins>
+		</pluginManagement>
 	</build>
 
 </project>
