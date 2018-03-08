@@ -521,13 +521,6 @@ limitations under the License.
          unpack="false"/>
 
    <plugin
-         id="de.uka.ipd.sdq.dsexplore.qml.contract.tests"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="de.uka.ipd.sdq.dsexplore.qml.contracttype"
          download-size="0"
          install-size="0"
