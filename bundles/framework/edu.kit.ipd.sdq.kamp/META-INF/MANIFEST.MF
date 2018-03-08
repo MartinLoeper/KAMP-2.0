@@ -12,10 +12,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.emf.compare,
  edu.kit.ipd.sdq.kamp.model.modificationmarks,
  org.palladiosimulator.pcm,
- de.uhd.ifi.se.pcm.bppcm;bundle-version="1.0.0",
- de.uhd.ifi.se.pcm.bppcm.edit;bundle-version="1.0.0",
- de.uhd.ifi.se.pcm.bppcm.editor;bundle-version="1.0.0",
- de.uhd.ifi.se.pcm.bppcm.ui;bundle-version="1.0.0"
+ org.palladiosimulator.pcm.editor;bundle-version="4.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ActivationPolicy: lazy
 Export-Package: edu.kit.ipd.sdq.kamp.architecture,
