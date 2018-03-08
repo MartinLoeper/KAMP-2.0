@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<!--
+-->
+
+<plugin>
+
+   <extension point="org.eclipse.ui.newWizards">
+      <!-- @generated BPFieldOfActivityAnnotations -->
+      <category
+            id="org.eclipse.emf.ecore.Wizard.category.ID"
+            name="%_UI_Wizard_category"/>
+      <wizard
+            id="edu.kit.ipd.sdq.kamp4bp.model.fieldofactivityannotations.presentation.BPFieldOfActivityAnnotationsModelWizardID"
+            name="%_UI_BPFieldOfActivityAnnotationsModelWizard_label"
+            class="edu.kit.ipd.sdq.kamp4bp.model.fieldofactivityannotations.presentation.BPFieldOfActivityAnnotationsModelWizard"
+            category="org.eclipse.emf.ecore.Wizard.category.ID"
+            icon="icons/full/obj16/BPFieldOfActivityAnnotationsModelFile.gif">
+         <description>%_UI_BPFieldOfActivityAnnotationsModelWizard_description</description>
+         <selection class="org.eclipse.core.resources.IResource"/>
+      </wizard>
+   </extension>
+
+   <extension point="org.eclipse.ui.editors">
+      <!-- @generated BPFieldOfActivityAnnotations -->
+      <editor
+            id="edu.kit.ipd.sdq.kamp4bp.model.fieldofactivityannotations.presentation.BPFieldOfActivityAnnotationsEditorID"
+            name="%_UI_BPFieldOfActivityAnnotationsEditor_label"
+            icon="icons/full/obj16/BPFieldOfActivityAnnotationsModelFile.gif"
+            extensions="fieldofactivityannotations"
+            class="edu.kit.ipd.sdq.kamp4bp.model.fieldofactivityannotations.presentation.BPFieldOfActivityAnnotationsEditor"
+            contributorClass="edu.kit.ipd.sdq.kamp4bp.model.fieldofactivityannotations.presentation.BPFieldOfActivityAnnotationsActionBarContributor">
+      </editor>
+   </extension>
+
+</plugin>

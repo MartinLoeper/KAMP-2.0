@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0"
+	xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+	xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel"
+	modelDirectory="/edu.kit.ipd.sdq.kamp4req.model.modificationmarks/src"
+	modelPluginID="edu.kit.ipd.sdq.kamp4req.model.modificationmarks"
+	modelName="ReqModificationmarks" importerID="org.eclipse.emf.importer.ecore"
+	complianceLevel="6.0" copyrightFields="false"
+	usedGenPackages="../../de.uhd.ifi.se.pcm.bppcm/model/bp.genmodel#//bppcm ../../edu.kit.ipd.sdq.kamp4bp.model.modificationmarks/model/BPModificationmarks.genmodel#//modificationmarks ../../toometa.decisions/model/decisions.genmodel#//decisions ../../de.uka.ipd.sdq.dsexplore.qml.dimensions/model/dimensions.genmodel#//dimensions ../../de.uka.ipd.sdq.dsexplore.qml.dimensiontypes/model/dimensiontypes.genmodel#//dimensiontypes ../../toometa.effects/model/effects.genmodel#//effects ../../toometa.glossary/model/glossary.genmodel#//glossary ../../edu.kit.ipd.sdq.kamp4is.model.modificationmarks/model/ISModificationmarks.genmodel#//modificationmarks ../../edu.kit.ipd.sdq.kamp.model.modificationmarks/model/Modificationmarks.genmodel#//modificationmarks ../../de.uka.ipd.sdq.namedelement/model/namedelement.genmodel#//namedelement ../../toometa.options/model/options.genmodel#//options ../../org.palladiosimulator.pcm/model/pcm.genmodel#//pcm ../../toometa.qualities/model/qualities.genmodel#//qualities ../../toometa.relations/model/relations.genmodel#//relations ../../toometa.requirements/model/requirements.genmodel#//requirements ../../de.uka.ipd.sdq.dsexplore.qml.units/model/units.genmodel#//units platform:/plugin/de.uka.ipd.sdq.identifier/model/identifier.genmodel#//identifier"
+	importOrganizing="true">
+	<foreignModel>ReqModificationmarks.ecore</foreignModel>
+	<genPackages prefix="ReqModificationmarks" basePackage="edu.kit.ipd.sdq.kamp4req.model"
+		resource="XMI" disposableProviderFactory="true" fileExtensions="modificationmarks"
+		ecorePackage="ReqModificationmarks.ecore#/">
+		<genClasses ecoreClass="ReqModificationmarks.ecore#//ReqModificationRepository" />
+		<genClasses ecoreClass="ReqModificationmarks.ecore#//ReqSeedModifications">
+			<genFeatures property="None" children="true" createChild="true"
+				ecoreFeature="ecore:EReference ReqModificationmarks.ecore#//ReqSeedModifications/requirementModifications" />
+			<genFeatures property="None" children="true" createChild="true"
+				ecoreFeature="ecore:EReference ReqModificationmarks.ecore#//ReqSeedModifications/decisionModifications" />
+			<genFeatures property="None" children="true" createChild="true"
+				ecoreFeature="ecore:EReference ReqModificationmarks.ecore#//ReqSeedModifications/optionModifications" />
+		</genClasses>
+		<genClasses
+			ecoreClass="ReqModificationmarks.ecore#//ReqChangePropagationDueToSpecificationDependencies">
+			<genFeatures property="None" children="true" createChild="true"
+				ecoreFeature="ecore:EReference ReqModificationmarks.ecore#//ReqChangePropagationDueToSpecificationDependencies/decisionModifications" />
+			<genFeatures property="None" children="true" createChild="true"
+				ecoreFeature="ecore:EReference ReqModificationmarks.ecore#//ReqChangePropagationDueToSpecificationDependencies/optionModifications" />
+			<genFeatures property="None" children="true" createChild="true"
+				ecoreFeature="ecore:EReference ReqModificationmarks.ecore#//ReqChangePropagationDueToSpecificationDependencies/requirementModifications" />
+			<genFeatures property="None" children="true" createChild="true"
+				ecoreFeature="ecore:EReference ReqModificationmarks.ecore#//ReqChangePropagationDueToSpecificationDependencies/dataTypeModifications" />
+			<genFeatures property="None" children="true" createChild="true"
+				ecoreFeature="ecore:EReference ReqModificationmarks.ecore#//ReqChangePropagationDueToSpecificationDependencies/entityModifications" />
+		</genClasses>
+		<genClasses ecoreClass="ReqModificationmarks.ecore#//ReqModifyEntity" />
+		<genClasses image="false"
+			ecoreClass="ReqModificationmarks.ecore#//ReqModifyTraceableObject">
+			<genTypeParameters
+				ecoreTypeParameter="ReqModificationmarks.ecore#//ReqModifyTraceableObject/T" />
+		</genClasses>
+		<genClasses ecoreClass="ReqModificationmarks.ecore#//ReqModifyRequirement" />
+		<genClasses ecoreClass="ReqModificationmarks.ecore#//ReqModifyDecision" />
+		<genClasses ecoreClass="ReqModificationmarks.ecore#//ReqModifyOption" />
+	</genPackages>
+</genmodel:GenModel>

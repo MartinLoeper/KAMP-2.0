@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<!--
+-->
+
+<plugin>
+
+   <extension point="org.eclipse.ui.newWizards">
+      <!-- @generated pcmbpoptions -->
+      <category
+            id="org.eclipse.emf.ecore.Wizard.category.ID"
+            name="%_UI_Wizard_category"/>
+      <wizard
+            id="pcmbpoptions.presentation.PcmbpoptionsModelWizardID"
+            name="%_UI_PcmbpoptionsModelWizard_label"
+            class="pcmbpoptions.presentation.PcmbpoptionsModelWizard"
+            category="org.eclipse.emf.ecore.Wizard.category.ID"
+            icon="icons/full/obj16/PcmbpoptionsModelFile.gif">
+         <description>%_UI_PcmbpoptionsModelWizard_description</description>
+         <selection class="org.eclipse.core.resources.IResource"/>
+      </wizard>
+   </extension>
+
+   <extension point="org.eclipse.ui.editors">
+      <!-- @generated pcmbpoptions -->
+      <editor
+            id="pcmbpoptions.presentation.PcmbpoptionsEditorID"
+            name="%_UI_PcmbpoptionsEditor_label"
+            icon="icons/full/obj16/PcmbpoptionsModelFile.gif"
+            extensions="pcmbpoptions"
+            class="pcmbpoptions.presentation.PcmbpoptionsEditor"
+            contributorClass="pcmbpoptions.presentation.PcmbpoptionsActionBarContributor">
+      </editor>
+   </extension>
+
+</plugin>

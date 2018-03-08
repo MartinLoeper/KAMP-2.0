@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/toometa.pcmarchoptions/src" editDirectory="/toometa.pcmarchoptions.edit/src"
+    editorDirectory="/toometa.pcmarchoptions.editor/src" modelPluginID="toometa.pcmarchoptions"
+    modelName="Pcmarchoptions" rootExtendsInterface="org.eclipse.emf.cdo.CDOObject"
+    rootExtendsClass="org.eclipse.emf.internal.cdo.CDOObjectImpl" importerID="org.eclipse.emf.importer.ecore"
+    featureDelegation="Dynamic" complianceLevel="8.0" copyrightFields="false" providerRootExtendsClass=""
+    testsPluginID="toometa.pcmarchoptions.tests" usedGenPackages="../../toometa.archoptions/model/archoptions.genmodel#//archoptions ../../de.uka.ipd.sdq.dsexplore.qml.dimensions/model/dimensions.genmodel#//dimensions ../../de.uka.ipd.sdq.dsexplore.qml.dimensiontypes/model/dimensiontypes.genmodel#//dimensiontypes ../../toometa.effects/model/effects.genmodel#//effects ../../toometa.glossary/model/glossary.genmodel#//glossary ../../de.uka.ipd.sdq.identifier/model/identifier.genmodel#//identifier ../../de.uka.ipd.sdq.namedelement/model/namedelement.genmodel#//namedelement ../../toometa.options/model/options.genmodel#//options ../../org.palladiosimulator.pcm/model/pcm.genmodel#//pcm platform:/plugin/de.uka.ipd.sdq.probfunction/model/ProbabilityFunction.genmodel#//probfunction ../../toometa.qualities/model/qualities.genmodel#//qualities ../../toometa.relations/model/relations.genmodel#//relations platform:/plugin/de.uka.ipd.sdq.stoex/model/stoex.genmodel#//stoex ../../de.uka.ipd.sdq.dsexplore.qml.units/model/units.genmodel#//units platform:/plugin/de.uka.ipd.sdq.units/model/Units.genmodel#//units"
+    importOrganizing="true">
+  <foreignModel>pcmarchoptions.ecore</foreignModel>
+  <modelPluginVariables>CDO=org.eclipse.emf.cdo</modelPluginVariables>
+  <genPackages prefix="Pcmarchoptions" disposableProviderFactory="true" extensibleProviderFactory="true"
+      childCreationExtenders="true" ecorePackage="pcmarchoptions.ecore#/">
+    <genClasses ecoreClass="pcmarchoptions.ecore#//PCM_SplitComponent" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pcmarchoptions.ecore#//PCM_SplitComponent/initialContextName"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pcmarchoptions.ecore#//PCM_SplitComponent/finalContexts"/>
+    </genClasses>
+    <genClasses ecoreClass="pcmarchoptions.ecore#//PCM_AllocateTogether" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pcmarchoptions.ecore#//PCM_AllocateTogether/allocationContexts"/>
+    </genClasses>
+    <genClasses ecoreClass="pcmarchoptions.ecore#//PCM_NeverAllocateToSpecificNodes"
+        labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pcmarchoptions.ecore#//PCM_NeverAllocateToSpecificNodes/allocationContexts"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pcmarchoptions.ecore#//PCM_NeverAllocateToSpecificNodes/hwNodes"/>
+    </genClasses>
+    <genClasses ecoreClass="pcmarchoptions.ecore#//PCM_IntroduceNewAdapter" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pcmarchoptions.ecore#//PCM_IntroduceNewAdapter/adapterContext"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pcmarchoptions.ecore#//PCM_IntroduceNewAdapter/contextBeingAdapted"/>
+    </genClasses>
+    <genClasses ecoreClass="pcmarchoptions.ecore#//PCM_IntroduceNewComponent" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pcmarchoptions.ecore#//PCM_IntroduceNewComponent/assemblyContexts"/>
+    </genClasses>
+    <genClasses ecoreClass="pcmarchoptions.ecore#//PCM_MoveComponents" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pcmarchoptions.ecore#//PCM_MoveComponents/allocationContexts"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pcmarchoptions.ecore#//PCM_MoveComponents/fromHwNode"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pcmarchoptions.ecore#//PCM_MoveComponents/toHwNode"/>
+    </genClasses>
+    <genClasses ecoreClass="pcmarchoptions.ecore#//PCM_OnlySingleInstantiation" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pcmarchoptions.ecore#//PCM_OnlySingleInstantiation/assemblyContexts"/>
+    </genClasses>
+    <genClasses ecoreClass="pcmarchoptions.ecore#//PCM_ChangeRoles" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pcmarchoptions.ecore#//PCM_ChangeRoles/assemblyContext"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pcmarchoptions.ecore#//PCM_ChangeRoles/roles"/>
+    </genClasses>
+    <genClasses ecoreClass="pcmarchoptions.ecore#//PCM_AllocateNeverTogether" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pcmarchoptions.ecore#//PCM_AllocateNeverTogether/allocationContexts"/>
+    </genClasses>
+    <genClasses ecoreClass="pcmarchoptions.ecore#//PCM_MultipleInstantiation" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pcmarchoptions.ecore#//PCM_MultipleInstantiation/assemblyContexts"/>
+    </genClasses>
+    <genClasses ecoreClass="pcmarchoptions.ecore#//PCM_BanComponent" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pcmarchoptions.ecore#//PCM_BanComponent/bannedContextNames"/>
+    </genClasses>
+    <genClasses ecoreClass="pcmarchoptions.ecore#//PCM_MultipleAllocation" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pcmarchoptions.ecore#//PCM_MultipleAllocation/allocationContexts"/>
+    </genClasses>
+    <genClasses ecoreClass="pcmarchoptions.ecore#//PCM_ProvidedFunctionality" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pcmarchoptions.ecore#//PCM_ProvidedFunctionality/providedRoles"/>
+    </genClasses>
+    <genClasses ecoreClass="pcmarchoptions.ecore#//PCM_ReplaceComponents" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pcmarchoptions.ecore#//PCM_ReplaceComponents/contextsReplacedWith"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pcmarchoptions.ecore#//PCM_ReplaceComponents/replacedContextNames"/>
+    </genClasses>
+    <genClasses ecoreClass="pcmarchoptions.ecore#//PCM_ReuseComponent" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pcmarchoptions.ecore#//PCM_ReuseComponent/assemblyContexts"/>
+    </genClasses>
+    <genClasses ecoreClass="pcmarchoptions.ecore#//PCM_FunctionalityConnection" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pcmarchoptions.ecore#//PCM_FunctionalityConnection/connector"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pcmarchoptions.ecore#//PCM_FunctionalityConnection/requiredRole"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pcmarchoptions.ecore#//PCM_FunctionalityConnection/providedRole"/>
+    </genClasses>
+    <genClasses ecoreClass="pcmarchoptions.ecore#//PCM_MergeComponents" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute pcmarchoptions.ecore#//PCM_MergeComponents/initialContextsNameList"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pcmarchoptions.ecore#//PCM_MergeComponents/finalContext"/>
+    </genClasses>
+    <genClasses ecoreClass="pcmarchoptions.ecore#//PCM_OnlySingleAllocation" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pcmarchoptions.ecore#//PCM_OnlySingleAllocation/allocationContexts"/>
+    </genClasses>
+    <genClasses ecoreClass="pcmarchoptions.ecore#//PCM_RequiredFunctionality" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pcmarchoptions.ecore#//PCM_RequiredFunctionality/requiredRoles"/>
+    </genClasses>
+    <genClasses ecoreClass="pcmarchoptions.ecore#//PCM_ChangeDataType">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pcmarchoptions.ecore#//PCM_ChangeDataType/oldDataTypes"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pcmarchoptions.ecore#//PCM_ChangeDataType/newDataTypes"/>
+    </genClasses>
+    <genClasses ecoreClass="pcmarchoptions.ecore#//PCM_IntroduceNewDataType">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pcmarchoptions.ecore#//PCM_IntroduceNewDataType/dataTypes"/>
+    </genClasses>
+    <genClasses ecoreClass="pcmarchoptions.ecore#//PCM_RemoveDataType">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pcmarchoptions.ecore#//PCM_RemoveDataType/dataTypes"/>
+    </genClasses>
+    <genClasses ecoreClass="pcmarchoptions.ecore#//PCM_IntroduceNewInterface">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pcmarchoptions.ecore#//PCM_IntroduceNewInterface/interfaces"/>
+    </genClasses>
+    <genClasses ecoreClass="pcmarchoptions.ecore#//PCM_ChangeInterface">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pcmarchoptions.ecore#//PCM_ChangeInterface/oldInterfaces"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pcmarchoptions.ecore#//PCM_ChangeInterface/newInterfaces"/>
+    </genClasses>
+    <genClasses ecoreClass="pcmarchoptions.ecore#//PCM_RemoveInterface">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference pcmarchoptions.ecore#//PCM_RemoveInterface/interfaces"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

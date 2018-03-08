@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="pcmbpoptions" nsURI="http://toometa.de/pcmbpoptions/0.1" nsPrefix="pcmbpoptions">
+  <eClassifiers xsi:type="ecore:EClass" name="PCM_EntityOption" abstract="true" eSuperTypes="../../toometa.archoptions/model/archoptions.ecore#//ArchOption"/>
+  <eClassifiers xsi:type="ecore:EClass" name="PCM_IntroduceNewEntity" eSuperTypes="#//PCM_EntityOption">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="entities" upperBound="-1"
+        eType="ecore:EClass ../../org.palladiosimulator.pcm/model/pcm.ecore#//core/entity/Entity"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="PCM_ChangeEntity" eSuperTypes="#//PCM_EntityOption">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="oldEntities" lowerBound="1"
+        upperBound="-1" eType="ecore:EClass ../../org.palladiosimulator.pcm/model/pcm.ecore#//core/entity/Entity"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="newEntities" upperBound="-1"
+        eType="ecore:EClass ../../org.palladiosimulator.pcm/model/pcm.ecore#//core/entity/Entity"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="PCM_RemoveEntity" eSuperTypes="#//PCM_EntityOption">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="entities" lowerBound="1"
+        upperBound="-1" eType="ecore:EClass ../../org.palladiosimulator.pcm/model/pcm.ecore#//core/entity/Entity"/>
+  </eClassifiers>
+</ecore:EPackage>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<!--
+-->
+
+<plugin>
+
+   <extension point="org.eclipse.ui.newWizards">
+      <!-- @generated BPModificationmarks -->
+      <category
+            id="org.eclipse.emf.ecore.Wizard.category.ID"
+            name="%_UI_Wizard_category"/>
+      <wizard
+            id="edu.kit.ipd.sdq.kamp4bp.model.modificationmarks.presentation.BPModificationmarksModelWizardID"
+            name="%_UI_BPModificationmarksModelWizard_label"
+            class="edu.kit.ipd.sdq.kamp4bp.model.modificationmarks.presentation.BPModificationmarksModelWizard"
+            category="org.eclipse.emf.ecore.Wizard.category.ID"
+            icon="icons/full/obj16/BPModificationmarksModelFile.gif">
+         <description>%_UI_BPModificationmarksModelWizard_description</description>
+         <selection class="org.eclipse.core.resources.IResource"/>
+      </wizard>
+   </extension>
+
+   <extension point="org.eclipse.ui.editors">
+      <!-- @generated BPModificationmarks -->
+      <editor
+            id="edu.kit.ipd.sdq.kamp4bp.model.modificationmarks.presentation.BPModificationmarksEditorID"
+            name="%_UI_BPModificationmarksEditor_label"
+            icon="icons/full/obj16/BPModificationmarksModelFile.gif"
+            extensions="modificationmarks"
+            class="edu.kit.ipd.sdq.kamp4bp.model.modificationmarks.presentation.BPModificationmarksEditor"
+            contributorClass="edu.kit.ipd.sdq.kamp4bp.model.modificationmarks.presentation.BPModificationmarksActionBarContributor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="false"
+            id="edu.kit.ipd.sdq.kamp4bp.model.modificationmarks.BPModificationRepositoryID"
+            objectClass="edu.kit.ipd.sdq.kamp4bp.model.modificationmarks.BPModificationRepository">
+         <action
+               class="edu.kit.ipd.sdq.kamp4bp.model.modificationmarks.editor.BPArchitectureBasedWorkplanDerivationAction"
+               icon="../edu.kit.ipd.sdq.kamp/icons/run.png"
+               id="edu.kit.ipd.sdq.kamp4bp.model.modificationmarks.editor.BPArchitectureBasedWorkplanDerivationActionID"
+               label="Step 5: Calculate activities"
+               menubarPath="edit">
+         </action>
+         <action
+               class="edu.kit.ipd.sdq.kamp4bp.model.modificationmarks.editor.BPChangePropagationAction"
+               icon="../edu.kit.ipd.sdq.kamp/icons/run.png"
+               id="edu.kit.ipd.sdq.kamp4bp.model.modificationmarks.editor.BPChangePropagationActionID"
+               label="Step 3: Calculate change propagation"
+               menubarPath="edit">
+         </action>
+      </objectContribution>
+   </extension>
+
+</plugin>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<!--
+-->
+
+<plugin>
+
+   <extension point="org.eclipse.ui.newWizards">
+      <!-- @generated glossary -->
+      <category
+            id="org.eclipse.emf.ecore.Wizard.category.ID"
+            name="%_UI_Wizard_category"/>
+      <wizard
+            id="glossary.presentation.GlossaryModelWizardID"
+            name="%_UI_GlossaryModelWizard_label"
+            class="glossary.presentation.GlossaryModelWizard"
+            category="org.eclipse.emf.ecore.Wizard.category.ID"
+            icon="icons/full/obj16/GlossaryModelFile.gif">
+         <description>%_UI_GlossaryModelWizard_description</description>
+         <selection class="org.eclipse.core.resources.IResource"/>
+      </wizard>
+   </extension>
+
+   <extension point="org.eclipse.ui.editors">
+      <!-- @generated glossary -->
+      <editor
+            id="glossary.presentation.GlossaryEditorID"
+            name="%_UI_GlossaryEditor_label"
+            icon="icons/full/obj16/GlossaryModelFile.gif"
+            extensions="glossary"
+            class="glossary.presentation.GlossaryEditor"
+            contributorClass="glossary.presentation.GlossaryActionBarContributor">
+      </editor>
+   </extension>
+
+</plugin>

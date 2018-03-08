@@ -1,0 +1,1 @@
+emma -m -l 'edu.kit.ipd.sdq.kamp4bp/BPTest.launch' -o 'output/junit/kamp.tests.launch.xml' --xml 'output/emma/coverage.xml'

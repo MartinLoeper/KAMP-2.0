@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<!--
+-->
+
+<plugin>
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <package
+            uri="http://sdq.ipd.uka.de/PalladioComponentModel/5.0/bp/bpUsageModel"
+            class="de.uhd.ifi.se.pcm.bppcm.bpusagemodel.BpusagemodelPackage"
+            genModel="model/bp.genmodel"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.extension_parser">
+      <parser
+            type="bpusagemodel"
+            class="de.uhd.ifi.se.pcm.bppcm.bpusagemodel.util.BpusagemodelResourceFactoryImpl"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <package
+            uri="http://sdq.ipd.uka.de/PalladioComponentModel/5.0/bp/OrganizationEnvironmentModel"
+            class="de.uhd.ifi.se.pcm.bppcm.organizationenvironmentmodel.OrganizationenvironmentmodelPackage"
+            genModel="model/bp.genmodel"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.extension_parser">
+      <parser
+            type="organizationenvironmentmodel"
+            class="de.uhd.ifi.se.pcm.bppcm.organizationenvironmentmodel.util.OrganizationenvironmentmodelResourceFactoryImpl"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated bp -->
+      <package
+            uri="http://palladiosimulator.org/PalladioComponentModel/5.1/bp/DataModel"
+            class="de.uhd.ifi.se.pcm.bppcm.datamodel.DatamodelPackage"
+            genModel="model/bp.genmodel"/>
+   </extension>
+
+</plugin>

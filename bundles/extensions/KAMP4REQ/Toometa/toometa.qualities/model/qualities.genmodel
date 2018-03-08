@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/toometa.qualities/src" modelPluginID="toometa.qualities"
+    modelName="Qualities" rootExtendsInterface="org.eclipse.emf.cdo.CDOObject" rootExtendsClass="org.eclipse.emf.internal.cdo.CDOObjectImpl"
+    importerID="org.eclipse.emf.importer.ecore" featureDelegation="Dynamic" complianceLevel="8.0"
+    copyrightFields="false" providerRootExtendsClass="" usedGenPackages="../../de.uka.ipd.sdq.dsexplore.qml.dimensions/model/dimensions.genmodel#//dimensions ../../de.uka.ipd.sdq.dsexplore.qml.dimensiontypes/model/dimensiontypes.genmodel#//dimensiontypes ../../de.uka.ipd.sdq.identifier/model/identifier.genmodel#//identifier ../../de.uka.ipd.sdq.namedelement/model/namedelement.genmodel#//namedelement ../../de.uka.ipd.sdq.dsexplore.qml.units/model/units.genmodel#//units"
+    importOrganizing="true">
+  <foreignModel>qualities.ecore</foreignModel>
+  <modelPluginVariables>CDO=org.eclipse.emf.cdo</modelPluginVariables>
+  <genPackages prefix="Qualities" disposableProviderFactory="true" ecorePackage="qualities.ecore#/">
+    <genClasses ecoreClass="qualities.ecore#//ReliabilityCompliance" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//Installability" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//Reliability" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//CoExistence" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//Operability" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//Stability" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//MaintainabilityCompliance" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//Portability" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//Maintainability" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//Maturity" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//Attractiveness" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//Analyzability" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//Replaceability" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//Recoverability" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//Understandability" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//PortabilityCompliance" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//RessourceUtilization" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//Changeability" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//Interoperability" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//FaultTolerance" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//QualityTypeRepository">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference qualities.ecore#//QualityTypeRepository/qualityType"/>
+    </genClasses>
+    <genClasses ecoreClass="qualities.ecore#//Adaptability" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//Functionality" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//TimeBehaviour" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//Security" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//Accuracy" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//FunctionalityCompliance" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//Efficiency" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//Safety" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//EfficiencyCompliance" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//Suitability" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//Learnability" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses image="false" ecoreClass="qualities.ecore#//QualityType" labelFeature="#//qualities/QualityType/description">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute qualities.ecore#//QualityType/description"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference qualities.ecore#//QualityType/qualityTypeRepository"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference qualities.ecore#//QualityType/dimension"/>
+    </genClasses>
+    <genClasses ecoreClass="qualities.ecore#//Usability" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//Performance" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//Testability" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//UsabilityCompliance" labelFeature="#//qualities/QualityType/description"/>
+    <genClasses ecoreClass="qualities.ecore#//TextQuality" labelFeature="#//qualities/QualityType/description"/>
+  </genPackages>
+</genmodel:GenModel>

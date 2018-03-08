@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<!--
+-->
+
+<plugin>
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated ISFieldOfActivityAnnotations -->
+      <package
+            uri="http://sdq.ipd.kit.edu/KAMP4ISFieldofactivityannotations/1.0"
+            class="edu.kit.ipd.sdq.kamp4is.model.fieldofactivityannotations.ISFieldOfActivityAnnotationsPackage"
+            genModel="model/ISFieldOfActivityAnnotations.genmodel"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.extension_parser">
+      <!-- @generated ISFieldOfActivityAnnotations -->
+      <parser
+            type="fieldofactivityannotations"
+            class="edu.kit.ipd.sdq.kamp4is.model.fieldofactivityannotations.util.ISFieldOfActivityAnnotationsResourceFactoryImpl"/>
+   </extension>
+
+</plugin>

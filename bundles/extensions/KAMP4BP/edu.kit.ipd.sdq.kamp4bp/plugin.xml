@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="true"
+            id="edu.kit.ipd.sdq.kamp4bp.ui.CreateSubalternativeContribution"
+            objectClass="org.eclipse.core.resources.IContainer">
+         <menu
+               icon="../edu.kit.ipd.sdq.kamp/icons/edit.png"
+               id="edu.kit.ipd.sdq.kamp4bp.menukamp"
+               label="KAMP4BP Analysis">
+         </menu>
+         <action
+               class="edu.kit.ipd.sdq.kamp4bp.ui.BPCreateEmptyBaseModelAction"
+               icon="../edu.kit.ipd.sdq.kamp/icons/filenew.png"
+               id="edu.kit.ipd.sdq.kamp4bp.ui.BPCreateEmptyBaseModelActionID"
+               label="Create empty KAMP4BP architecture"
+               menubarPath="kamp4bp">
+         </action>
+         <action
+               class="edu.kit.ipd.sdq.kamp4bp.ui.BPDeriveWorkplanAction"
+               icon="../edu.kit.ipd.sdq.kamp/icons/run.png"
+               id="edu.kit.ipd.sdq.kamp4bp.ui.BPDeriveWorkplanActionID"
+               label="Derive KAMP4BP workplan"
+               menubarPath="kamp4bp">
+         </action>
+      </objectContribution>
+   </extension>
+
+</plugin>

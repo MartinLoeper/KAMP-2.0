@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/toometa.options/src" modelPluginID="toometa.options"
+    modelName="Options" rootExtendsInterface="org.eclipse.emf.cdo.CDOObject" rootExtendsClass="org.eclipse.emf.internal.cdo.CDOObjectImpl"
+    importerID="org.eclipse.emf.importer.ecore" featureDelegation="Dynamic" complianceLevel="8.0"
+    copyrightFields="false" providerRootExtendsClass="" usedGenPackages="../../de.uka.ipd.sdq.dsexplore.qml.dimensions/model/dimensions.genmodel#//dimensions ../../de.uka.ipd.sdq.dsexplore.qml.dimensiontypes/model/dimensiontypes.genmodel#//dimensiontypes ../../toometa.effects/model/effects.genmodel#//effects ../../toometa.glossary/model/glossary.genmodel#//glossary ../../de.uka.ipd.sdq.identifier/model/identifier.genmodel#//identifier ../../de.uka.ipd.sdq.namedelement/model/namedelement.genmodel#//namedelement ../../toometa.qualities/model/qualities.genmodel#//qualities ../../toometa.relations/model/relations.genmodel#//relations ../../de.uka.ipd.sdq.dsexplore.qml.units/model/units.genmodel#//units"
+    importOrganizing="true">
+  <foreignModel>options.ecore</foreignModel>
+  <modelPluginVariables>CDO=org.eclipse.emf.cdo</modelPluginVariables>
+  <genPackages prefix="Options" disposableProviderFactory="true" extensibleProviderFactory="true"
+      childCreationExtenders="true" ecorePackage="options.ecore#/">
+    <genClasses ecoreClass="options.ecore#//TextOption"/>
+    <genClasses image="false" ecoreClass="options.ecore#//Option">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute options.ecore#//Option/description"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute options.ecore#//Option/keywords"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference options.ecore#//Option/repository"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference options.ecore#//Option/rationale"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute options.ecore#//Option/isModelled"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute options.ecore#//Option/isImplemented"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute options.ecore#//Option/timeStamp"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference options.ecore#//Option/effects"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference options.ecore#//Option/usedTerms"/>
+    </genClasses>
+    <genClasses ecoreClass="options.ecore#//OptionRepository">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference options.ecore#//OptionRepository/options"/>
+    </genClasses>
+    <genClasses ecoreClass="options.ecore#//Constraint"/>
+    <genClasses ecoreClass="options.ecore#//Rationale" labelFeature="#//options/Rationale/rationaleText">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute options.ecore#//Rationale/rationaleText"/>
+    </genClasses>
+    <genClasses ecoreClass="options.ecore#//TextRationale"/>
+    <genClasses ecoreClass="options.ecore#//AnalysisRationale"/>
+  </genPackages>
+</genmodel:GenModel>

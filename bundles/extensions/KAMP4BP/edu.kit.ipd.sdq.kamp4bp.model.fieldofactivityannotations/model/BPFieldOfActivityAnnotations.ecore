@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="fieldofactivityannotations" nsURI="http://sdq.ipd.kit.edu/KAMP4BPFieldOfActivityAnnotations/1.0"
+    nsPrefix="fieldofactivityannotations">
+  <eClassifiers xsi:type="ecore:EClass" name="BPFieldOfActivityAnnotationsRepository"
+      eSuperTypes="../../edu.kit.ipd.sdq.kamp4is.model.fieldofactivityannotations/model/ISFieldOfActivityAnnotations.ecore#//ISFieldOfActivityAnnotationsRepository">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="businessProcessSpecification"
+        eType="#//BPBusinessProcessSpecification" containment="true" eOpposite="#//BPBusinessProcessSpecification/parent"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="BPUserActionAnnotation" abstract="true"
+      eSuperTypes="../../org.palladiosimulator.pcm/model/pcm.ecore#//core/entity/NamedElement">
+    <eTypeParameters name="T">
+      <eBounds eClassifier="ecore:EClass ../../org.palladiosimulator.pcm/model/pcm.ecore#//usagemodel/AbstractUserAction"/>
+    </eTypeParameters>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="parent" lowerBound="1"
+        eType="#//BPBusinessProcessSpecification" eOpposite="#//BPBusinessProcessSpecification/userActionAnnotations"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="annotatedUserActions" upperBound="-1">
+      <eGenericType eTypeParameter="#//BPUserActionAnnotation/T"/>
+    </eStructuralFeatures>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="BPGood">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="actorStep" eType="ecore:EClass ../../de.uhd.ifi.se.pcm.bppcm/model/bp.ecore#//bpusagemodel/ActorStep"/>
+    <eGenericSuperTypes eClassifier="#//BPUserActionAnnotation">
+      <eTypeArguments eClassifier="ecore:EClass ../../org.palladiosimulator.pcm/model/pcm.ecore#//usagemodel/AbstractUserAction"/>
+    </eGenericSuperTypes>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="BPMessage">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="sender" eType="ecore:EClass ../../de.uhd.ifi.se.pcm.bppcm/model/bp.ecore#//bpusagemodel/ActorStep"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="receiver" eType="ecore:EClass ../../de.uhd.ifi.se.pcm.bppcm/model/bp.ecore#//bpusagemodel/ActorStep"/>
+    <eGenericSuperTypes eClassifier="#//BPUserActionAnnotation">
+      <eTypeArguments eClassifier="ecore:EClass ../../org.palladiosimulator.pcm/model/pcm.ecore#//usagemodel/AbstractUserAction"/>
+    </eGenericSuperTypes>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="BPOrganizationalUnit">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="abstractUserAction" eType="ecore:EClass ../../org.palladiosimulator.pcm/model/pcm.ecore#//usagemodel/AbstractUserAction"/>
+    <eGenericSuperTypes eClassifier="#//BPUserActionAnnotation">
+      <eTypeArguments eClassifier="ecore:EClass ../../de.uhd.ifi.se.pcm.bppcm/model/bp.ecore#//bpusagemodel/Activity"/>
+    </eGenericSuperTypes>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="BPTrainingCourse">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="actorStep" eType="ecore:EClass ../../de.uhd.ifi.se.pcm.bppcm/model/bp.ecore#//bpusagemodel/ActorStep"/>
+    <eGenericSuperTypes eClassifier="#//BPUserActionAnnotation">
+      <eTypeArguments eClassifier="ecore:EClass ../../de.uhd.ifi.se.pcm.bppcm/model/bp.ecore#//bpusagemodel/ActorStep"/>
+    </eGenericSuperTypes>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="BPBusinessProcessSpecification">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="parent" lowerBound="1"
+        eType="#//BPFieldOfActivityAnnotationsRepository" eOpposite="#//BPFieldOfActivityAnnotationsRepository/businessProcessSpecification"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="userActionAnnotations"
+        upperBound="-1" containment="true" eOpposite="#//BPUserActionAnnotation/parent">
+      <eGenericType eClassifier="#//BPUserActionAnnotation">
+        <eTypeArguments/>
+      </eGenericType>
+    </eStructuralFeatures>
+  </eClassifiers>
+</ecore:EPackage>

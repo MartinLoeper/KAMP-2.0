@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/toometa.requirements/src" modelPluginID="toometa.requirements"
+    modelName="Requirements" rootExtendsInterface="org.eclipse.emf.cdo.CDOObject"
+    rootExtendsClass="org.eclipse.emf.internal.cdo.CDOObjectImpl" importerID="org.eclipse.emf.importer.ecore"
+    featureDelegation="Dynamic" complianceLevel="8.0" copyrightFields="false" providerRootExtendsClass=""
+    usedGenPackages="../../toometa.glossary/model/glossary.genmodel#//glossary ../../de.uka.ipd.sdq.identifier/model/identifier.genmodel#//identifier ../../de.uka.ipd.sdq.namedelement/model/namedelement.genmodel#//namedelement ../../toometa.qualities/model/qualities.genmodel#//qualities ../../toometa.relations/model/relations.genmodel#//relations ../../de.uka.ipd.sdq.dsexplore.qml.dimensions/model/dimensions.genmodel#//dimensions ../../de.uka.ipd.sdq.dsexplore.qml.dimensiontypes/model/dimensiontypes.genmodel#//dimensiontypes ../../de.uka.ipd.sdq.dsexplore.qml.units/model/units.genmodel#//units"
+    importOrganizing="true">
+  <foreignModel>requirements.ecore</foreignModel>
+  <modelPluginVariables>CDO=org.eclipse.emf.cdo</modelPluginVariables>
+  <genPackages prefix="Requirements" disposableProviderFactory="true" ecorePackage="requirements.ecore#/">
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="requirements.ecore#//ReqPriorityEnum">
+      <genEnumLiterals ecoreEnumLiteral="requirements.ecore#//ReqPriorityEnum/neutral"/>
+      <genEnumLiterals ecoreEnumLiteral="requirements.ecore#//ReqPriorityEnum/low"/>
+      <genEnumLiterals ecoreEnumLiteral="requirements.ecore#//ReqPriorityEnum/high"/>
+      <genEnumLiterals ecoreEnumLiteral="requirements.ecore#//ReqPriorityEnum/critical"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="requirements.ecore#//ReqStatusEnum">
+      <genEnumLiterals ecoreEnumLiteral="requirements.ecore#//ReqStatusEnum/new"/>
+      <genEnumLiterals ecoreEnumLiteral="requirements.ecore#//ReqStatusEnum/accepted"/>
+      <genEnumLiterals ecoreEnumLiteral="requirements.ecore#//ReqStatusEnum/rejected"/>
+      <genEnumLiterals ecoreEnumLiteral="requirements.ecore#//ReqStatusEnum/replaced"/>
+      <genEnumLiterals ecoreEnumLiteral="requirements.ecore#//ReqStatusEnum/done"/>
+    </genEnums>
+    <genClasses ecoreClass="requirements.ecore#//ReqRepository" labelFeature="#//requirements/ReqRepository/description">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute requirements.ecore#//ReqRepository/description"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference requirements.ecore#//ReqRepository/projectReqSection"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference requirements.ecore#//ReqRepository/processReqSection"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference requirements.ecore#//ReqRepository/systemReqSection"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="requirements.ecore#//Requirement" labelFeature="#//requirements/Requirement/specification">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute requirements.ecore#//Requirement/specification"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute requirements.ecore#//Requirement/priority"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute requirements.ecore#//Requirement/status"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference requirements.ecore#//Requirement/usesTerms"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference requirements.ecore#//Requirement/repository"/>
+    </genClasses>
+    <genClasses ecoreClass="requirements.ecore#//ProjectRequirement" labelFeature="#//requirements/Requirement/specification"/>
+    <genClasses image="false" ecoreClass="requirements.ecore#//SystemRequirement"
+        labelFeature="#//requirements/Requirement/specification"/>
+    <genClasses ecoreClass="requirements.ecore#//ProcessRequirement" labelFeature="#//requirements/Requirement/specification"/>
+    <genClasses ecoreClass="requirements.ecore#//Constraint" labelFeature="#//requirements/Requirement/specification"/>
+    <genClasses ecoreClass="requirements.ecore#//FunctionalRequirement" labelFeature="#//requirements/Requirement/specification"/>
+    <genClasses ecoreClass="requirements.ecore#//QualityRequirement" labelFeature="#//requirements/Requirement/specification">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference requirements.ecore#//QualityRequirement/qualityType"/>
+    </genClasses>
+    <genClasses ecoreClass="requirements.ecore#//ProjectRequirements">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference requirements.ecore#//ProjectRequirements/projectRequirements"/>
+    </genClasses>
+    <genClasses ecoreClass="requirements.ecore#//SystemRequirements">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference requirements.ecore#//SystemRequirements/systemRequirements"/>
+    </genClasses>
+    <genClasses ecoreClass="requirements.ecore#//ProcessRequirements">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference requirements.ecore#//ProcessRequirements/processRrequirements"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

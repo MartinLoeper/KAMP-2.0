@@ -1,0 +1,70 @@
+grammar edu.kit.ipd.sdq.kamp.ruledsl.KampRuleLanguage with tools.vitruv.dsls.mirbase.MirBase
+hidden(WS, SL_COMMENT)
+
+generate kampRuleLanguage "http://www.kit.edu/ipd/sdq/kamp/ruledsl/KampRuleLanguage"
+
+import "http://www.eclipse.org/emf/2002/Ecore" as ecore
+import "http://www.kit.edu/ipd/sdq/vitruvius/dsls/mirbase/MirBase" as mirbase
+import "http://www.eclipse.org/xtext/common/JavaVMTypes" as jvmTypes
+
+RuleFile:
+	MirBaseFile
+	(javaPackageImports+=JavaImport)*
+	(steps+=Step)*
+;
+
+Step:
+	DuplicateAwareStep | IndependentStep
+;
+
+IndependentStep:
+	KampRule
+;
+
+DuplicateAwareStep:
+	'step' (name=ValidID)? '{' (rules+=KampRule)+ '}'
+;
+
+KampRule:
+	'rule' name=ValidID ':'
+	source=UnnamedMetaclassReference
+	(instructions+=Instruction)+
+	';'
+	(modificationMark=ModificationMark)?
+;
+
+ModificationMark:
+	'insert' type=[jvmTypes::JvmType|QualifiedName] '#' memberRef=ID 'into' target=[jvmTypes::JvmType|QualifiedName] '#' targetMethod=ID ';'
+;
+
+Instruction:
+	Lookup | CausingEntityMarker
+;
+
+Lookup:
+	PropagationReference | RuleReference
+;
+
+RuleReference:
+	'=>' 'RULE' '[' rule=[KampRule|ValidID] ']'
+;
+
+CausingEntityMarker:
+	{CausingEntityMarker} '*'
+;
+
+PropagationReference:
+	ForwardEReference | BackwardEReference
+;
+
+ForwardEReference returns ForwardEReference:
+	'->' feature=[ecore::EReference]
+;
+
+BackwardEReference: 
+	'<-' mclass=UnnamedMetaclassReference ('[' feature=[ecore::EStructuralFeature|ValidID] ']')?
+; 
+
+JavaImport:
+	'import-package' javaType=QualifiedName
+;

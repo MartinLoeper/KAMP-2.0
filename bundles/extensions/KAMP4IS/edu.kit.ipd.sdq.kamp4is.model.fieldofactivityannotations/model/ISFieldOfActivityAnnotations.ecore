@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+	name="fieldofactivityannotations" nsURI="http://sdq.ipd.kit.edu/KAMP4ISFieldofactivityannotations/1.0"
+	nsPrefix="fieldofactivityannotations">
+	<eClassifiers xsi:type="ecore:EClass"
+		name="ISFieldOfActivityAnnotationsRepository">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="developmentArtefactSpecification" eType="#//ISDevelopmentArtefactSpecification"
+			containment="true" eOpposite="#//ISDevelopmentArtefactSpecification/parent" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="buildSpecification" eType="#//ISBuildSpecification"
+			containment="true" eOpposite="#//ISBuildSpecification/parent" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="testSpecification" eType="#//ISTestSpecification" containment="true"
+			eOpposite="#//ISTestSpecification/parent" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="releaseSpecification" eType="#//ISReleaseSpecification"
+			containment="true" eOpposite="#//ISReleaseSpecification/parent" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="deploymentSpecification" eType="#//ISDeploymentSpecification"
+			containment="true" eOpposite="#//ISDeploymentSpecification/parent" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="staffSpecification" eType="#//ISStaffSpecification"
+			containment="true" eOpposite="#//ISStaffSpecification/parent" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="technologySpecification" eType="#//ISTechnologySpecification"
+			containment="true" eOpposite="#//ISTechnologySpecification/parent" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="designPatternSpecification" eType="#//ISDesignPatternSpecification"
+			containment="true" eOpposite="#//ISDesignPatternSpecification/parent" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass"
+		name="ISDevelopmentArtefactSpecification">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="parent" lowerBound="1" eType="#//ISFieldOfActivityAnnotationsRepository"
+			eOpposite="#//ISFieldOfActivityAnnotationsRepository/developmentArtefactSpecification" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="sourceFiles" upperBound="-1" eType="#//ISSourceFile"
+			containment="true" eOpposite="#//ISSourceFile/parent" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="sourceFileAggregations" upperBound="-1" eType="#//ISSourceFileAggregation"
+			containment="true" eOpposite="#//ISSourceFileAggregation/parent" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="metadataFiles" upperBound="-1" eType="#//ISMetadataFile"
+			containment="true" eOpposite="#//ISMetadataFile/parent" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="metadataFileAggregations" upperBound="-1"
+			eType="#//ISMetadataFileAggregation" containment="true"
+			eOpposite="#//ISMetadataFileAggregation/parent" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ISSourceFile"
+		eSuperTypes="#//ISFile">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="parent" lowerBound="1" eType="#//ISDevelopmentArtefactSpecification"
+			eOpposite="#//ISDevelopmentArtefactSpecification/sourceFiles" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="component"
+			eType="ecore:EClass platform:/plugin/org.palladiosimulator.pcm/model/pcm.ecore#//repository/RepositoryComponent" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ISSourceFileAggregation"
+		eSuperTypes="#//ISFileAggregation">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="parent" lowerBound="1" eType="#//ISDevelopmentArtefactSpecification"
+			eOpposite="#//ISDevelopmentArtefactSpecification/sourceFileAggregations" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="component"
+			eType="ecore:EClass platform:/plugin/org.palladiosimulator.pcm/model/pcm.ecore#//repository/RepositoryComponent" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ISMetadataFile"
+		eSuperTypes="#//ISFile">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="parent" lowerBound="1" eType="#//ISDevelopmentArtefactSpecification"
+			eOpposite="#//ISDevelopmentArtefactSpecification/metadataFiles" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="component"
+			eType="ecore:EClass platform:/plugin/org.palladiosimulator.pcm/model/pcm.ecore#//repository/RepositoryComponent" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ISMetadataFileAggregation"
+		eSuperTypes="#//ISFileAggregation">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="parent" lowerBound="1" eType="#//ISDevelopmentArtefactSpecification"
+			eOpposite="#//ISDevelopmentArtefactSpecification/metadataFileAggregations" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="component"
+			eType="ecore:EClass platform:/plugin/org.palladiosimulator.pcm/model/pcm.ecore#//repository/RepositoryComponent" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ISBuildSpecification">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="parent" lowerBound="1" eType="#//ISFieldOfActivityAnnotationsRepository"
+			eOpposite="#//ISFieldOfActivityAnnotationsRepository/buildSpecification" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="buildConfigurations" upperBound="-1" eType="#//ISBuildConfiguration"
+			containment="true" eOpposite="#//ISBuildConfiguration/parent" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="thirdPartyComponentOrLibraries" upperBound="-1"
+			eType="#//ISThirdPartyComponentOrLibrary" containment="true"
+			eOpposite="#//ISThirdPartyComponentOrLibrary/parent" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ISBuildConfiguration"
+		eSuperTypes="#//ISFile">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="parent" lowerBound="1" eType="#//ISBuildSpecification"
+			eOpposite="#//ISBuildSpecification/buildConfigurations" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="component" upperBound="-1"
+			eType="ecore:EClass platform:/plugin/org.palladiosimulator.pcm/model/pcm.ecore#//repository/RepositoryComponent" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ISThirdPartyComponentOrLibrary"
+		eSuperTypes="#//ISFile">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="parent" lowerBound="1" eType="#//ISBuildSpecification"
+			eOpposite="#//ISBuildSpecification/thirdPartyComponentOrLibraries" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="component"
+			eType="ecore:EClass platform:/plugin/org.palladiosimulator.pcm/model/pcm.ecore#//repository/RepositoryComponent" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ISTestSpecification">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="parent" lowerBound="1" eType="#//ISFieldOfActivityAnnotationsRepository"
+			eOpposite="#//ISFieldOfActivityAnnotationsRepository/testSpecification" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="unitTestCases" upperBound="-1" eType="#//ISUnitTestCase"
+			containment="true" eOpposite="#//ISUnitTestCase/parent" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="acceptanceTestCases" upperBound="-1" eType="#//ISAcceptanceTestCase"
+			containment="true" eOpposite="#//ISAcceptanceTestCase/parent" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="integrationTestCases" upperBound="-1" eType="#//ISIntegrationTestCase"
+			containment="true" eOpposite="#//ISIntegrationTestCase/parent" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="unitTestCaseAggregations" upperBound="-1"
+			eType="#//ISUnitTestCaseAggregation" containment="true"
+			eOpposite="#//ISUnitTestCaseAggregation/parent" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="acceptanceTestCaseAggregations" upperBound="-1"
+			eType="#//ISAcceptanceTestCaseAggregation" containment="true"
+			eOpposite="#//ISAcceptanceTestCaseAggregation/parent" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="integrationTestCaseAggregations" upperBound="-1"
+			eType="#//ISIntegrationTestCaseAggregation" containment="true"
+			eOpposite="#//ISIntegrationTestCaseAggregation/parent" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ISReleaseSpecification">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="releaseConfigurations" upperBound="-1" eType="#//ISReleaseConfiguration"
+			containment="true" eOpposite="#//ISReleaseConfiguration/parent" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="parent" lowerBound="1" eType="#//ISFieldOfActivityAnnotationsRepository"
+			eOpposite="#//ISFieldOfActivityAnnotationsRepository/releaseSpecification" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ISReleaseConfiguration">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="parent" lowerBound="1" eType="#//ISReleaseSpecification"
+			eOpposite="#//ISReleaseSpecification/releaseConfigurations" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="components" upperBound="-1"
+			eType="ecore:EClass platform:/plugin/org.palladiosimulator.pcm/model/pcm.ecore#//repository/RepositoryComponent" />
+		<eStructuralFeatures xsi:type="ecore:EAttribute"
+			name="pathname"
+			eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" />
+		<eStructuralFeatures xsi:type="ecore:EAttribute"
+			name="description"
+			eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ISDeploymentSpecification">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="runtimeInstances" upperBound="-1" eType="#//ISRuntimeInstance"
+			containment="true" eOpposite="#//ISRuntimeInstance/parent" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="runtimeInstanceAggregations" upperBound="-1"
+			eType="#//ISRuntimeInstanceAggregation" containment="true"
+			eOpposite="#//ISRuntimeInstanceAggregation/parent" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="parent" lowerBound="1" eType="#//ISFieldOfActivityAnnotationsRepository"
+			eOpposite="#//ISFieldOfActivityAnnotationsRepository/deploymentSpecification" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ISRuntimeInstance">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="parent" lowerBound="1" eType="#//ISDeploymentSpecification"
+			eOpposite="#//ISDeploymentSpecification/runtimeInstances" />
+		<eStructuralFeatures xsi:type="ecore:EAttribute"
+			name="name"
+			eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" />
+		<eStructuralFeatures xsi:type="ecore:EAttribute"
+			name="description"
+			eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="components" upperBound="-1"
+			eType="ecore:EClass platform:/plugin/org.palladiosimulator.pcm/model/pcm.ecore#//repository/RepositoryComponent" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ISRuntimeInstanceAggregation">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="parent" lowerBound="1" eType="#//ISDeploymentSpecification"
+			eOpposite="#//ISDeploymentSpecification/runtimeInstanceAggregations" />
+		<eStructuralFeatures xsi:type="ecore:EAttribute"
+			name="numberOfInstances" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt" />
+		<eStructuralFeatures xsi:type="ecore:EAttribute"
+			name="description"
+			eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="components" upperBound="-1"
+			eType="ecore:EClass platform:/plugin/org.palladiosimulator.pcm/model/pcm.ecore#//repository/RepositoryComponent" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ISUnitTestCase"
+		eSuperTypes="#//ISTestCase">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="parent" lowerBound="1" eType="#//ISTestSpecification"
+			eOpposite="#//ISTestSpecification/unitTestCases" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="providedrole"
+			eType="ecore:EClass platform:/plugin/org.palladiosimulator.pcm/model/pcm.ecore#//repository/OperationProvidedRole" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ISAcceptanceTestCase"
+		eSuperTypes="#//ISTestCase">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="parent" lowerBound="1" eType="#//ISTestSpecification"
+			eOpposite="#//ISTestSpecification/acceptanceTestCases" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="providedrole"
+			eType="ecore:EClass platform:/plugin/org.palladiosimulator.pcm/model/pcm.ecore#//repository/OperationProvidedRole" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ISIntegrationTestCase"
+		eSuperTypes="#//ISTestCase">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="parent" lowerBound="1" eType="#//ISTestSpecification"
+			eOpposite="#//ISTestSpecification/integrationTestCases" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="providedrole"
+			eType="ecore:EClass platform:/plugin/org.palladiosimulator.pcm/model/pcm.ecore#//repository/OperationProvidedRole" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="assemblyConnector"
+			eType="ecore:EClass platform:/plugin/org.palladiosimulator.pcm/model/pcm.ecore#//core/composition/AssemblyConnector" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ISUnitTestCaseAggregation"
+		eSuperTypes="#//ISTestCaseAggregation">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="parent" lowerBound="1" eType="#//ISTestSpecification"
+			eOpposite="#//ISTestSpecification/unitTestCaseAggregations" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="providedrole"
+			eType="ecore:EClass platform:/plugin/org.palladiosimulator.pcm/model/pcm.ecore#//repository/OperationProvidedRole" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ISAcceptanceTestCaseAggregation"
+		eSuperTypes="#//ISTestCaseAggregation">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="parent" lowerBound="1" eType="#//ISTestSpecification"
+			eOpposite="#//ISTestSpecification/acceptanceTestCaseAggregations" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="providedrole"
+			eType="ecore:EClass platform:/plugin/org.palladiosimulator.pcm/model/pcm.ecore#//repository/OperationProvidedRole" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ISIntegrationTestCaseAggregation"
+		eSuperTypes="#//ISTestCaseAggregation">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="parent" lowerBound="1" eType="#//ISTestSpecification"
+			eOpposite="#//ISTestSpecification/integrationTestCaseAggregations" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="providedrole"
+			eType="ecore:EClass platform:/plugin/org.palladiosimulator.pcm/model/pcm.ecore#//repository/OperationProvidedRole" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="assemblyConnector"
+			eType="ecore:EClass platform:/plugin/org.palladiosimulator.pcm/model/pcm.ecore#//core/composition/AssemblyConnector" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ISStaffSpecification">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="parent" lowerBound="1" eType="#//ISFieldOfActivityAnnotationsRepository"
+			eOpposite="#//ISFieldOfActivityAnnotationsRepository/staffSpecification" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="personList" lowerBound="1" eType="#//ISPersonList" containment="true"
+			eOpposite="#//ISPersonList/parent" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="roleList" lowerBound="1" eType="#//ISRoleList" containment="true"
+			eOpposite="#//ISRoleList/parent" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ISPersonList">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="parent" lowerBound="1" eType="#//ISStaffSpecification"
+			eOpposite="#//ISStaffSpecification/personList" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="persons" upperBound="-1" eType="#//ISPerson" containment="true"
+			eOpposite="#//ISPerson/parent" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ISPerson">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="parent" lowerBound="1" eType="#//ISPersonList" eOpposite="#//ISPersonList/persons" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="roles" upperBound="-1" eType="#//ISRole" eOpposite="#//ISRole/person" />
+		<eStructuralFeatures xsi:type="ecore:EAttribute"
+			name="name"
+			eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ISRole"
+		abstract="true">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="parent" lowerBound="1" eType="#//ISRoleList" eOpposite="#//ISRoleList/roles" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="person" upperBound="-1" eType="#//ISPerson" eOpposite="#//ISPerson/roles" />
+		<eStructuralFeatures xsi:type="ecore:EAttribute"
+			name="description"
+			eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="components" upperBound="-1"
+			eType="ecore:EClass platform:/plugin/org.palladiosimulator.pcm/model/pcm.ecore#//repository/RepositoryComponent" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ISRoleList">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="parent" lowerBound="1" eType="#//ISStaffSpecification"
+			eOpposite="#//ISStaffSpecification/roleList" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="roles" upperBound="-1" eType="#//ISRole" containment="true"
+			eOpposite="#//ISRole/parent" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ISDeveloper"
+		eSuperTypes="#//ISRole" />
+	<eClassifiers xsi:type="ecore:EClass" name="ISBuildConfigurator"
+		eSuperTypes="#//ISRole" />
+	<eClassifiers xsi:type="ecore:EClass" name="ISTestDeveloper"
+		eSuperTypes="#//ISRole" />
+	<eClassifiers xsi:type="ecore:EClass" name="ISTester"
+		eSuperTypes="#//ISRole" />
+	<eClassifiers xsi:type="ecore:EClass" name="ISReleaseConfigurator"
+		eSuperTypes="#//ISRole" />
+	<eClassifiers xsi:type="ecore:EClass" name="ISDeployer"
+		eSuperTypes="#//ISRole" />
+	<eClassifiers xsi:type="ecore:EClass" name="ISFile"
+		abstract="true">
+		<eStructuralFeatures xsi:type="ecore:EAttribute"
+			name="filename"
+			eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" />
+		<eStructuralFeatures xsi:type="ecore:EAttribute"
+			name="technology"
+			eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ISFileAggregation"
+		abstract="true">
+		<eStructuralFeatures xsi:type="ecore:EAttribute"
+			name="numberOfFiles" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt" />
+		<eStructuralFeatures xsi:type="ecore:EAttribute"
+			name="technology"
+			eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ISTestCase"
+		abstract="true">
+		<eStructuralFeatures xsi:type="ecore:EAttribute"
+			name="nameOfTest"
+			eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ISTestCaseAggregation"
+		abstract="true">
+		<eStructuralFeatures xsi:type="ecore:EAttribute"
+			name="numberOfTestcases" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt" />
+		<eStructuralFeatures xsi:type="ecore:EAttribute"
+			name="nameOfTestSuite"
+			eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ISDesignPatternSpecification">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="parent" lowerBound="1" eType="#//ISFieldOfActivityAnnotationsRepository"
+			eOpposite="#//ISFieldOfActivityAnnotationsRepository/designPatternSpecification" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="designPatternRoles" ordered="false" upperBound="-1"
+			eType="#//ISDesignPatternRole" containment="true" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ISDesignPatternRole"
+		eSuperTypes="platform:/plugin/de.uka.ipd.sdq.identifier/model/identifier.ecore#//Identifier">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="providedRole" ordered="false"
+			eType="ecore:EClass platform:/plugin/org.palladiosimulator.pcm/model/pcm.ecore#//repository/ProvidedRole" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="component" ordered="false"
+			eType="ecore:EClass platform:/plugin/org.palladiosimulator.pcm/model/pcm.ecore#//repository/RepositoryComponent" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ISTechnologySpecification">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="parent" lowerBound="1" eType="#//ISFieldOfActivityAnnotationsRepository"
+			eOpposite="#//ISFieldOfActivityAnnotationsRepository/technologySpecification" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="technologicalCorrespondences" ordered="false" upperBound="-1"
+			eType="#//ISTechnologicalCorrespondence" containment="true" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ISTechnologicalCorrespondence"
+		eSuperTypes="platform:/plugin/de.uka.ipd.sdq.identifier/model/identifier.ecore#//Identifier">
+		<eStructuralFeatures xsi:type="ecore:EAttribute"
+			name="technologicalCorrespondenceType" ordered="false"
+			eType="#//ISTechnologicalCorrespondenceTypes" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="component" ordered="false"
+			eType="ecore:EClass platform:/plugin/org.palladiosimulator.pcm/model/pcm.ecore#//repository/RepositoryComponent" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EEnum"
+		name="ISTechnologicalCorrespondenceTypes">
+		<eLiterals name="SetOfClasses" />
+		<eLiterals name="JavaPackages" value="1" />
+		<eLiterals name="Plugins" value="2" />
+		<eLiterals name="EclipsePlugins" value="3" />
+		<eLiterals name="EJB" value="4" />
+		<eLiterals name="Packages" value="5" />
+		<eLiterals name="Namespaces" value="6" />
+		<eLiterals name="Directories" value="7" />
+	</eClassifiers>
+</ecore:EPackage>

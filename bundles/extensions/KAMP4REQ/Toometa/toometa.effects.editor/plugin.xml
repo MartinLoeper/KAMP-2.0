@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<!--
+-->
+
+<plugin>
+
+   <extension point="org.eclipse.ui.newWizards">
+      <!-- @generated effects -->
+      <category
+            id="org.eclipse.emf.ecore.Wizard.category.ID"
+            name="%_UI_Wizard_category"/>
+      <wizard
+            id="effects.presentation.EffectsModelWizardID"
+            name="%_UI_EffectsModelWizard_label"
+            class="effects.presentation.EffectsModelWizard"
+            category="org.eclipse.emf.ecore.Wizard.category.ID"
+            icon="icons/full/obj16/EffectsModelFile.gif">
+         <description>%_UI_EffectsModelWizard_description</description>
+         <selection class="org.eclipse.core.resources.IResource"/>
+      </wizard>
+   </extension>
+
+   <extension point="org.eclipse.ui.editors">
+      <!-- @generated effects -->
+      <editor
+            id="effects.presentation.EffectsEditorID"
+            name="%_UI_EffectsEditor_label"
+            icon="icons/full/obj16/EffectsModelFile.gif"
+            extensions="effects"
+            class="effects.presentation.EffectsEditor"
+            contributorClass="effects.presentation.EffectsActionBarContributor">
+      </editor>
+   </extension>
+
+</plugin>

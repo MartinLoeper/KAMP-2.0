@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            category="de.uka.ipd.sdq.codegen.simudatavisualization"
+            class="de.uhd.ifi.se.pcm.bppcm.ui.ProcessCalendar"
+            id="de.uhd.ifi.se.pcm.bppcm.ui.processCalendarView"
+            name="Process Calendar"
+            restorable="true">
+      </view>
+      <view
+            category="de.uka.ipd.sdq.codegen.simudatavisualization"
+            class="de.uhd.ifi.se.pcm.bppcm.ui.ActorCalendar"
+            id="de.uhd.ifi.se.pcm.bppcm.ui.ActorCalendar"
+            name="ActorCalendar"
+            restorable="true">
+      </view>
+   </extension>
+
+</plugin>

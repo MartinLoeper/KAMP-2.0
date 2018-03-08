@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/toometa.glossary/src" modelPluginID="toometa.glossary"
+    modelName="Glossary" rootExtendsInterface="org.eclipse.emf.cdo.CDOObject" rootExtendsClass="org.eclipse.emf.internal.cdo.CDOObjectImpl"
+    importerID="org.eclipse.emf.importer.ecore" featureDelegation="Dynamic" complianceLevel="8.0"
+    copyrightFields="false" providerRootExtendsClass="" usedGenPackages="../../de.uka.ipd.sdq.identifier/model/identifier.genmodel#//identifier"
+    importOrganizing="true">
+  <foreignModel>glossary.ecore</foreignModel>
+  <modelPluginVariables>CDO=org.eclipse.emf.cdo</modelPluginVariables>
+  <genPackages prefix="Glossary" disposableProviderFactory="true" ecorePackage="glossary.ecore#/">
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="glossary.ecore#//TermInfluenceProperty">
+      <genEnumLiterals ecoreEnumLiteral="glossary.ecore#//TermInfluenceProperty/neutral"/>
+      <genEnumLiterals ecoreEnumLiteral="glossary.ecore#//TermInfluenceProperty/positive"/>
+      <genEnumLiterals ecoreEnumLiteral="glossary.ecore#//TermInfluenceProperty/negative"/>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="glossary.ecore#//TermCategory">
+      <genEnumLiterals ecoreEnumLiteral="glossary.ecore#//TermCategory/KEYWORD"/>
+      <genEnumLiterals ecoreEnumLiteral="glossary.ecore#//TermCategory/GVERB"/>
+      <genEnumLiterals ecoreEnumLiteral="glossary.ecore#//TermCategory/GOBJECT"/>
+      <genEnumLiterals ecoreEnumLiteral="glossary.ecore#//TermCategory/QUESTION"/>
+      <genEnumLiterals ecoreEnumLiteral="glossary.ecore#//TermCategory/OTHER"/>
+    </genEnums>
+    <genClasses ecoreClass="glossary.ecore#//GlossaryTerm" labelFeature="#//glossary/GlossaryTerm/term">
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference glossary.ecore#//GlossaryTerm/glossary"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute glossary.ecore#//GlossaryTerm/term"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute glossary.ecore#//GlossaryTerm/definition"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference glossary.ecore#//GlossaryTerm/synonym"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute glossary.ecore#//GlossaryTerm/otherforms"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute glossary.ecore#//GlossaryTerm/termcategory"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute glossary.ecore#//GlossaryTerm/termproperty"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference glossary.ecore#//GlossaryTerm/antonym"/>
+    </genClasses>
+    <genClasses ecoreClass="glossary.ecore#//Glossary" labelFeature="#//glossary/Glossary/title">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference glossary.ecore#//Glossary/terms"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute glossary.ecore#//Glossary/title"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

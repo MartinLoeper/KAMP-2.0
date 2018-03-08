@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+	name="modificationmarks" nsURI="http://sdq.ipd.kit.edu/KAMP4BPModificationmarks/1.0"
+	nsPrefix="modificationmarks">
+	<eClassifiers xsi:type="ecore:EClass" name="BPModificationRepository">
+		<eGenericSuperTypes
+			eClassifier="ecore:EClass ../../edu.kit.ipd.sdq.kamp4is.model.modificationmarks/model/ISModificationmarks.ecore#//AbstractISModificationRepository">
+			<eTypeArguments eClassifier="#//BPSeedModifications" />
+		</eGenericSuperTypes>
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="BPSeedModifications"
+		eSuperTypes="../../edu.kit.ipd.sdq.kamp4is.model.modificationmarks/model/ISModificationmarks.ecore#//ISSeedModifications">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="dataObjectModifications" upperBound="-1" eType="#//BPModifyDataObject"
+			containment="true" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="actorStepModifications" upperBound="-1" eType="#//BPModifyActorStep"
+			containment="true" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="entryLevelSystemCallModifications" upperBound="-1"
+			eType="#//BPModifyEntryLevelSystemCall" containment="true" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="deviceResourceModifications" upperBound="-1"
+			eType="#//BPModifyDeviceResource" containment="true" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="roleModifications" upperBound="-1" eType="#//BPModifyRole"
+			containment="true" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass"
+		name="BPChangePropagationDueToDataDependencies"
+		eSuperTypes="../../edu.kit.ipd.sdq.kamp4is.model.modificationmarks/model/ISModificationmarks.ecore#//ISChangePropagationDueToDataDependencies">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="dataObjectModifications" upperBound="-1" eType="#//BPModifyDataObject"
+			containment="true" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="actorStepModifications" upperBound="-1" eType="#//BPModifyActorStep"
+			containment="true" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="entryLevelSystemCallModifications" upperBound="-1"
+			eType="#//BPModifyEntryLevelSystemCall" containment="true" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="BPInterBusinessProcessPropagation"
+		eSuperTypes="../../edu.kit.ipd.sdq.kamp.model.modificationmarks/model/Modificationmarks.ecore#//ChangePropagationStep">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="abstractUserActionModifications" upperBound="-1" containment="true">
+			<eGenericType eClassifier="#//BPModifyAbstractUserAction">
+				<eTypeArguments />
+			</eGenericType>
+		</eStructuralFeatures>
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="BPModifyDataObject">
+		<eGenericSuperTypes
+			eClassifier="ecore:EClass ../../edu.kit.ipd.sdq.kamp4is.model.modificationmarks/model/ISModificationmarks.ecore#//ISModifyEntity">
+			<eTypeArguments
+				eClassifier="ecore:EClass ../../de.uhd.ifi.se.pcm.bppcm/model/bp.ecore#//datamodel/DataObject">
+				<eTypeArguments />
+			</eTypeArguments>
+		</eGenericSuperTypes>
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="BPModifyAbstractUserAction">
+		<eTypeParameters name="T">
+			<eBounds
+				eClassifier="ecore:EClass platform:/plugin/org.palladiosimulator.pcm/model/pcm.ecore#//usagemodel/AbstractUserAction" />
+		</eTypeParameters>
+		<eGenericSuperTypes
+			eClassifier="ecore:EClass ../../edu.kit.ipd.sdq.kamp4is.model.modificationmarks/model/ISModificationmarks.ecore#//ISModifyEntity">
+			<eTypeArguments eTypeParameter="#//BPModifyAbstractUserAction/T" />
+		</eGenericSuperTypes>
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass"
+		name="BPModifyAcquireDeviceResourceAction">
+		<eGenericSuperTypes eClassifier="#//BPModifyAbstractUserAction">
+			<eTypeArguments
+				eClassifier="ecore:EClass ../../de.uhd.ifi.se.pcm.bppcm/model/bp.ecore#//bpusagemodel/AcquireDeviceResourceAction" />
+		</eGenericSuperTypes>
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass"
+		name="BPModifyReleaseDeviceResourceAction">
+		<eGenericSuperTypes eClassifier="#//BPModifyAbstractUserAction">
+			<eTypeArguments
+				eClassifier="ecore:EClass ../../de.uhd.ifi.se.pcm.bppcm/model/bp.ecore#//bpusagemodel/ReleaseDeviceResourceAction" />
+		</eGenericSuperTypes>
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="BPModifyActorStep">
+		<eGenericSuperTypes eClassifier="#//BPModifyAbstractUserAction">
+			<eTypeArguments
+				eClassifier="ecore:EClass ../../de.uhd.ifi.se.pcm.bppcm/model/bp.ecore#//bpusagemodel/ActorStep" />
+		</eGenericSuperTypes>
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="BPModifyEntryLevelSystemCall">
+		<eGenericSuperTypes eClassifier="#//BPModifyAbstractUserAction">
+			<eTypeArguments
+				eClassifier="ecore:EClass platform:/plugin/org.palladiosimulator.pcm/model/pcm.ecore#//usagemodel/EntryLevelSystemCall" />
+		</eGenericSuperTypes>
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="BPModifyDeviceResource">
+		<eGenericSuperTypes
+			eClassifier="ecore:EClass ../../edu.kit.ipd.sdq.kamp4is.model.modificationmarks/model/ISModificationmarks.ecore#//ISModifyEntity">
+			<eTypeArguments
+				eClassifier="ecore:EClass ../../de.uhd.ifi.se.pcm.bppcm/model/bp.ecore#//organizationenvironmentmodel/DeviceResource" />
+		</eGenericSuperTypes>
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="BPModifyRole">
+		<eGenericSuperTypes
+			eClassifier="ecore:EClass ../../edu.kit.ipd.sdq.kamp4is.model.modificationmarks/model/ISModificationmarks.ecore#//ISModifyEntity">
+			<eTypeArguments
+				eClassifier="ecore:EClass ../../de.uhd.ifi.se.pcm.bppcm/model/bp.ecore#//organizationenvironmentmodel/Role" />
+		</eGenericSuperTypes>
+	</eClassifiers>
+</ecore:EPackage>

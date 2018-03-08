@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<!--
+-->
+
+<plugin>
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated ISModificationmarks -->
+      <package
+            uri="http://sdq.ipd.kit.edu/KAMP4ISModificationmarks/1.0"
+            class="edu.kit.ipd.sdq.kamp4is.model.modificationmarks.ISModificationmarksPackage"
+            genModel="model/ISModificationmarks.genmodel"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.extension_parser">
+      <!-- @generated ISModificationmarks -->
+      <parser
+            type="modificationmarks"
+            class="edu.kit.ipd.sdq.kamp4is.model.modificationmarks.util.ISModificationmarksResourceFactoryImpl"/>
+   </extension>
+
+</plugin>

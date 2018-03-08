@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+	name="modificationmarks" nsURI="http://sdq.ipd.kit.edu/KAMP4ReqModificationmarks/1.0"
+	nsPrefix="modificationmarks">
+	<eClassifiers xsi:type="ecore:EClass" name="ReqModificationRepository">
+		<eGenericSuperTypes
+			eClassifier="ecore:EClass ../../edu.kit.ipd.sdq.kamp4is.model.modificationmarks/model/ISModificationmarks.ecore#//AbstractISModificationRepository">
+			<eTypeArguments eClassifier="#//ReqSeedModifications" />
+		</eGenericSuperTypes>
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ReqSeedModifications"
+		eSuperTypes="../../edu.kit.ipd.sdq.kamp4bp.model.modificationmarks/model/BPModificationmarks.ecore#//BPSeedModifications">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="requirementModifications" upperBound="-1" eType="#//ReqModifyRequirement"
+			containment="true" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="decisionModifications" upperBound="-1" eType="#//ReqModifyDecision"
+			containment="true" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="optionModifications" upperBound="-1" eType="#//ReqModifyOption"
+			containment="true" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass"
+		name="ReqChangePropagationDueToSpecificationDependencies"
+		eSuperTypes="../../edu.kit.ipd.sdq.kamp.model.modificationmarks/model/Modificationmarks.ecore#//ChangePropagationStep">
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="decisionModifications" upperBound="-1" eType="#//ReqModifyDecision"
+			containment="true" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="optionModifications" upperBound="-1" eType="#//ReqModifyOption"
+			containment="true" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="requirementModifications" upperBound="-1" eType="#//ReqModifyRequirement"
+			containment="true" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="dataTypeModifications" upperBound="-1"
+			eType="ecore:EClass ../../edu.kit.ipd.sdq.kamp4is.model.modificationmarks/model/ISModificationmarks.ecore#//ISModifyDataType"
+			containment="true" />
+		<eStructuralFeatures xsi:type="ecore:EReference"
+			name="entityModifications" upperBound="-1" eType="#//ReqModifyEntity"
+			containment="true" />
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ReqModifyEntity">
+		<eGenericSuperTypes
+			eClassifier="ecore:EClass ../../edu.kit.ipd.sdq.kamp4is.model.modificationmarks/model/ISModificationmarks.ecore#//ISModifyEntity">
+			<eTypeArguments
+				eClassifier="ecore:EClass ../../org.palladiosimulator.pcm/model/pcm.ecore#//core/entity/Entity" />
+		</eGenericSuperTypes>
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ReqModifyTraceableObject"
+		abstract="true">
+		<eTypeParameters name="T">
+			<eBounds
+				eClassifier="ecore:EClass ../../toometa.relations/model/relations.ecore#//TraceableObject" />
+		</eTypeParameters>
+		<eGenericSuperTypes
+			eClassifier="ecore:EClass ../../edu.kit.ipd.sdq.kamp.model.modificationmarks/model/Modificationmarks.ecore#//AbstractModification">
+			<eTypeArguments eTypeParameter="#//ReqModifyTraceableObject/T" />
+			<eTypeArguments
+				eClassifier="ecore:EClass http://www.eclipse.org/emf/2002/Ecore#//EObject" />
+		</eGenericSuperTypes>
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ReqModifyRequirement">
+		<eGenericSuperTypes eClassifier="#//ReqModifyTraceableObject">
+			<eTypeArguments
+				eClassifier="ecore:EClass ../../toometa.requirements/model/requirements.ecore#//Requirement" />
+		</eGenericSuperTypes>
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ReqModifyDecision">
+		<eGenericSuperTypes eClassifier="#//ReqModifyTraceableObject">
+			<eTypeArguments
+				eClassifier="ecore:EClass ../../toometa.decisions/model/decisions.ecore#//Decision" />
+		</eGenericSuperTypes>
+	</eClassifiers>
+	<eClassifiers xsi:type="ecore:EClass" name="ReqModifyOption">
+		<eGenericSuperTypes eClassifier="#//ReqModifyTraceableObject">
+			<eTypeArguments
+				eClassifier="ecore:EClass ../../toometa.options/model/options.ecore#//Option" />
+		</eGenericSuperTypes>
+	</eClassifiers>
+</ecore:EPackage>

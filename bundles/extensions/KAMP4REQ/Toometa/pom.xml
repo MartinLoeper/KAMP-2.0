@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>edu.kit.ipd.sdq.kamp</groupId>
+		<artifactId>KAMP4REQ</artifactId>
+		<version>0.2.0-SNAPSHOT</version>
+		<relativePath>../</relativePath>
+	</parent>
+	<artifactId>Toometa</artifactId>
+	<packaging>pom</packaging>
+	<name>Toometa Subtree</name>
+
+	<modules>
+		<module>de.uka.ipd.sdq.dsexplore.qml.contract</module>
+		<module>de.uka.ipd.sdq.dsexplore.qml.contract.edit</module>
+		<module>de.uka.ipd.sdq.dsexplore.qml.contract.editor</module>
+		
+		<module>de.uka.ipd.sdq.dsexplore.qml.contracttype</module>
+		<module>de.uka.ipd.sdq.dsexplore.qml.contracttype.edit</module>
+		<module>de.uka.ipd.sdq.dsexplore.qml.contracttype.editor</module>
+		
+		<module>de.uka.ipd.sdq.dsexplore.qml.declarations</module>
+		<module>de.uka.ipd.sdq.dsexplore.qml.declarations.edit</module>
+		<module>de.uka.ipd.sdq.dsexplore.qml.declarations.editor</module>
+		
+		<module>de.uka.ipd.sdq.dsexplore.qml.dimensions</module>
+		<module>de.uka.ipd.sdq.dsexplore.qml.dimensions.edit</module>
+		<module>de.uka.ipd.sdq.dsexplore.qml.dimensions.editor</module>
+		
+		<module>de.uka.ipd.sdq.dsexplore.qml.dimensiontypes</module>
+		<module>de.uka.ipd.sdq.dsexplore.qml.dimensiontypes.edit</module>
+		<module>de.uka.ipd.sdq.dsexplore.qml.dimensiontypes.editor</module>
+		
+		<module>de.uka.ipd.sdq.dsexplore.qml.handling</module>
+		
+		<module>de.uka.ipd.sdq.dsexplore.qml.profile</module>
+		<module>de.uka.ipd.sdq.dsexplore.qml.profile.edit</module>
+		<module>de.uka.ipd.sdq.dsexplore.qml.profile.editor</module>
+		
+		<module>de.uka.ipd.sdq.dsexplore.qml.units</module>
+		<module>de.uka.ipd.sdq.dsexplore.qml.units.edit</module>
+		<module>de.uka.ipd.sdq.dsexplore.qml.units.editor</module>
+		
+		<module>de.uka.ipd.sdq.namedelement</module>
+		<module>de.uka.ipd.sdq.namedelement.edit</module>
+		<module>de.uka.ipd.sdq.namedelement.editor</module>
+		
+		<module>toometa.archoptions</module>
+		<module>toometa.archoptions.edit</module>
+		<module>toometa.archoptions.editor</module>
+		
+		<module>toometa.decisions</module>
+		<module>toometa.decisions.edit</module>
+		<module>toometa.decisions.editor</module>
+		
+		<module>toometa.effects</module>
+		<module>toometa.effects.edit</module>
+		<module>toometa.effects.editor</module>
+		
+		<module>toometa.glossary</module>
+		<module>toometa.glossary.edit</module>
+		<module>toometa.glossary.editor</module>
+		
+		<module>toometa.options</module>
+		<module>toometa.options.edit</module>
+		<module>toometa.options.editor</module>
+		
+		<module>toometa.pcmarchoptions</module>
+		<module>toometa.pcmarchoptions.edit</module>
+		<module>toometa.pcmarchoptions.editor</module>
+		
+		<module>toometa.pcmbpoptions</module>
+		<module>toometa.pcmbpoptions.edit</module>
+		<module>toometa.pcmbpoptions.editor</module>
+		
+		<module>toometa.qualities</module>
+		<module>toometa.qualities.edit</module>
+		<module>toometa.qualities.editor</module>
+		
+		<module>toometa.relations</module>
+		<module>toometa.relations.edit</module>
+		<module>toometa.relations.editor</module>
+		
+		<module>toometa.requirements</module>
+		<module>toometa.requirements.edit</module>
+		<module>toometa.requirements.editor</module>
+	</modules>
+
+</project>

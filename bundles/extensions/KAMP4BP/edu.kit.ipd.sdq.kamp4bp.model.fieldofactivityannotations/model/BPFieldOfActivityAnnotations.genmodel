@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/edu.kit.ipd.sdq.kamp4bp.model.fieldofactivityannotations/src"
+    modelPluginID="edu.kit.ipd.sdq.kamp4bp.model.fieldofactivityannotations" modelName="BPFieldOfActivityAnnotations"
+    importerID="org.eclipse.emf.importer.ecore" complianceLevel="6.0" copyrightFields="false"
+    tableProviders="true" usedGenPackages="../../de.uhd.ifi.se.pcm.bppcm/model/bp.genmodel#//bppcm ../../edu.kit.ipd.sdq.kamp4is.model.fieldofactivityannotations/model/ISFieldOfActivityAnnotations.genmodel#//fieldofactivityannotations ../../org.palladiosimulator.pcm/model/pcm.genmodel#//pcm platform:/plugin/de.uka.ipd.sdq.identifier/model/identifier.genmodel#//identifier platform:/plugin/de.uka.ipd.sdq.stoex/model/stoex.genmodel#//stoex platform:/plugin/de.uka.ipd.sdq.units/model/Units.genmodel#//units platform:/plugin/de.uka.ipd.sdq.probfunction/model/ProbabilityFunction.genmodel#//probfunction"
+    importOrganizing="true">
+  <foreignModel>BPFieldOfActivityAnnotations.ecore</foreignModel>
+  <genPackages prefix="BPFieldOfActivityAnnotations" basePackage="edu.kit.ipd.sdq.kamp4bp.model"
+      resource="XMI" disposableProviderFactory="true" fileExtensions="fieldofactivityannotations"
+      ecorePackage="BPFieldOfActivityAnnotations.ecore#/">
+    <genClasses ecoreClass="BPFieldOfActivityAnnotations.ecore#//BPFieldOfActivityAnnotationsRepository">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference BPFieldOfActivityAnnotations.ecore#//BPFieldOfActivityAnnotationsRepository/businessProcessSpecification"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="BPFieldOfActivityAnnotations.ecore#//BPUserActionAnnotation">
+      <genTypeParameters ecoreTypeParameter="BPFieldOfActivityAnnotations.ecore#//BPUserActionAnnotation/T"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference BPFieldOfActivityAnnotations.ecore#//BPUserActionAnnotation/parent"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference BPFieldOfActivityAnnotations.ecore#//BPUserActionAnnotation/annotatedUserActions"/>
+    </genClasses>
+    <genClasses ecoreClass="BPFieldOfActivityAnnotations.ecore#//BPGood">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference BPFieldOfActivityAnnotations.ecore#//BPGood/actorStep"/>
+    </genClasses>
+    <genClasses ecoreClass="BPFieldOfActivityAnnotations.ecore#//BPMessage">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference BPFieldOfActivityAnnotations.ecore#//BPMessage/sender"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference BPFieldOfActivityAnnotations.ecore#//BPMessage/receiver"/>
+    </genClasses>
+    <genClasses ecoreClass="BPFieldOfActivityAnnotations.ecore#//BPOrganizationalUnit">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference BPFieldOfActivityAnnotations.ecore#//BPOrganizationalUnit/abstractUserAction"/>
+    </genClasses>
+    <genClasses ecoreClass="BPFieldOfActivityAnnotations.ecore#//BPTrainingCourse">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference BPFieldOfActivityAnnotations.ecore#//BPTrainingCourse/actorStep"/>
+    </genClasses>
+    <genClasses ecoreClass="BPFieldOfActivityAnnotations.ecore#//BPBusinessProcessSpecification">
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference BPFieldOfActivityAnnotations.ecore#//BPBusinessProcessSpecification/parent"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference BPFieldOfActivityAnnotations.ecore#//BPBusinessProcessSpecification/userActionAnnotations"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

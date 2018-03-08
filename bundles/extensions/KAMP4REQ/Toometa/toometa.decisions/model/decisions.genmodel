@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/toometa.decisions/src" modelPluginID="toometa.decisions"
+    modelName="Decisions" rootExtendsInterface="org.eclipse.emf.cdo.CDOObject" rootExtendsClass="org.eclipse.emf.internal.cdo.CDOObjectImpl"
+    importerID="org.eclipse.emf.importer.ecore" featureDelegation="Dynamic" complianceLevel="8.0"
+    copyrightFields="false" providerRootExtendsClass="" usedGenPackages="../../toometa.glossary/model/glossary.genmodel#//glossary ../../de.uka.ipd.sdq.identifier/model/identifier.genmodel#//identifier ../../toometa.relations/model/relations.genmodel#//relations"
+    importOrganizing="true">
+  <foreignModel>decisions.ecore</foreignModel>
+  <modelPluginVariables>CDO=org.eclipse.emf.cdo</modelPluginVariables>
+  <genPackages prefix="Decisions" disposableProviderFactory="true" extensibleProviderFactory="true"
+      ecorePackage="decisions.ecore#/">
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="decisions.ecore#//DecisionStatusEnum">
+      <genEnumLiterals ecoreEnumLiteral="decisions.ecore#//DecisionStatusEnum/open"/>
+      <genEnumLiterals ecoreEnumLiteral="decisions.ecore#//DecisionStatusEnum/taken"/>
+      <genEnumLiterals ecoreEnumLiteral="decisions.ecore#//DecisionStatusEnum/reviewed"/>
+      <genEnumLiterals ecoreEnumLiteral="decisions.ecore#//DecisionStatusEnum/obsolete"/>
+      <genEnumLiterals ecoreEnumLiteral="decisions.ecore#//DecisionStatusEnum/replaced"/>
+      <genEnumLiterals ecoreEnumLiteral="decisions.ecore#//DecisionStatusEnum/inConflict"/>
+    </genEnums>
+    <genClasses ecoreClass="decisions.ecore#//DecisionRepository">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference decisions.ecore#//DecisionRepository/decisions"/>
+    </genClasses>
+    <genClasses ecoreClass="decisions.ecore#//Decision" labelFeature="#//decisions/Decision/description">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference decisions.ecore#//Decision/rationales"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute decisions.ecore#//Decision/description"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute decisions.ecore#//Decision/status"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute decisions.ecore#//Decision/timestamp"/>
+      <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference decisions.ecore#//Decision/repository"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference decisions.ecore#//Decision/usedTerms"/>
+    </genClasses>
+    <genClasses ecoreClass="decisions.ecore#//Rationale" labelFeature="#//decisions/Rationale/description">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute decisions.ecore#//Rationale/description"/>
+    </genClasses>
+    <genClasses ecoreClass="decisions.ecore#//TextDecision" labelFeature="#//decisions/Decision/description"/>
+    <genClasses ecoreClass="decisions.ecore#//TextRationale" labelFeature="#//decisions/Rationale/description"/>
+  </genPackages>
+</genmodel:GenModel>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>edu.kit.ipd.sdq.kamp</groupId>
+		<artifactId>extensions</artifactId>
+		<version>0.2.0-SNAPSHOT</version>
+		<relativePath>../</relativePath>
+	</parent>
+	<artifactId>KAMP4IS</artifactId>
+	<packaging>pom</packaging>
+	<name>KAMP for Information Systems</name>
+
+	<modules>
+		<module>de.uka.ipd.sdq.pcm.componentinternaldependencies.edit</module>
+		<module>de.uka.ipd.sdq.pcm.componentinternaldependencies.editor</module>
+		<module>edu.kit.ipd.sdq.kamp4is</module>
+		<module>edu.kit.ipd.sdq.kamp4is.model.fieldofactivityannotations</module>
+		<module>edu.kit.ipd.sdq.kamp4is.model.fieldofactivityannotations.edit</module>
+		<module>edu.kit.ipd.sdq.kamp4is.model.fieldofactivityannotations.editor</module>
+		<module>edu.kit.ipd.sdq.kamp4is.model.modificationmarks</module>
+		<module>edu.kit.ipd.sdq.kamp4is.model.modificationmarks.edit</module>
+		<module>edu.kit.ipd.sdq.kamp4is.model.modificationmarks.editor</module>
+		<module>org.palladiosimulator.pcm.componentinternaldependencies</module>
+	</modules>
+
+</project>

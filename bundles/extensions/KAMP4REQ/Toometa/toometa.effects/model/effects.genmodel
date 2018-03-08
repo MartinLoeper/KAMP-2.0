@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/toometa.effects/src" modelPluginID="toometa.effects"
+    modelName="Effects" rootExtendsInterface="org.eclipse.emf.cdo.CDOObject" rootExtendsClass="org.eclipse.emf.internal.cdo.CDOObjectImpl"
+    importerID="org.eclipse.emf.importer.ecore" featureDelegation="Dynamic" complianceLevel="8.0"
+    copyrightFields="false" providerRootExtendsClass="" usedGenPackages="../../de.uka.ipd.sdq.dsexplore.qml.dimensions/model/dimensions.genmodel#//dimensions ../../de.uka.ipd.sdq.dsexplore.qml.dimensiontypes/model/dimensiontypes.genmodel#//dimensiontypes ../../de.uka.ipd.sdq.identifier/model/identifier.genmodel#//identifier ../../de.uka.ipd.sdq.namedelement/model/namedelement.genmodel#//namedelement ../../toometa.qualities/model/qualities.genmodel#//qualities ../../de.uka.ipd.sdq.dsexplore.qml.units/model/units.genmodel#//units"
+    importOrganizing="true">
+  <foreignModel>effects.ecore</foreignModel>
+  <modelPluginVariables>CDO=org.eclipse.emf.cdo</modelPluginVariables>
+  <genPackages prefix="Effects" disposableProviderFactory="true" ecorePackage="effects.ecore#/">
+    <genEnums typeSafeEnumCompatible="false" ecoreEnum="effects.ecore#//EffectType">
+      <genEnumLiterals ecoreEnumLiteral="effects.ecore#//EffectType/neutral"/>
+      <genEnumLiterals ecoreEnumLiteral="effects.ecore#//EffectType/positive"/>
+      <genEnumLiterals ecoreEnumLiteral="effects.ecore#//EffectType/negative"/>
+    </genEnums>
+    <genClasses ecoreClass="effects.ecore#//SimpleEffect" labelFeature="#//effects/Effect/description"/>
+    <genClasses ecoreClass="effects.ecore#//EffectRepository">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference effects.ecore#//EffectRepository/knownEffects"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference effects.ecore#//EffectRepository/effectCategories"/>
+    </genClasses>
+    <genClasses image="false" ecoreClass="effects.ecore#//Effect" labelFeature="#//effects/Effect/description">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute effects.ecore#//Effect/EffectType"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute effects.ecore#//Effect/description"/>
+    </genClasses>
+    <genClasses ecoreClass="effects.ecore#//EffectCategory"/>
+    <genClasses ecoreClass="effects.ecore#//QualityEffect" labelFeature="#//effects/Effect/description">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference effects.ecore#//QualityEffect/qualityType"/>
+    </genClasses>
+    <genClasses ecoreClass="effects.ecore#//CategoryEffect" labelFeature="#//effects/Effect/description">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference effects.ecore#//CategoryEffect/category"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

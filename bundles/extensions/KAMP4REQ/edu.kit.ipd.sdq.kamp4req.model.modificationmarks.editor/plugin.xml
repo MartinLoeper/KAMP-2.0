@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<!--
+-->
+
+<plugin>
+
+   <extension point="org.eclipse.ui.newWizards">
+      <!-- @generated ReqModificationmarks -->
+      <category
+            id="org.eclipse.emf.ecore.Wizard.category.ID"
+            name="%_UI_Wizard_category"/>
+      <wizard
+            id="edu.kit.ipd.sdq.kamp4req.model.modificationmarks.presentation.ReqModificationmarksModelWizardID"
+            name="%_UI_ReqModificationmarksModelWizard_label"
+            class="edu.kit.ipd.sdq.kamp4req.model.modificationmarks.presentation.ReqModificationmarksModelWizard"
+            category="org.eclipse.emf.ecore.Wizard.category.ID"
+            icon="icons/full/obj16/ReqModificationmarksModelFile.gif">
+         <description>%_UI_ReqModificationmarksModelWizard_description</description>
+         <selection class="org.eclipse.core.resources.IResource"/>
+      </wizard>
+   </extension>
+
+   <extension point="org.eclipse.ui.editors">
+      <!-- @generated ReqModificationmarks -->
+      <editor
+            id="edu.kit.ipd.sdq.kamp4req.model.modificationmarks.presentation.ReqModificationmarksEditorID"
+            name="%_UI_ReqModificationmarksEditor_label"
+            icon="icons/full/obj16/ReqModificationmarksModelFile.gif"
+            extensions="modificationmarks"
+            class="edu.kit.ipd.sdq.kamp4req.model.modificationmarks.presentation.ReqModificationmarksEditor"
+            contributorClass="edu.kit.ipd.sdq.kamp4req.model.modificationmarks.presentation.ReqModificationmarksActionBarContributor">
+      </editor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="false"
+            id="edu.kit.ipd.sdq.kamp4req.model.modificationmarks.ReqModificationRepositoryID"
+            objectClass="edu.kit.ipd.sdq.kamp4req.model.modificationmarks.ReqModificationRepository">
+         <action
+               class="edu.kit.ipd.sdq.kamp4req.model.modificationmarks.editor.ReqArchitectureBasedWorkplanDerivationAction"
+               icon="../edu.kit.ipd.sdq.kamp/icons/run.png"
+               id="edu.kit.ipd.sdq.kamp4req.model.modificationmarks.editor.ReqArchitectureBasedWorkplanDerivationActionID"
+               label="Step 5: Calculate activities"
+               menubarPath="edit">
+         </action>
+         <action
+               class="edu.kit.ipd.sdq.kamp4req.model.modificationmarks.editor.ReqChangePropagationAction"
+               icon="../edu.kit.ipd.sdq.kamp/icons/run.png"
+               id="edu.kit.ipd.sdq.kamp4req.model.modificationmarks.editor.ReqChangePropagationActionID"
+               label="Step 3: Calculate change propagation"
+               menubarPath="edit">
+         </action>
+      </objectContribution>
+   </extension>
+
+</plugin>

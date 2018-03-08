@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore"
+    xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/toometa.archoptions/src" modelPluginID="toometa.archoptions"
+    modelName="Archoptions" rootExtendsInterface="org.eclipse.emf.cdo.CDOObject" rootExtendsClass="org.eclipse.emf.internal.cdo.CDOObjectImpl"
+    importerID="org.eclipse.emf.importer.ecore" featureDelegation="Dynamic" complianceLevel="8.0"
+    copyrightFields="false" providerRootExtendsClass="" usedGenPackages="../../toometa.options/model/options.genmodel#//options ../../toometa.effects/model/effects.genmodel#//effects ../../toometa.glossary/model/glossary.genmodel#//glossary platform:/plugin/de.uka.ipd.sdq.identifier/model/identifier.genmodel#//identifier ../../de.uka.ipd.sdq.namedelement/model/namedelement.genmodel#//namedelement ../../toometa.qualities/model/qualities.genmodel#//qualities ../../toometa.relations/model/relations.genmodel#//relations ../../de.uka.ipd.sdq.dsexplore.qml.dimensions/model/dimensions.genmodel#//dimensions ../../de.uka.ipd.sdq.dsexplore.qml.dimensiontypes/model/dimensiontypes.genmodel#//dimensiontypes ../../de.uka.ipd.sdq.dsexplore.qml.units/model/units.genmodel#//units"
+    importOrganizing="true">
+  <foreignModel>archoptions.ecore</foreignModel>
+  <modelPluginVariables>CDO=org.eclipse.emf.cdo</modelPluginVariables>
+  <genPackages prefix="Archoptions" disposableProviderFactory="true" extensibleProviderFactory="true"
+      childCreationExtenders="true" ecorePackage="archoptions.ecore#/">
+    <genClasses ecoreClass="archoptions.ecore#//ProvidedFunctionality" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description"/>
+    <genClasses ecoreClass="archoptions.ecore#//RequiredFunctionality" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description"/>
+    <genClasses ecoreClass="archoptions.ecore#//FunctionalityConnection" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description"/>
+    <genClasses ecoreClass="archoptions.ecore#//MultipleInstantiation" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description"/>
+    <genClasses ecoreClass="archoptions.ecore#//OnlySingleInstantiation" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description"/>
+    <genClasses ecoreClass="archoptions.ecore#//OnlySingleAllocation" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description"/>
+    <genClasses ecoreClass="archoptions.ecore#//MultipleAllocation" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description"/>
+    <genClasses ecoreClass="archoptions.ecore#//AllocateTogether" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description"/>
+    <genClasses ecoreClass="archoptions.ecore#//AllocateNeverTogether" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description"/>
+    <genClasses ecoreClass="archoptions.ecore#//NeverAllocateToSpecificNodes" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description"/>
+    <genClasses ecoreClass="archoptions.ecore#//MoveComponents" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description"/>
+    <genClasses ecoreClass="archoptions.ecore#//IntroduceNewComponent" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description"/>
+    <genClasses ecoreClass="archoptions.ecore#//IntroduceNewAdapter" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description"/>
+    <genClasses ecoreClass="archoptions.ecore#//ReuseComponent" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description"/>
+    <genClasses ecoreClass="archoptions.ecore#//BanComponent" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description"/>
+    <genClasses ecoreClass="archoptions.ecore#//ReplaceComponents" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description"/>
+    <genClasses ecoreClass="archoptions.ecore#//SplitComponent" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description"/>
+    <genClasses ecoreClass="archoptions.ecore#//MergeComponents" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description"/>
+    <genClasses ecoreClass="archoptions.ecore#//ChangeRoles" labelFeature="../../toometa.options/model/options.genmodel#//options/Option/description"/>
+    <genClasses image="false" ecoreClass="archoptions.ecore#//ComponentOption"/>
+    <genClasses image="false" ecoreClass="archoptions.ecore#//DeploymentOption"/>
+    <genClasses image="false" ecoreClass="archoptions.ecore#//ArchOption">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference archoptions.ecore#//ArchOption/analysisRationale"/>
+    </genClasses>
+    <genClasses ecoreClass="archoptions.ecore#//ChangeDataType"/>
+    <genClasses ecoreClass="archoptions.ecore#//IntroduceNewDataType"/>
+    <genClasses ecoreClass="archoptions.ecore#//RemoveDataType"/>
+    <genClasses ecoreClass="archoptions.ecore#//InterfaceOption"/>
+    <genClasses ecoreClass="archoptions.ecore#//DataTypeOption"/>
+    <genClasses ecoreClass="archoptions.ecore#//ChangeInterface"/>
+    <genClasses ecoreClass="archoptions.ecore#//RemoveInterface"/>
+    <genClasses image="false" ecoreClass="archoptions.ecore#//IntroduceNewInterface"/>
+    <genClasses image="false" ecoreClass="archoptions.ecore#//ArchCandidate">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference archoptions.ecore#//ArchCandidate/subOptions"/>
+    </genClasses>
+  </genPackages>
+</genmodel:GenModel>

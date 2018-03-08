@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<!--
+-->
+
+<plugin>
+
+   <extension point="org.eclipse.ui.newWizards">
+      <!-- @generated qualities -->
+      <category
+            id="org.eclipse.emf.ecore.Wizard.category.ID"
+            name="%_UI_Wizard_category"/>
+      <wizard
+            id="qualities.presentation.QualitiesModelWizardID"
+            name="%_UI_QualitiesModelWizard_label"
+            class="qualities.presentation.QualitiesModelWizard"
+            category="org.eclipse.emf.ecore.Wizard.category.ID"
+            icon="icons/full/obj16/QualitiesModelFile.gif">
+         <description>%_UI_QualitiesModelWizard_description</description>
+         <selection class="org.eclipse.core.resources.IResource"/>
+      </wizard>
+   </extension>
+
+   <extension point="org.eclipse.ui.editors">
+      <!-- @generated qualities -->
+      <editor
+            id="qualities.presentation.QualitiesEditorID"
+            name="%_UI_QualitiesEditor_label"
+            icon="icons/full/obj16/QualitiesModelFile.gif"
+            extensions="qualities"
+            class="qualities.presentation.QualitiesEditor"
+            contributorClass="qualities.presentation.QualitiesActionBarContributor">
+      </editor>
+   </extension>
+
+</plugin>
