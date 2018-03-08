@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="edu.kit.ipd.sdq.kamp.framework.feature"
-      label="KAMP Core Feature"
+      label="KAMP CORE"
       version="1.0.0.qualifier"
       provider-name="KIT SDQ IPD">
 
