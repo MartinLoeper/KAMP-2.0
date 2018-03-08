@@ -1,9 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/edu.kit.ipd.sdq.kamp.framework.feature_0.2.0.qualifier.jar" id="edu.kit.ipd.sdq.kamp.framework.feature" version="0.2.0.qualifier">
-      <category name="KAMP Framework"/>
-   </feature>
-   <category-def name="KAMP Framework" label="KAMP Framework">
+   <bundle id="edu.kit.ipd.sdq.kamp" version="1.0.0.qualifier">
+      <category name="KAMP"/>
+   </bundle>
+   <bundle id="edu.kit.ipd.sdq.kamp.model.modificationmarks" version="1.0.0.qualifier">
+      <category name="KAMP"/>
+   </bundle>
+   <bundle id="edu.kit.ipd.sdq.kamp.model.modificationmarks.edit" version="1.0.0.qualifier">
+      <category name="KAMP"/>
+   </bundle>
+   <bundle id="edu.kit.ipd.sdq.kamp.model.modificationmarks.editor" version="1.0.0.qualifier">
+      <category name="KAMP"/>
+   </bundle>
+   <category-def name="KAMP" label="KAMP">
       <description>
          The KAMP framework, including the essential core and optional extensions
       </description>
