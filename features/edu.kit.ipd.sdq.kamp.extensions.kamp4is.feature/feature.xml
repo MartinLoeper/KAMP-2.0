@@ -214,6 +214,37 @@
 
    <requires>
       <import feature="edu.kit.ipd.sdq.kamp.framework.feature" version="1.0.0.qualifier"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.emf.ecore.xmi"/>
+      <import plugin="org.eclipse.emf.edit.ui"/>
+      <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="edu.kit.ipd.sdq.kamp.model.modificationmarks.edit"/>
+      <import plugin="org.palladiosimulator.pcm.edit"/>
+      <import plugin="de.uka.ipd.sdq.stoex.edit"/>
+      <import plugin="de.uka.ipd.sdq.identifier.edit"/>
+      <import plugin="de.uka.ipd.sdq.units.edit"/>
+      <import plugin="de.uka.ipd.sdq.probfunction.edit"/>
+      <import plugin="edu.kit.ipd.sdq.kamp.model.modificationmarks.editor"/>
+      <import plugin="edu.kit.ipd.sdq.kamp"/>
+      <import plugin="org.eclipse.emf.edit"/>
+      <import plugin="edu.kit.ipd.sdq.kamp.model.modificationmarks"/>
+      <import plugin="org.palladiosimulator.pcm"/>
+      <import plugin="de.uka.ipd.sdq.stoex"/>
+      <import plugin="de.uka.ipd.sdq.identifier"/>
+      <import plugin="de.uka.ipd.sdq.units"/>
+      <import plugin="de.uka.ipd.sdq.probfunction"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.junit"/>
+      <import plugin="org.palladiosimulator.pcm" version="3.2.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.compare" version="1.2.2" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.resources" version="3.7.101" match="greaterOrEqual"/>
+      <import plugin="edu.kit.ipd.sdq.kamp.model.modificationmarks" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.compare.rcp" version="2.3.0" match="greaterOrEqual"/>
+      <import plugin="de.uka.ipd.sdq.pcm.componentinternaldependencies" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="de.uhd.ifi.se.pcm.bppcm"/>
+      <import plugin="org.eclipse.emf.ecore"/>
+      <import plugin="org.eclipse.uml2.common.edit"/>
    </requires>
 
    <plugin

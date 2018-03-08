@@ -231,6 +231,61 @@ limitations under the License.
 
    <requires>
       <import feature="edu.kit.ipd.sdq.kamp.framework.feature" version="1.0.0.qualifier"/>
+      <import plugin="org.eclipse.ui"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.junit"/>
+      <import plugin="org.eclipse.emf.compare" version="1.2.2" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.resources" version="3.7.101" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.compare.rcp" version="2.3.0" match="greaterOrEqual"/>
+      <import plugin="de.uka.ipd.sdq.pcm.componentinternaldependencies" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="edu.kit.ipd.sdq.kamp"/>
+      <import plugin="edu.kit.ipd.sdq.kamp4is"/>
+      <import plugin="edu.kit.ipd.sdq.kamp4bp"/>
+      <import plugin="edu.kit.ipd.sdq.kamp4is.model.fieldofactivityannotations"/>
+      <import plugin="edu.kit.ipd.sdq.kamp4bp.model.fieldofactivityannotations" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="edu.kit.ipd.sdq.kamp4is.model.modificationmarks.edit"/>
+      <import plugin="org.eclipse.emf.ecore"/>
+      <import plugin="org.eclipse.emf.ecore.xmi"/>
+      <import plugin="de.uhd.ifi.se.pcm.bppcm"/>
+      <import plugin="edu.kit.ipd.sdq.kamp4bp.model.modificationmarks"/>
+      <import plugin="edu.kit.ipd.sdq.kamp4is.model.modificationmarks"/>
+      <import plugin="edu.kit.ipd.sdq.kamp.model.modificationmarks"/>
+      <import plugin="org.palladiosimulator.pcm"/>
+      <import plugin="de.uka.ipd.sdq.identifier"/>
+      <import plugin="de.uka.ipd.sdq.stoex"/>
+      <import plugin="de.uka.ipd.sdq.units"/>
+      <import plugin="de.uka.ipd.sdq.probfunction"/>
+      <import plugin="org.eclipse.emf.edit.ui"/>
+      <import plugin="org.eclipse.ui.ide"/>
+      <import plugin="de.uhd.ifi.se.pcm.bppcm.edit"/>
+      <import plugin="edu.kit.ipd.sdq.kamp4bp.model.modificationmarks.edit"/>
+      <import plugin="edu.kit.ipd.sdq.kamp.model.modificationmarks.edit"/>
+      <import plugin="org.palladiosimulator.pcm.edit"/>
+      <import plugin="de.uka.ipd.sdq.identifier.edit"/>
+      <import plugin="de.uka.ipd.sdq.stoex.edit"/>
+      <import plugin="de.uka.ipd.sdq.units.edit"/>
+      <import plugin="de.uka.ipd.sdq.probfunction.edit"/>
+      <import plugin="edu.kit.ipd.sdq.kamp.model.modificationmarks.editor"/>
+      <import plugin="edu.kit.ipd.sdq.kamp" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="edu.kit.ipd.sdq.kamp4is" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.edit"/>
+      <import plugin="org.eclipse.emf.cdo"/>
+      <import plugin="org.eclipse.emf.ecore.edit"/>
+      <import plugin="toometa.qualities" version="0.1.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.core.runtime" version="3.11.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.ecore" version="2.11.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.ecore.xmi" version="2.11.0" match="greaterOrEqual"/>
+      <import plugin="de.uka.ipd.sdq.identifier" version="2.1.0" match="greaterOrEqual"/>
+      <import plugin="org.palladiosimulator.pcm" version="4.0.0" match="greaterOrEqual"/>
+      <import plugin="de.uka.ipd.sdq.probfunction" version="2.1.0" match="greaterOrEqual"/>
+      <import plugin="de.uka.ipd.sdq.stoex" version="2.2.0" match="greaterOrEqual"/>
+      <import plugin="de.uka.ipd.sdq.units" version="2.1.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ocl.ecore" version="3.5.0" match="greaterOrEqual"/>
+      <import plugin="org.palladiosimulator.pcm.edit" version="4.0.0" match="greaterOrEqual"/>
+      <import plugin="de.uka.ipd.sdq.dsexplore.qml.handling" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.palladiosimulator.pcm.ui" version="2.0.0" match="greaterOrEqual"/>
+      <import plugin="org.palladiosimulator.editors.commons.propertytabs" version="1.0.0" match="greaterOrEqual"/>
+      <import plugin="org.opt4j" version="1.0.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
