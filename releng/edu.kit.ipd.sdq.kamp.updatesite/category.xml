@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/edu.kit.ipd.sdq.kamp.framework.feature_0.2.0.qualifier.jar" id="tools.vitruv.framework.feature" version="0.2.0.qualifier">
+   <feature url="features/edu.kit.ipd.sdq.kamp.framework.feature_0.2.0.qualifier.jar" id="edu.kit.ipd.sdq.kamp.framework.feature" version="0.2.0.qualifier">
       <category name="KAMP Framework"/>
    </feature>
    <category-def name="KAMP Framework" label="KAMP Framework">
