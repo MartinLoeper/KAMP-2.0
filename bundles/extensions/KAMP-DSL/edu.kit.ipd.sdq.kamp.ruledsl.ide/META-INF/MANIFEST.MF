@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: edu.kit.ipd.sdq.kamp.ruledsl.ide
 Bundle-Vendor: KIT SDQ IPD
-Bundle-Version: 2.0.0.qualifier
+Bundle-Version: 0.2.0.qualifier
 Bundle-SymbolicName: edu.kit.ipd.sdq.kamp.ruledsl.ide; singleton:=true
 Bundle-ActivationPolicy: lazy
 Require-Bundle: edu.kit.ipd.sdq.kamp.ruledsl,
