@@ -212,6 +212,16 @@
    limitations under the License.
    </license>
 
+   <includes
+         id="edu.kit.ipd.sdq.kamp.framework.feature"
+         version="1.0.0.qualifier"
+         name="KAMP Core"/>
+
+   <includes
+         id="edu.kit.ipd.sdq.kamp.extensions.kamp4is.feature"
+         version="1.0.0.qualifier"
+         name="KAMP4IS"/>
+
    <requires>
       <import feature="edu.kit.ipd.sdq.kamp.framework.feature" version="1.0.0.qualifier"/>
       <import feature="edu.kit.ipd.sdq.kamp.extensions.kamp4is.feature" version="1.0.0.qualifier"/>

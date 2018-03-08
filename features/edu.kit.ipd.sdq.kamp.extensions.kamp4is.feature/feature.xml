@@ -212,6 +212,11 @@
    limitations under the License.
    </license>
 
+   <includes
+         id="edu.kit.ipd.sdq.kamp.framework.feature"
+         version="1.0.0.qualifier"
+         name="KAMP Core"/>
+
    <requires>
       <import feature="edu.kit.ipd.sdq.kamp.framework.feature" version="1.0.0.qualifier"/>
       <import plugin="org.eclipse.core.runtime"/>
