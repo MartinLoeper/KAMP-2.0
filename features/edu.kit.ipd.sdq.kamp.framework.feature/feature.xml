@@ -230,6 +230,24 @@ and
 limitations under the License.
    </license>
 
+   <includes
+         id="edu.kit.ipd.sdq.kamp.extensions.kamp4bp.feature"
+         version="1.0.0.qualifier"
+         name="KAMP4BP"
+         optional="true"/>
+
+   <includes
+         id="edu.kit.ipd.sdq.kamp.extensions.kamp4is.feature"
+         version="1.0.0.qualifier"
+         name="KAMP4IS"
+         optional="true"/>
+
+   <includes
+         id="edu.kit.ipd.sdq.kamp.extensions.kamp4req.feature"
+         version="1.0.0.qualifier"
+         name="KAMP4REQ"
+         optional="true"/>
+
    <requires>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.emf.ecore"/>
