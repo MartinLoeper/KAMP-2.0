@@ -5,16 +5,12 @@
       version="1.0.0.qualifier"
       provider-name="KIT SDQ IPD">
 
-   <description url="http://www.example.com/description">
-      [Enter Feature Description here.]
+   <description url="KAMP Core">
+      The KAMP core module.
    </description>
 
-   <copyright url="http://www.example.com/copyright">
-      [Enter Copyright Description here.]
-   </copyright>
-
-   <license url="http://www.example.com/license">
-      [Enter License Description here.]
+   <license url="https://raw.githubusercontent.com/MartinLoeper/KAMP-2.0/master/LICENSE">
+      Apache License, Version 2.0, January 2004http://www.apache.org/licenses/
    </license>
 
    <plugin
