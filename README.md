@@ -10,4 +10,4 @@ In order to install KAMP, open an [Eclipse (Modelling Tools) Oxygen Installation
 2) This project includes the [KAMP Rule Language](https://github.com/MartinLoeper/KAMP-DSL).
 
 ## Changelog
-- This fork brings Continues Integration to KAMP and enables our partners to install the framework more easily.
+- This fork brings Continuous Integration to KAMP and enables our partners to install the framework more easily.
