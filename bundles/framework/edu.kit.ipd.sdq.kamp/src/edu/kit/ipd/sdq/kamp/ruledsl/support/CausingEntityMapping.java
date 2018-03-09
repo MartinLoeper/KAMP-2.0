@@ -140,7 +140,7 @@ public final class CausingEntityMapping<U extends EObject, V extends EObject> {
 	 * @return the causing entities
 	 */
 	public Set<V> getCausingEntities() {
-		return Collections.unmodifiableSet(new HashSet<>(causingEntities));
+		return new HashSet<>(causingEntities);
 	}
 
 	public void addCausingEntityDistinct(V element) {
