@@ -25,10 +25,10 @@ Workflow {
 		    from = "platform:/resource/org.eclipse.xtext.common.types/"
 		    to = "classpath:/"
 		  }
-//		  uriMap = {
-//		    from = "platform:/resource/tools.vitruv.dsls.mirbase/"
-//		    to = "classpath:/"
-//		  } 
+		  uriMap = {
+		    from = "platform:/resource/tools.vitruv.dsls.mirbase/"
+		    to = "classpath:/"
+		  } 
     }
     
     component = DirectoryCleaner {
