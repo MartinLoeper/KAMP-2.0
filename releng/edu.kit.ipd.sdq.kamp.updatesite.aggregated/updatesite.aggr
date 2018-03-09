@@ -16,6 +16,9 @@
         <categories name="org.palladiosimulator.corefeatures.category" versionRange="0.0.0.7R21cPpsE67gKWDLOfyVBrs"/>
         <mapRules xsi:type="aggregator:ExclusionRule" name="de.uka.ipd.sdq.dsexplore.feature.feature.group" versionRange="4.0.1.201712071438"/>
       </repositories>
+      <repositories location="http://vitruv.tools/updatesite/nightly">
+        <categories name="201803061326.Vitruv Application Development" versionRange="1.0.0.077-cZrbdL7E7Ac7I7UAIEU"/>
+      </repositories>
     </contributions>
   </validationSets>
   <configurations architecture="x86_64"/>

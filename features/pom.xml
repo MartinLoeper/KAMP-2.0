@@ -18,6 +18,7 @@
 		<module>edu.kit.ipd.sdq.kamp.extensions.kamp4bp.feature</module>
 		<module>edu.kit.ipd.sdq.kamp.extensions.kamp4is.feature</module>
 		<module>edu.kit.ipd.sdq.kamp.extensions.kamp4req.feature</module>
+		<module>edu.kit.ipd.sdq.kamp.extensions.ruledsl.feature</module>
 	</modules>
 
 </project>
