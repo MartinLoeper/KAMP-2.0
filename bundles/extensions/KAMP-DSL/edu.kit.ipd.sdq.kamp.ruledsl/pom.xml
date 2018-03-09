@@ -21,6 +21,9 @@
 						<argument>-p</argument>
 						<argument>rootPath=/${project.basedir}/..</argument>
 					</arguments>
+					<classpathScope>compile</classpathScope>
+					<includePluginDependencies>true</includePluginDependencies>
+					<cleanupDaemonThreads>false</cleanupDaemonThreads><!-- see https://bugs.eclipse.org/bugs/show_bug.cgi?id=475098#c3 -->
 				</configuration>
 			</plugin>
 
@@ -32,12 +35,31 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-clean-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>clean-xtext</id>
-						<phase>clean</phase>
-					</execution>
-				</executions>
+				<configuration>
+					<filesets combine.children="append">
+						<fileset>
+							<directory>${basedir}/../edu.kit.ipd.sdq.kamp.ruledsl/src-gen/</directory>
+							<includes>
+								<include>**/*</include>
+							</includes>
+						</fileset>
+						<fileset>
+							<directory>${basedir}/../edu.kit.ipd.sdq.kamp.ruledsl.ide/src-gen/</directory>
+							<includes>
+								<include>**/*</include>
+							</includes>
+						</fileset>
+						<fileset>
+							<directory>${basedir}/../edu.kit.ipd.sdq.kamp.ruledsl.ui/src-gen/</directory>
+							<includes>
+								<include>**/*</include>
+							</includes>
+						</fileset>
+						<fileset>
+							<directory>${basedir}/model/generated/</directory>
+						</fileset>
+					</filesets>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

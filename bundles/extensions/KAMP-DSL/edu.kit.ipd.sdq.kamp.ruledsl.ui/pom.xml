@@ -17,7 +17,7 @@
 				<artifactId>maven-clean-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>clean-xtext</id>
+						<id>gen-clean</id>
 						<phase>clean</phase>
 					</execution>
 				</executions>

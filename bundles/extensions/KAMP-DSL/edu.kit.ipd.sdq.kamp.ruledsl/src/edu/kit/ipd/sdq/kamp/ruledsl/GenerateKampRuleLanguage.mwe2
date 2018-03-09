@@ -9,35 +9,6 @@ var projectName = "edu.kit.ipd.sdq.kamp.ruledsl"
 var runtimeProject = "../${projectName}"
 
 Workflow {
-	bean = StandaloneSetup {
-    	scanClassPath = true
-    	platformUri = "${runtimeProject}/.."
-    	registerGeneratedEPackage = "org.eclipse.xtext.xbase.XbasePackage"
-    	registerGenModelFile = "platform:/resource/org.eclipse.xtext.xbase/model/Xbase.genmodel"
-    
-    	resourceSet = org.eclipse.xtext.resource.XtextResourceSet:theResourceSet {}
-    	// add mappings from platform:/resource to classpath:/
-		  uriMap = {
-		    from = "platform:/resource/org.eclipse.xtext.xbase/"
-		    to = "classpath:/"
-		  }
-		  uriMap = {
-		    from = "platform:/resource/org.eclipse.xtext.common.types/"
-		    to = "classpath:/"
-		  }
-		  uriMap = {
-		    from = "platform:/resource/tools.vitruv.dsls.mirbase/"
-		    to = "classpath:/"
-		  } 
-    }
-    
-    component = DirectoryCleaner {
-    	directory = "${runtimeProject}/src-gen"
-    }
-    
-    component = DirectoryCleaner {
-    	directory = "${runtimeProject}/model/generated"
-    }
     
 	component = XtextGenerator {
 		configuration = {
