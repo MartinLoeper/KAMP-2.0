@@ -14,7 +14,7 @@ public final class ErrorHandlingUtil {
 	
 	public static MultiStatus createMultiStatus(String pluginId, String msg, Throwable t) {
         List<Status> childStatuses = new ArrayList<>();
-        StackTraceElement[] stackTraces = Thread.currentThread().getStackTrace();
+        StackTraceElement[] stackTraces = t.getStackTrace();
 
         for (StackTraceElement stackTrace: stackTraces) {
             Status status = new Status(IStatus.ERROR, pluginId, stackTrace.toString());
