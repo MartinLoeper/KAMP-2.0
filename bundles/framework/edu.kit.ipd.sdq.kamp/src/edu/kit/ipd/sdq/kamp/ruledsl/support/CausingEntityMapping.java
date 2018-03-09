@@ -61,7 +61,7 @@ public final class CausingEntityMapping<U extends EObject, V extends EObject> {
 	}
 	
 	public CausingEntityMapping(U affectedElement, CausingEntityMapping<?, V> cem) {
-		this(affectedElement, new HashSet<>(cem.getCausingEntities()));
+		this(affectedElement, cem.getCausingEntities());
 		this.parents = cem.getParents();
 		this.parents.put(affectedElement, this);
 	}
