@@ -142,7 +142,7 @@ public class RuleProvider implements IRuleProvider {
 	
     public static MultiStatus createMultiStatus(String msg, Throwable t) {
         List<Status> childStatuses = new ArrayList<>();
-        StackTraceElement[] stackTraces = Thread.currentThread().getStackTrace();
+        StackTraceElement[] stackTraces = t.getStackTrace();
 
         for (StackTraceElement stackTrace: stackTraces) {
             Status status = new Status(IStatus.ERROR, KampRuleLanguageUtil.BUNDLE_NAME + ".xxxxxxxx", stackTrace.toString());
