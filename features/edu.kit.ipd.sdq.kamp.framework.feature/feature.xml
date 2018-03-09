@@ -242,6 +242,7 @@ limitations under the License.
       <import plugin="org.eclipse.emf.edit.ui"/>
       <import plugin="org.eclipse.ui.ide"/>
       <import plugin="org.palladiosimulator.pcm.editor"/>
+      <import plugin="org.palladiosimulator.pcm.resources"/>
    </requires>
 
    <plugin
