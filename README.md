@@ -13,3 +13,8 @@ More information at the [updatesite repository](https://github.com/MartinLoeper/
 
 ## Changelog
 - This fork brings Continuous Integration to KAMP and enables our partners to install the framework more easily.
+
+## Credits
+This project was structured according to [Vitruv](https://github.com/vitruv-tools/Vitruv). A big shout-out to HeikoKlare, max-kramer and all other colleagues of the [kit-sdq](https://github.com/kit-sdq) team for setting up all this Maven Tycho stuff on Travis.
+
+The following article by Lars Vogel and Simon Scholz was also very useful: http://www.vogella.com/tutorials/EclipseTycho/article.html
