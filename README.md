@@ -11,7 +11,7 @@ There is an installer for every major OS:
 - [Linux 32 bit](https://github.com/MartinLoeper/KAMP-Linux-32bit-Installer)
 
 Using the installer is usually much faster than wiring up all the components together manually.
-In particular, all user which share multiple Eclipse installations will benefit from the installer's underlying [bundle pool](https://stackoverflow.com/questions/28746404/what-does-the-bundle-pool-option-in-the-eclipse-installer-has-to-offer).
+In particular, all users which share multiple Eclipse installations will benefit from the installer's underlying [bundle pool](https://stackoverflow.com/questions/28746404/what-does-the-bundle-pool-option-in-the-eclipse-installer-has-to-offer).
 
 ## Update Site
 In order to install KAMP, open an [Eclipse (Modelling Tools) Oxygen Installation](https://www.eclipse.org/downloads/packages/release/Oxygen/3.RC3), `Help -> Install New Software...` and insert the following into the 'work with' input field: https://martinloeper.github.io/updatesite/nightly.
