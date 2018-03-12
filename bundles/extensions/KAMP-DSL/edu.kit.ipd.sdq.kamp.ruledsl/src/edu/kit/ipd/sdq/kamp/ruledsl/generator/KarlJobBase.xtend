@@ -199,6 +199,7 @@ abstract class KarlJobBase extends Job {
 			}
 			
 			cFile.create(new FileInputStream(srcFile), false, monitor)
+			cFile.setDerived(true, monitor)
 		}
 	}	
 	
