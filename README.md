@@ -4,11 +4,11 @@ KAMP is an approach to analyze the change propagation in a software system from 
 
 ## Installer
 There are installers for every platform:
-- [https://github.com/MartinLoeper/KAMP-Windows-Installer](Windows 64bit)
-- [https://github.com/MartinLoeper/KAMP-Windows-32bit-Installer](Windows 32bit)
-- [https://github.com/MartinLoeper/KAMP-OSX-Installer](OSX 64bit)
-- [https://github.com/MartinLoeper/KAMP-Linux-Installer](Linux 64bit)
-- [https://github.com/MartinLoeper/KAMP-Linux-32bit-Installer](Linux 32bit)
+- [Windows 64 bit](https://github.com/MartinLoeper/KAMP-Windows-Installer)
+- [Windows 32 bit](https://github.com/MartinLoeper/KAMP-Windows-32bit-Installer)
+- [OSX 64 bit](https://github.com/MartinLoeper/KAMP-OSX-Installer)
+- [Linux 64 bit](https://github.com/MartinLoeper/KAMP-Linux-Installer)
+- [Linux 32 bit](https://github.com/MartinLoeper/KAMP-Linux-32bit-Installer)
 
 ## Update Site
 In order to install KAMP, open an [Eclipse (Modelling Tools) Oxygen Installation](https://www.eclipse.org/downloads/packages/release/Oxygen/3.RC3), `Help -> Install New Software...` and insert the following into the 'work with' input field: https://martinloeper.github.io/updatesite/nightly.
