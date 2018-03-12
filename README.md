@@ -3,7 +3,7 @@
 KAMP is an approach to analyze the change propagation in a software system from technical and organizational perspectives. It is based on the software architecture annotated with technical (e.g. deployment) and organizational artifacts (e.g. management).
 
 ## Installer
-There are installers for every platform:
+There is an installer for every major OS:
 - [Windows 64 bit](https://github.com/MartinLoeper/KAMP-Windows-Installer)
 - [Windows 32 bit](https://github.com/MartinLoeper/KAMP-Windows-32bit-Installer)
 - [OSX 64 bit](https://github.com/MartinLoeper/KAMP-OSX-Installer)
