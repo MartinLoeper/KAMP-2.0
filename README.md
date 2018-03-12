@@ -10,7 +10,7 @@ There is an installer for every major OS:
 - [Linux 64 bit](https://github.com/MartinLoeper/KAMP-Linux-Installer)
 - [Linux 32 bit](https://github.com/MartinLoeper/KAMP-Linux-32bit-Installer)
 
-Using the installer is usually much more faster than wiring up all the components together manually.
+Using the installer is usually much faster than wiring up all the components together manually.
 In particular, all user which share multiple Eclipse installations will benefit from the installer's underlying [bundle pool](https://stackoverflow.com/questions/28746404/what-does-the-bundle-pool-option-in-the-eclipse-installer-has-to-offer).
 
 ## Update Site
