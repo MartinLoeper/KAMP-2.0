@@ -667,7 +667,9 @@ abstract class KarlJobBase extends Job {
 	        var String res = new BufferedReader(new InputStreamReader(in)).lines().collect(Collectors.joining("\n"));
 			res = String.format(res, rulesToBeRegistered)
 	        		
-			pluginProject.getFolder("gen").getFile("Activator.java").create(new ByteArrayInputStream(res.getBytes(StandardCharsets.UTF_8)), true, monitor)
+			val newFile = pluginProject.getFolder("gen").getFile("Activator.java")
+			newFile.create(new ByteArrayInputStream(res.getBytes(StandardCharsets.UTF_8)), true, monitor)
+			newFile.setDerived(true, monitor)
     	} finally {
     		try { if(in !== null) in.close(); } finally {}
     	}	
