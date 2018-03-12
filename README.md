@@ -2,6 +2,14 @@
 
 KAMP is an approach to analyze the change propagation in a software system from technical and organizational perspectives. It is based on the software architecture annotated with technical (e.g. deployment) and organizational artifacts (e.g. management).
 
+## Installer
+There is an installer for every major OS:
+- [Windows 64 bit](https://github.com/MartinLoeper/KAMP-Windows-Installer)
+- [Windows 32 bit](https://github.com/MartinLoeper/KAMP-Windows-32bit-Installer)
+- [OSX 64 bit](https://github.com/MartinLoeper/KAMP-OSX-Installer)
+- [Linux 64 bit](https://github.com/MartinLoeper/KAMP-Linux-Installer)
+- [Linux 32 bit](https://github.com/MartinLoeper/KAMP-Linux-32bit-Installer)
+
 ## Update Site
 In order to install KAMP, open an [Eclipse (Modelling Tools) Oxygen Installation](https://www.eclipse.org/downloads/packages/release/Oxygen/3.RC3), `Help -> Install New Software...` and insert the following into the 'work with' input field: https://martinloeper.github.io/updatesite/nightly.
 
