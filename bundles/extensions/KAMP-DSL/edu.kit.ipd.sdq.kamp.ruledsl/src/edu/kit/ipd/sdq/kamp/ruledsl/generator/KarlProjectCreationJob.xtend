@@ -33,6 +33,7 @@ public class KarlProjectCreationJob extends KarlJobBase {
 		    createActivator(project, subMonitor.split(1), config.getRootRuleFile)
 			//createServiceBase(project, subMonitor.split(1));
 		   	moveRuleSourceFiles(subMonitor.split(1), project, config.sourceFileUris, config.sourceFileNames);
+		    hideSrcGenFolder(root.getProject(config.assignedProjectName));
 		    
 		    setupProject(subMonitor.split(3), project)
 		   	//buildProject(project, subMonitor.split(1));
@@ -71,5 +72,6 @@ public class KarlProjectCreationJob extends KarlJobBase {
 			
 			return new Status(Status.ERROR, BUNDLE_NAME, "Die Regeln konnten nicht eingefügt werden.", e);
 		}
-	}	
+	}
+	
 }

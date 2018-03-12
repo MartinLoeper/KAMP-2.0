@@ -99,6 +99,18 @@ abstract class KarlJobBase extends Job {
 		jobManager.join(ResourcesPlugin.FAMILY_AUTO_BUILD, monitor);
 	}
 	
+	def hideSrcGenFolder(IProject project) {
+		val srcGenFolder = project.getFolder("src-gen");
+		
+		// create the folder if it does not exist
+		if(!srcGenFolder.exists) {
+			srcGenFolder.create(true, true, new NullProgressMonitor)
+		}
+		
+		// hide the src gen folder
+		srcGenFolder.hidden = true
+	}
+	
 		/**
 	 * Synchronizes the MANIFEST imports from the KAMP project and the KARL project.
 	 * 
