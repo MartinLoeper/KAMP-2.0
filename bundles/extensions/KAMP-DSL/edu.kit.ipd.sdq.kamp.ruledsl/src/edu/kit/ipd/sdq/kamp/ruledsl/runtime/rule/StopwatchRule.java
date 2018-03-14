@@ -40,7 +40,7 @@ public class StopwatchRule implements IRule {
 	}
 	
 	@Override
-	public void apply(AbstractArchitectureVersion version, ChangePropagationStepRegistry registry) {
+	public void apply(AbstractArchitectureVersion<?> version, ChangePropagationStepRegistry registry) {
 		
 		this.stopwatch.start();
 		

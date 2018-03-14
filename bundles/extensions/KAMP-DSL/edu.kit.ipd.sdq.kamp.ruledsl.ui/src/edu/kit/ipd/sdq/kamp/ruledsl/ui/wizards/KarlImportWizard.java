@@ -1,10 +1,14 @@
 package edu.kit.ipd.sdq.kamp.ruledsl.ui.wizards;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -14,13 +18,19 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.ILocalVariable;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
@@ -28,6 +38,8 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.FieldAccess;
+import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.MemberValuePair;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -39,6 +51,8 @@ import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.TypeLiteral;
+import org.eclipse.jdt.core.dom.VariableDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.jdt.core.dom.rewrite.ImportRewrite;
 import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
@@ -51,11 +65,17 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.TextEdit;
 import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWizard;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.wiring.BundleWiring;
+
+import edu.kit.ipd.sdq.kamp.ruledsl.support.IRule;
 
 public class KarlImportWizard extends Wizard implements INewWizard {
 	private static final String KAMP_RULE_ANNOTATION_IMPORT = "edu.kit.ipd.sdq.kamp.ruledsl.runtime.KampRule";
@@ -90,7 +110,10 @@ public class KarlImportWizard extends Wizard implements INewWizard {
 			return null;
 		} else {
 			if(page == artifactChooserPage) {
-				return artifactChooserPage.getSelectedArtifcat().getWizardPage();
+				WizardPage cWizardPage = artifactChooserPage.getSelectedArtifcat().getWizardPage();
+				this.artifacts.stream().filter(a -> a.getWizardPage() != cWizardPage).forEach(a -> a.getWizardPage().setPageComplete(true));
+				
+				return cWizardPage;
 			}
 		}
 		
@@ -191,18 +214,18 @@ public class KarlImportWizard extends Wizard implements INewWizard {
 	    eventHandlerAnnotation.setTypeName(astRoot.getAST().newName("KampRule"));
 	    
 	    String ruleName = CUSTOM_RULE_ARTIFACT.getWizardPage().getRuleName();
+	    IType superclass = CUSTOM_RULE_ARTIFACT.getWizardPage().getSuperclass();
 	    String parentRuleName = CUSTOM_RULE_ARTIFACT.getWizardPage().getParentRuleName();
 	    eventHandlerAnnotation.values().add(createAnnotationMember(ast, "enabled", CUSTOM_RULE_ARTIFACT.getWizardPage().getEnabledState()));
 	    
 	    if(parentRuleName != null && !parentRuleName.equals("")) {
-	    	eventHandlerAnnotation.values().add(createAnnotationMember(ast, "disableAncestors", CUSTOM_RULE_ARTIFACT.getWizardPage().getAncestorsEnabledState()));
+	    	eventHandlerAnnotation.values().add(createAnnotationMember(ast, "disableAncestors", !CUSTOM_RULE_ARTIFACT.getWizardPage().getAncestorsEnabledState()));
 	    	eventHandlerAnnotation.values().add(createAnnotationMember(ast, "parent", parentRuleName));
 	    
 	    	astRoot.accept(new ASTVisitor() {
 	    		
 	    		@Override
 	    		public boolean visit(TypeDeclaration cNode) {
-	    			TypeDeclaration node = (TypeDeclaration) rewriter.createCopyTarget(cNode);
 	    			// add constructor
 	    	    	MethodDeclaration constructor = astRoot.getAST().newMethodDeclaration();
 	    	    	constructor.setConstructor(true);
@@ -216,10 +239,45 @@ public class KarlImportWizard extends Wizard implements INewWizard {
 	    	    	varDec.setType(ast.newSimpleType(ast.newSimpleName(parentRuleName)));
 	    	    	constructor.parameters().add(varDec);
 	    	    	constructor.modifiers().add(ast.newModifier(ModifierKeyword.PUBLIC_KEYWORD));
-	    	    	ListRewrite lrw = rewriter.getListRewrite(cNode, TypeDeclaration.BODY_DECLARATIONS_PROPERTY);
+	    	    	
+	    	    	// add global variable parent rule
+//	    	    	VariableDeclarationFragment fragment = ast.newVariableDeclarationFragment();
+//	    	    	fragment.setName(ast.newSimpleName("mParentRule"));
+//	    	    	FieldDeclaration globalVarDecl = ast.newFieldDeclaration(fragment);
+//	    	    	globalVarDecl.setType(ast.newSimpleType(ast.newSimpleName(parentRuleName)));
+//	    	    	globalVarDecl.modifiers().add(ast.newModifier(ModifierKeyword.PRIVATE_KEYWORD));
+	    	        
+	    	        // add superclass if set in wizard
+	    	        if(superclass != null) {
+	    	        	rewriter.set(cNode, TypeDeclaration.SUPERCLASS_TYPE_PROPERTY, ast.newName(superclass.getFullyQualifiedName()), null);
+	    	        	
+	    	        	try {
+							IMethod[] methods = superclass.getMethods();
+							for(IMethod m : methods) {
+								if(m.isConstructor()) {
+									if(m.getParameters().length == 1) {
+										ILocalVariable var = m.getParameters()[0];
+										if((Signature.getSignatureQualifier(var.getTypeSignature())
+												+ "." + Signature.getSignatureSimpleName(var.getTypeSignature())).equals(IRule.class.getName())) {
+											
+											// constructor needs IRule argument
+											superInvocation.arguments().add(ast.newSimpleName("parentRule"));
+										}
+									}
+								}
+							}
+						} catch (JavaModelException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+	    	        }
+	    	        
+	    	        // persist constructor in AST tree
+	    	        ListRewrite lrw = rewriter.getListRewrite(cNode, TypeDeclaration.BODY_DECLARATIONS_PROPERTY);
 	    	        lrw.insertFirst(constructor, null);
-	    	  	
-	    			return super.visit(node);
+//	    	        lrw.insertFirst(globalVarDecl, null);
+	    	        
+	    			return super.visit(cNode);
 	    		}
 			});
 	    }
