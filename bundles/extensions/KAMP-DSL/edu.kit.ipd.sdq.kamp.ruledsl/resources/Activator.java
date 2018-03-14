@@ -128,6 +128,7 @@ public class Activator extends AbstractUIPlugin implements BundleActivator {
 							m.invoke(cRule, this.ruleGraph);
 						} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 							// TODO this might cause too much dialogs... use a newer batch-like api
+							// TODO for InvocationTargetException the causing exception must be displayed
 							Display.getDefault().syncExec(new Runnable() {
 							    public void run() {
 							    	MultiStatus status = RuleProvider.createMultiStatus(null, e);

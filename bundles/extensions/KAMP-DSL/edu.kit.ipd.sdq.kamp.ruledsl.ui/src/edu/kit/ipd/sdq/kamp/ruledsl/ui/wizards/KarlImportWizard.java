@@ -1,0 +1,298 @@
+package edu.kit.ipd.sdq.kamp.ruledsl.ui.wizards;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
+import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.dom.AST;
+import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.Block;
+import org.eclipse.jdt.core.dom.ClassInstanceCreation;
+import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.MemberValuePair;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.Modifier.ModifierKeyword;
+import org.eclipse.jdt.core.dom.NormalAnnotation;
+import org.eclipse.jdt.core.dom.QualifiedType;
+import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
+import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
+import org.eclipse.jdt.core.dom.SuperMethodInvocation;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jdt.core.dom.TypeLiteral;
+import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
+import org.eclipse.jdt.core.dom.rewrite.ImportRewrite;
+import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
+import org.eclipse.jdt.ui.wizards.NewClassWizardPage;
+import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.Document;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.text.edits.MalformedTreeException;
+import org.eclipse.text.edits.TextEdit;
+import org.eclipse.ui.INewWizard;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchWizard;
+
+public class KarlImportWizard extends Wizard implements INewWizard {
+	private static final String KAMP_RULE_ANNOTATION_IMPORT = "edu.kit.ipd.sdq.kamp.ruledsl.runtime.KampRule";
+	private static final String KAMP_IRULE_INTERFACE = "edu.kit.ipd.sdq.kamp.ruledsl.support.IRule";
+	private static WizardArtifact<KampRulePage> CUSTOM_RULE_ARTIFACT;
+	private static WizardArtifact<KampRulePage> CONFIGURATION_ARTIFACT;
+	private ChooseArtifactTypePage artifactChooserPage;
+	private NewClassWizardPage newClassWizardPage;
+	private IStructuredSelection selection;
+	private IPackageFragment srcPackage;
+	private final java.util.List<WizardArtifact> artifacts = new ArrayList<>();
+
+	public KarlImportWizard(ISelection selection) {
+		super();
+		setHelpAvailable(false);
+		setForcePreviousAndNextButtons(true);
+		this.selection = (IStructuredSelection) selection;
+		IProject project = extractSelection().getProject();
+		CUSTOM_RULE_ARTIFACT = new WizardArtifact("Custom Rule", new KampRulePage(project));
+		CONFIGURATION_ARTIFACT = new WizardArtifact("Configuration", new KampRulePage(project));
+		addArtifacts();
+	}
+	
+	private void addArtifacts() {
+		this.artifacts.add(CUSTOM_RULE_ARTIFACT);
+		//this.artifacts.add(CONFIGURATION_ARTIFACT);
+	}
+	
+	@Override
+	public IWizardPage getNextPage(IWizardPage page) {
+		if(this.artifacts.stream().filter(p -> p.getWizardPage() == page).findAny().isPresent()) {
+			return null;
+		} else {
+			if(page == artifactChooserPage) {
+				return artifactChooserPage.getSelectedArtifcat().getWizardPage();
+			}
+		}
+		
+		return super.getNextPage(page);
+	}
+	
+	@Override
+	public IWizardPage getPreviousPage(IWizardPage page) {
+		return super.getPreviousPage(page);
+	}
+	
+	public void setupClassCreation() throws CoreException {
+		String newClassName = getNewClassFileName();
+		newClassWizardPage.setTypeName(newClassName, true);
+		
+		IProject project = extractSelection().getProject();
+		IJavaProject jProject = getJavaProjects().stream().filter(p -> p.getProject().getName().equals(project.getName())).findAny().get();
+		if(jProject == null) {
+			IStatus status = new Status(Status.ERROR, "edu.kit.ipd.sdq.kamp.ruledsl.ui", "Project must be a JAVA project");
+			throw new CoreException(status);
+		}
+		
+		IPackageFragmentRoot root = jProject.getPackageFragmentRoot(jProject.getProject());
+		newClassWizardPage.setPackageFragmentRoot(root, true);
+		srcPackage = root.getPackageFragment("src");
+		newClassWizardPage.setPackageFragment(srcPackage, true);
+		newClassWizardPage.addSuperInterface(KAMP_IRULE_INTERFACE);
+		newClassWizardPage.setMethodStubSelection(false, false, true, true);
+	}
+	
+	private String getNewClassFileName() {
+		return CUSTOM_RULE_ARTIFACT.getWizardPage().getRuleName();
+	}
+
+	public static List<IJavaProject> getJavaProjects() {
+	      List<IJavaProject> projectList = new LinkedList<IJavaProject>();
+	      try {
+	         IWorkspaceRoot workspaceRoot = ResourcesPlugin.getWorkspace().getRoot();
+	         IProject[] projects = workspaceRoot.getProjects();
+	         for(int i = 0; i < projects.length; i++) {
+	            IProject project = projects[i];
+	            if(project.isOpen() && project.hasNature(JavaCore.NATURE_ID)) {
+	               projectList.add(JavaCore.create(project));
+	            }
+	         }
+	      }
+	      catch(CoreException ce) {
+	         ce.printStackTrace();
+	      }
+	      return projectList;
+	   }
+	
+	@Override
+	public void addPages() {
+		artifactChooserPage = new ChooseArtifactTypePage(this.selection, this.artifacts);
+		newClassWizardPage = new NewClassWizardPage();
+		addPage(artifactChooserPage);
+		addPage(newClassWizardPage);
+		
+		// this page is never shown, it is set up using setupClassCreation and triggered via performFinish
+		newClassWizardPage.setPageComplete(true);
+
+		for(WizardArtifact<?> a : this.artifacts) {
+			addPage(a.getWizardPage());
+		}
+	}
+
+	@Override
+	public boolean performFinish() {
+		try {
+			setupClassCreation();
+			IRunnableWithProgress runnable = newClassWizardPage.getRunnable();
+			runnable.run(null);
+			ICompilationUnit compilationUnit = this.srcPackage.getCompilationUnit(getNewClassFileName() + ".java");
+			addAnnotations(compilationUnit);
+			
+			return true;
+		} catch (InvocationTargetException | InterruptedException | MalformedTreeException | BadLocationException | CoreException e) {
+			Platform.getLog(Platform.getBundle("edu.kit.ipd.sdq.kamp.ruledsl.ui")).log(new Status(Status.ERROR, "edu.kit.ipd.sdq.kamp.ruledsl.ui", "Exception", e));
+		}
+		
+		return false;
+	}
+	
+	private void addAnnotations(final ICompilationUnit cu) throws MalformedTreeException, BadLocationException, CoreException {
+
+	     // parse compilation unit
+	    final ASTParser parser = ASTParser.newParser(AST.JLS3);
+	    parser.setSource(cu);
+	    final CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
+
+	    // create a ASTRewrite
+		final AST ast = astRoot.getAST();
+	    final ASTRewrite rewriter = ASTRewrite.create(ast);
+	
+	    final ListRewrite listRewrite = rewriter.getListRewrite(astRoot, CompilationUnit.TYPES_PROPERTY);
+	    final NormalAnnotation eventHandlerAnnotation = astRoot.getAST().newNormalAnnotation();
+	    eventHandlerAnnotation.setTypeName(astRoot.getAST().newName("KampRule"));
+	    
+	    String ruleName = CUSTOM_RULE_ARTIFACT.getWizardPage().getRuleName();
+	    String parentRuleName = CUSTOM_RULE_ARTIFACT.getWizardPage().getParentRuleName();
+	    eventHandlerAnnotation.values().add(createAnnotationMember(ast, "enabled", CUSTOM_RULE_ARTIFACT.getWizardPage().getEnabledState()));
+	    
+	    if(parentRuleName != null && !parentRuleName.equals("")) {
+	    	eventHandlerAnnotation.values().add(createAnnotationMember(ast, "disableAncestors", CUSTOM_RULE_ARTIFACT.getWizardPage().getAncestorsEnabledState()));
+	    	eventHandlerAnnotation.values().add(createAnnotationMember(ast, "parent", parentRuleName));
+	    
+	    	astRoot.accept(new ASTVisitor() {
+	    		
+	    		@Override
+	    		public boolean visit(TypeDeclaration cNode) {
+	    			TypeDeclaration node = (TypeDeclaration) rewriter.createCopyTarget(cNode);
+	    			// add constructor
+	    	    	MethodDeclaration constructor = astRoot.getAST().newMethodDeclaration();
+	    	    	constructor.setConstructor(true);
+	    	    	constructor.setName(ast.newSimpleName(ruleName));
+	    	    	Block block = ast.newBlock();
+	    	    	SuperConstructorInvocation superInvocation = ast.newSuperConstructorInvocation();
+	    	    	block.statements().add(superInvocation);
+	    	    	constructor.setBody(block);
+	    	    	SingleVariableDeclaration varDec = ast.newSingleVariableDeclaration();
+	    	    	varDec.setName(ast.newSimpleName("parentRule"));
+	    	    	varDec.setType(ast.newSimpleType(ast.newSimpleName(parentRuleName)));
+	    	    	constructor.parameters().add(varDec);
+	    	    	constructor.modifiers().add(ast.newModifier(ModifierKeyword.PUBLIC_KEYWORD));
+	    	    	ListRewrite lrw = rewriter.getListRewrite(cNode, TypeDeclaration.BODY_DECLARATIONS_PROPERTY);
+	    	        lrw.insertFirst(constructor, null);
+	    	  	
+	    			return super.visit(node);
+	    		}
+			});
+	    }
+	    
+	    listRewrite.insertAt(eventHandlerAnnotation, 0, null);
+	    final TextEdit edits = rewriter.rewriteAST();
+	
+	    // apply the text edits to the compilation unit
+	    final Document document = new Document(cu.getSource());
+	    edits.apply(document);
+	    
+	    // add immport for annotation
+	    ImportRewrite ir = ImportRewrite.create(cu, true);
+		ir.addImport(KAMP_RULE_ANNOTATION_IMPORT);
+		if(parentRuleName != null && !parentRuleName.equals("")) {
+			ir.addImport("gen.rule." + parentRuleName);
+		}
+		
+		final TextEdit importEdits = ir.rewriteImports(new NullProgressMonitor());
+		importEdits.apply(document);
+	
+	    // this is the code for adding statements
+	    cu.getBuffer().setContents((document.get()));
+	    cu.save(null, true);
+	}
+	
+	protected MemberValuePair createQualifiedAnnotationMember(final AST ast, final String name, final String value, final String value2) {
+	    final MemberValuePair mV = ast.newMemberValuePair();
+	    mV.setName(ast.newSimpleName(name));
+	    final TypeLiteral typeLiteral = ast.newTypeLiteral();
+	    final QualifiedType newQualifiedName = ast.newQualifiedType(ast.newSimpleType(ast.newSimpleName(value)), ast.newSimpleName(value2));
+	    typeLiteral.setType(newQualifiedName);
+	    mV.setValue(typeLiteral);
+	    return mV;
+	}
+	
+	protected MemberValuePair createAnnotationMember(final AST ast, final String name, final String value) {
+	
+	    final MemberValuePair mV = ast.newMemberValuePair();
+	    mV.setName(ast.newSimpleName(name));
+	    final TypeLiteral typeLiteral = ast.newTypeLiteral();
+	    typeLiteral.setType(ast.newSimpleType(ast.newSimpleName(value)));
+	    mV.setValue(typeLiteral);
+	    return mV;
+	}
+	
+	protected MemberValuePair createAnnotationMember(final AST ast, final String name, final boolean value) {
+		
+	    final MemberValuePair mV = ast.newMemberValuePair();
+	    mV.setName(ast.newSimpleName(name));
+	    final TypeLiteral typeLiteral = ast.newTypeLiteral();
+	    mV.setValue(ast.newBooleanLiteral(value));
+	    return mV;
+	}
+
+	/**
+	 * We will accept the selection in the workbench to see if
+	 * we can initialize from it.
+	 * @see IWorkbenchWizard#init(IWorkbench, IStructuredSelection)
+	 */
+	@Override
+	public void init(IWorkbench workbench, IStructuredSelection selection) {
+		this.selection = selection;
+	}
+	
+	private IResource extractSelection() {
+	    Object element = this.selection.getFirstElement();
+	    if (element instanceof IResource)
+	        return (IResource) element;
+	    if (!(element instanceof IAdaptable))
+	        return null;
+	    IAdaptable adaptable = (IAdaptable)element;
+	    Object adapter = adaptable.getAdapter(IResource.class);
+	    return (IResource) adapter;
+	}
+}

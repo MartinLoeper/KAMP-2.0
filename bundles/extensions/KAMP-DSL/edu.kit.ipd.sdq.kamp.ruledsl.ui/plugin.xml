@@ -584,6 +584,13 @@
 		adaptable="true"
 		id="edu.kit.ipd.sdq.kamp.ruledsl.objectContribution"
 		objectClass="org.eclipse.core.resources.IContainer">
+     <action
+           class="edu.kit.ipd.sdq.kamp.ruledsl.ui.wizards.OpenKarlWizardAction"
+           enablesFor="1"
+           id="edu.kit.ipd.sdq.kamp.ruledsl.openWizard"
+           label="Create KARL Artifact"
+           menubarPath="kamp">
+     </action>
 		
 		<action
 		class="edu.kit.ipd.sdq.kamp.ruledsl.ui.CreateKarlFileAction"
@@ -602,4 +609,18 @@
 		</action>
 		</objectContribution>
 	</extension>
+ <extension
+       point="org.eclipse.ui.newWizards">
+    <category
+          id="edu.kit.ipd.sdq.kamp.ruledsl.ui"
+          name="KARL Wizards">
+    </category>
+    <wizard
+          category="edu.kit.ipd.sdq.kamp.ruledsl.ui"
+          class="edu.kit.ipd.sdq.kamp.ruledsl.ui.wizards.KarlImportWizard"
+          icon="icons/sample.png"
+          id="edu.kit.ipd.sdq.kamp.ruledsl.ui.wizards.KarlImportWizard"
+          name="DSL User Artifact Creation Wizard">
+    </wizard>
+ </extension>
 </plugin>
