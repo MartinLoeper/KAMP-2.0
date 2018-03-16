@@ -2,10 +2,13 @@ package edu.kit.ipd.sdq.kamp.ruledsl.ui.wizards;
 
 import java.util.ArrayList;
 
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
@@ -40,6 +43,20 @@ public class ChooseArtifactTypePage extends WizardPage {
 			list.add(cArtifact.getName());
 		}
 		
+		listViewer.addDoubleClickListener(new IDoubleClickListener() {
+			
+			@Override
+			public void doubleClick(DoubleClickEvent event) {
+				setSelectedArtifact(list.getSelectionIndex());
+				if(cArtifact.getWizardPage() != null) {
+					getWizard().getContainer().showPage(cArtifact.getWizardPage());
+				} else {
+					getWizard().performFinish();
+					((Window) getWizard().getContainer()).close();
+				}
+			}
+		});
+		
 		listViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			
 			@Override
@@ -47,6 +64,8 @@ public class ChooseArtifactTypePage extends WizardPage {
 				if(list.getSelectionIndex() >= 0) {
 					setSelectedArtifact(list.getSelectionIndex());
 				}
+				
+				getWizard().getContainer().updateButtons();
 			}
 
 		});
