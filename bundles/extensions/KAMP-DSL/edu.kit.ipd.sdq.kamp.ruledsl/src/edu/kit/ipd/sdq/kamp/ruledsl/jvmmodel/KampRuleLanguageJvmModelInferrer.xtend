@@ -345,9 +345,21 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 	def dispatch generateCodeForRule(ForwardEReference ref, JvmGenericType typeToAddTo, boolean addToCausingEntities) {
 		var varName = '''marked«ref.metaclass.name.toFirstUpper»__''' + getLookupNumber(ref)
 		nameForLookup.put(ref, varName)
+		var String projectionClasses = null;
+		if(ref.projections !== null && ref.projections.length > 0) {
+			for(projection : ref.projections) {
+				if(projectionClasses === null) {
+					projectionClasses = projection.qualifiedName + ".class";
+				} else {
+					projectionClasses = projectionClasses + ", " +  projection.qualifiedName + ".class";
+				}
+			} 
+		} else {
+			projectionClasses= "null";
+		}
 		
 		'''
-			«Stream.canonicalName»<CausingEntityMapping<«ref.metaclass.instanceTypeName», EObject>> «varName» = «LookupUtil.canonicalName».lookupForwardReference(«nameForLookup.get(getPreviousSiblingOfType(ref, Lookup))», «ref.feature.many», "«ref.feature.name»", «ref.metaclass.instanceTypeName».class, «addToCausingEntities»);
+			«Stream.canonicalName»<CausingEntityMapping<«ref.metaclass.instanceTypeName», EObject>> «varName» = «LookupUtil.canonicalName».lookupForwardReference(«nameForLookup.get(getPreviousSiblingOfType(ref, Lookup))», «ref.feature.many», "«ref.feature.name»", «ref.metaclass.instanceTypeName».class, «addToCausingEntities», «projectionClasses»);
 		'''
 	}
 
@@ -357,9 +369,21 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 	def dispatch generateCodeForRule(BackwardEReference ref, JvmGenericType typeToAddTo, boolean addToCausingEntities) {
 		var varName = '''backmarked«ref.mclass.metaclass.name.toFirstUpper»__''' + getLookupNumber(ref); 
 		nameForLookup.put(ref, varName)
+		var String projectionClasses = null;
+		if(ref.projections !== null && ref.projections.length > 0) {
+			for(projection : ref.projections) {
+				if(projectionClasses === null) {
+					projectionClasses = projection.qualifiedName + ".class";
+				} else {
+					projectionClasses = projectionClasses + ", " +  projection.qualifiedName + ".class";
+				}
+			} 
+		} else {
+			projectionClasses= "null";
+		}
 		
 		'''
-			«Stream.canonicalName»<CausingEntityMapping<«ref.metaclass.instanceTypeName», EObject>> «varName» = «LookupUtil.canonicalName».lookupBackwardReference(version, «ref.mclass.metaclass.instanceTypeName».class, ''' + getFeatureName(ref) + ''', «nameForLookup.get(getPreviousSiblingOfType(ref, Lookup))», «addToCausingEntities»).stream();
+			«Stream.canonicalName»<CausingEntityMapping<«ref.metaclass.instanceTypeName», EObject>> «varName» = «LookupUtil.canonicalName».lookupBackwardReference(version, «ref.mclass.metaclass.instanceTypeName».class, ''' + getFeatureName(ref) + ''', «nameForLookup.get(getPreviousSiblingOfType(ref, Lookup))», «addToCausingEntities», «projectionClasses»).stream();
 		'''
 	}
 	

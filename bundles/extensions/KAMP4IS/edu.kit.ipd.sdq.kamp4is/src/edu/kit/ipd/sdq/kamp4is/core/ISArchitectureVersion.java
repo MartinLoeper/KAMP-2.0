@@ -3,27 +3,34 @@ package edu.kit.ipd.sdq.kamp4is.core;
 import de.uka.ipd.sdq.componentInternalDependencies.ComponentInternalDependenciesFactory;
 import de.uka.ipd.sdq.componentInternalDependencies.ComponentInternalDependencyRepository;
 
+import org.eclipse.emf.ecore.util.ECrossReferenceAdapter;
 import org.palladiosimulator.pcm.repository.Repository;
 import org.palladiosimulator.pcm.repository.RepositoryFactory;
 import org.palladiosimulator.pcm.system.System;
 import org.palladiosimulator.pcm.system.SystemFactory;
 
 import edu.kit.ipd.sdq.kamp.architecture.AbstractArchitectureVersion;
+import edu.kit.ipd.sdq.kamp.architecture.CrossReferenceProvider;
 import edu.kit.ipd.sdq.kamp4is.model.fieldofactivityannotations.ISFieldOfActivityAnnotationsRepository;
 import edu.kit.ipd.sdq.kamp4is.model.fieldofactivityannotations.ISFieldOfActivityAnnotationsFactory;
 import edu.kit.ipd.sdq.kamp4is.model.modificationmarks.AbstractISModificationRepository;
 
-public class ISArchitectureVersion extends AbstractArchitectureVersion<AbstractISModificationRepository<?>> {
+public class ISArchitectureVersion extends AbstractArchitectureVersion<AbstractISModificationRepository<?>> implements CrossReferenceProvider {
 	private Repository repository;
 	private org.palladiosimulator.pcm.system.System system;
 	private ISFieldOfActivityAnnotationsRepository fieldOfActivityRepository;
 	private ComponentInternalDependencyRepository componentInternalDependencyRepository;
-	
+	private final ECrossReferenceAdapter eCrossReferenceAdapter;
+
 	public ISArchitectureVersion(String name, Repository repository, System system,
 			ISFieldOfActivityAnnotationsRepository fieldOfActivityRepository,
 			AbstractISModificationRepository<?> modificationMarkRepository,
-			ComponentInternalDependencyRepository componentInternalDependencyRepository) {
+			ComponentInternalDependencyRepository componentInternalDependencyRepository,
+			ECrossReferenceAdapter eCrossReferenceAdapter) {
 		super(name, modificationMarkRepository);
+		
+		this.eCrossReferenceAdapter = eCrossReferenceAdapter;
+		
 		// Some of the files describing the architecture might not exist; prevent NullPointer
 		// in propagation algorithm by setting newly created objects (whose EReferences are
 		// instantiated with empty collections, so the algorithm can handle them)
@@ -47,6 +54,11 @@ public class ISArchitectureVersion extends AbstractArchitectureVersion<AbstractI
 		this.componentInternalDependencyRepository = componentInternalDependencyRepository;
 	}
 
+	@Override
+	public ECrossReferenceAdapter getECrossReferenceAdapter() {
+		return this.eCrossReferenceAdapter;
+	}
+	
 	public Repository getRepository() {
 		return repository;
 	}

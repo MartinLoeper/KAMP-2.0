@@ -27,14 +27,13 @@ import edu.kit.ipd.sdq.kamp4is.model.modificationmarks.AbstractISModificationRep
  * (old files that do not have a KAMP+INTBIIS model, but a KAMP model, can be
  * still be processed).
  */
-public class BPArchitectureVersion extends ISArchitectureVersion implements CrossReferenceProvider {
+public class BPArchitectureVersion extends ISArchitectureVersion {
 
 	public static final String USAGEMODEL_DEFAULT_NAME = "default";
 
 	private Map<String, UsageModel> usageModels;
 	private DataModel dataModel;
 	private OrganizationEnvironmentModel organizationEnvironmentModel;
-	private final ECrossReferenceAdapter eCrossReferenceAdapter;
 
 	public BPArchitectureVersion(String name, Repository repository, System system,
 			ISFieldOfActivityAnnotationsRepository fieldOfActivityRepository,
@@ -43,8 +42,8 @@ public class BPArchitectureVersion extends ISArchitectureVersion implements Cros
 			Map<String, UsageModel> usageModels, DataModel dataModel,
 			OrganizationEnvironmentModel organizationEnvironmentModel, ECrossReferenceAdapter eCrossReferenceAdapter) {
 		super(name, repository, system, fieldOfActivityRepository, modificationMarkRepository,
-				componentInternalDependencyRepository);
-		this.eCrossReferenceAdapter = eCrossReferenceAdapter;
+				componentInternalDependencyRepository, eCrossReferenceAdapter);
+	
 		if (usageModels.isEmpty()) {
 			usageModels.put(USAGEMODEL_DEFAULT_NAME, UsagemodelFactory.eINSTANCE.createUsageModel());
 		}
@@ -58,11 +57,6 @@ public class BPArchitectureVersion extends ISArchitectureVersion implements Cros
 					.createOrganizationEnvironmentModel();
 		}
 		this.organizationEnvironmentModel = organizationEnvironmentModel;
-	}
-	
-	@Override
-	public ECrossReferenceAdapter getECrossReferenceAdapter() {
-		return this.eCrossReferenceAdapter;
 	}
 
 	public Map<String, UsageModel> getUsageModels() {

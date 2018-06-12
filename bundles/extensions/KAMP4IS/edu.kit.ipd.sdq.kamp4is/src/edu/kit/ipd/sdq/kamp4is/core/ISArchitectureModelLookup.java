@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Set;
 
 import de.uka.ipd.sdq.componentInternalDependencies.RoleToRoleDependency;
+
+import org.eclipse.emf.common.util.EList;
 import org.palladiosimulator.pcm.core.composition.AssemblyConnector;
 import org.palladiosimulator.pcm.core.composition.AssemblyContext;
 import org.palladiosimulator.pcm.core.composition.Connector;
@@ -24,6 +26,7 @@ import org.palladiosimulator.pcm.repository.OperationRequiredRole;
 import org.palladiosimulator.pcm.repository.OperationSignature;
 import org.palladiosimulator.pcm.repository.Parameter;
 import org.palladiosimulator.pcm.repository.ProvidedRole;
+import org.palladiosimulator.pcm.repository.Repository;
 import org.palladiosimulator.pcm.repository.RepositoryComponent;
 import org.palladiosimulator.pcm.repository.RequiredRole;
 import org.palladiosimulator.pcm.repository.Role;
@@ -206,10 +209,6 @@ public class ISArchitectureModelLookup {
 				OperationInterface operationInterface = (OperationInterface) interfac;
 				matchingSignatures.retainAll(operationInterface.getSignatures__OperationInterface());
 				MapUtil.putOrAddToMap(results, operationInterface, matchingSignatures);
-			} else if (interfac instanceof EventGroup) {
-				EventGroup eventGroup = (EventGroup) interfac;
-				matchingSignatures.retainAll(eventGroup.getEventTypes__EventGroup());
-				MapUtil.putOrAddToMap(results, eventGroup, matchingSignatures);
 			}
 		}
 

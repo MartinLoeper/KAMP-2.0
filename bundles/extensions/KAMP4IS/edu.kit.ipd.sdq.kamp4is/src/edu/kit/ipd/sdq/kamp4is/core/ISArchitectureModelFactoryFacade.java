@@ -27,7 +27,7 @@ public class ISArchitectureModelFactoryFacade {
 		ISFieldOfActivityAnnotationsRepository fieldOfActivityRepository = ISArchitectureModelFactoryFacade.createFieldOfActivityAnnotationsRepository();
 		ISModificationRepository modificationMarkRepository = ISArchitectureModelFactoryFacade.createModificationmarksRepository();
 		ComponentInternalDependencyRepository componentInternalDependencyRepository = ISArchitectureModelFactoryFacade.createComponentInternalDependencyRepository();
-		return new ISArchitectureVersion(name, repository, system, fieldOfActivityRepository, modificationMarkRepository, componentInternalDependencyRepository);
+		return new ISArchitectureVersion(name, repository, system, fieldOfActivityRepository, modificationMarkRepository, componentInternalDependencyRepository, null);
 	}
 	
 	public static Repository createRepository(String name) {

@@ -4,6 +4,8 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.emf.ecore.util.ECrossReferenceAdapter;
+
 import de.uka.ipd.sdq.componentInternalDependencies.ComponentInternalDependencyRepository;
 import org.palladiosimulator.pcm.repository.Repository;
 import org.palladiosimulator.pcm.system.System;
@@ -17,6 +19,9 @@ public class ISArchitectureVersionPersistency extends AbstractISArchitectureVers
 	@Override
 	public ISArchitectureVersion load(String folderpath, String filename, String versionname) {
 		ResourceSet loadResourceSet = new ResourceSetImpl();	
+		
+		ECrossReferenceAdapter adapter = new ECrossReferenceAdapter();
+		loadResourceSet.eAdapters().add(adapter);
 		String repositoryfilePath = filename + "."+FILEEXTENSION_REPOSITORY;
 		String systemfilePath = filename + "."+FILEEXTENSION_SYSTEM;
 		String fieldOfActivityRepositoryFilePath = filename + "."+FILEEXTENSION_FIELDOFACTIVITYANNOTATIONS;
@@ -29,12 +34,15 @@ public class ISArchitectureVersionPersistency extends AbstractISArchitectureVers
 		AbstractISModificationRepository<?> modificationMarkRepository = (AbstractISModificationRepository<?>)loadEmfModelFromResource(folderpath, internalModFilePath, loadResourceSet);
 		ComponentInternalDependencyRepository componentInternalDependencyRepository = (ComponentInternalDependencyRepository)loadEmfModelFromResource(folderpath, cidepfilePath, loadResourceSet);
 		
-		return new ISArchitectureVersion(versionname, repository, system, fieldOfActivityRepository, modificationMarkRepository, componentInternalDependencyRepository);
+		return new ISArchitectureVersion(versionname, repository, system, fieldOfActivityRepository, modificationMarkRepository, componentInternalDependencyRepository, adapter);
 	}	
 	
 	@Override
 	public ISArchitectureVersion load(IContainer folder, String versionname) {
 		ResourceSet loadResourceSet = new ResourceSetImpl();	
+		ECrossReferenceAdapter adapter = new ECrossReferenceAdapter();
+		loadResourceSet.eAdapters().add(adapter);
+
 		IFile repositoryfile = FileAndFolderManagement.retrieveFileWithExtension(folder, FILEEXTENSION_REPOSITORY);
 		IFile systemfile = FileAndFolderManagement.retrieveFileWithExtension(folder, FILEEXTENSION_SYSTEM);
 		IFile fieldOfActivityRepositoryFile = FileAndFolderManagement.retrieveFileWithExtension(folder, FILEEXTENSION_FIELDOFACTIVITYANNOTATIONS);
@@ -58,7 +66,7 @@ public class ISArchitectureVersionPersistency extends AbstractISArchitectureVers
 		if (cidepfile != null && cidepfile.exists())
 			componentInternalDependencyRepository = (ComponentInternalDependencyRepository)loadEmfModelFromResource(cidepfile.getFullPath().toString(), null, loadResourceSet);
 		
-		return new ISArchitectureVersion(versionname, repository, system, fieldOfActivityRepository, modificationMarkRepository, componentInternalDependencyRepository);
+		return new ISArchitectureVersion(versionname, repository, system, fieldOfActivityRepository, modificationMarkRepository, componentInternalDependencyRepository, adapter);
 	}
 	
 }

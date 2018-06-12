@@ -14,7 +14,7 @@ public class ISChangePropagationAction extends AbstractChangePropagationAction<I
 
 	@Override
 	protected AbstractChangePropagationAnalysis<ISArchitectureVersion> createChangePropagationAnalysis() {
-		return new ISChangePropagationAnalysis();
+		return new ISChangePropagationAnalysis(getProject());
 	}
 
 	@Override

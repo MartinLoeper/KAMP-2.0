@@ -58,11 +58,11 @@ PropagationReference:
 ;
 
 ForwardEReference returns ForwardEReference:
-	'->' feature=[ecore::EReference]
+	'->' feature=[ecore::EReference] ('[' projections+=[jvmTypes::JvmType|QualifiedName] ('OR' projections+=[jvmTypes::JvmType|QualifiedName])* ']')?
 ;
 
 BackwardEReference: 
-	'<-' mclass=UnnamedMetaclassReference ('[' feature=[ecore::EStructuralFeature|ValidID] ']')?
+	'<-' ('[' projections+=[jvmTypes::JvmType|QualifiedName] ('OR' projections+=[jvmTypes::JvmType|QualifiedName])* ']')? mclass=UnnamedMetaclassReference ('[' feature=[ecore::EStructuralFeature|ValidID] ']')?
 ; 
 
 JavaImport:

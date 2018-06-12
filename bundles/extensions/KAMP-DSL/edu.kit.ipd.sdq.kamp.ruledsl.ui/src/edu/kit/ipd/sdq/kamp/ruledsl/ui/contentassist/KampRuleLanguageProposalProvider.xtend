@@ -25,6 +25,12 @@ import org.eclipse.emf.ecore.EcoreFactory
 import edu.kit.ipd.sdq.kamp.model.modificationmarks.ChangePropagationStep
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.ForwardEReference
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.impl.KampRuleImpl
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.BackwardEReference
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.KampRule
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.Lookup
+import static extension edu.kit.ipd.sdq.kamp.ruledsl.util.KampRuleLanguageEcoreUtil.*
 
 /**
  * See https://www.eclipse.org/Xtext/documentation/304_ide_concepts.html#content-assist
@@ -97,7 +103,36 @@ class KampRuleLanguageProposalProvider extends AbstractKampRuleLanguageProposalP
 			}
 		}
 	}
-
+		
+	override completeForwardEReference_Projections(EObject model, Assignment assignment, ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
+		var container = EcoreUtil2.getContainerOfType(model, ForwardEReference);
+		
+		if (container !== null && container instanceof ForwardEReference) {
+			val currentFeature = container.feature;
+            val IJvmTypeProvider jvmTypeProvider = jvmTypeProviderFactory.createTypeProvider(model.eContainer.eResource().getResourceSet());
+            val JvmType interfaceToImplement = jvmTypeProvider.findTypeByName(currentFeature.getEType().instanceClass.canonicalName);
+            // what does KampRuleLanguagePackage.Literals.MODIFICATION_MARK__TYPE mean here?
+            typeProposalProvider.createSubTypeProposals(interfaceToImplement, this, context, KampRuleLanguagePackage.Literals.MODIFICATION_MARK__TYPE, new IsInterface(), acceptor);
+        } else {
+            super.completeJvmParameterizedTypeReference_Type(model, assignment, context, acceptor);
+        }
+	}
+	
+	override completeBackwardEReference_Projections(EObject model, Assignment assignment, ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
+		var container = EcoreUtil2.getContainerOfType(model, BackwardEReference);
+		
+		if (container !== null && container instanceof BackwardEReference) {
+			val previousLookup = (container as Lookup).previousMetaclass
+            val IJvmTypeProvider jvmTypeProvider = jvmTypeProviderFactory.createTypeProvider(model.eContainer.eResource().getResourceSet());
+            print(previousLookup.instanceClass.canonicalName);
+            val JvmType interfaceToImplement = jvmTypeProvider.findTypeByName(previousLookup.instanceClass.canonicalName);
+            // what does KampRuleLanguagePackage.Literals.MODIFICATION_MARK__TYPE mean here?
+            typeProposalProvider.createSubTypeProposals(interfaceToImplement, this, context, KampRuleLanguagePackage.Literals.MODIFICATION_MARK__TYPE, new IsInterface(), acceptor);
+        } else {
+            super.completeJvmParameterizedTypeReference_Type(model, assignment, context, acceptor);
+        }
+	}
+	
 	public static class IsInterface implements ITypesProposalProvider.Filter {
 		override accept(int modifiers, char[] packageName, char[] simpleTypeName,
 				char[][] enclosingTypeNames, String path) {
