@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <aggregator:Aggregation xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aggregator="http://www.eclipse.org/cbi/p2repo/2011/aggregator/1.1.0" label="KAMP Framework Update Site" buildRoot="target">
-  <validationSets label="main">
+  <validationSets description="The main validation set for KAMP.&#xD;&#xA;It contains all required features to be installed." label="main">
     <contributions label="local">
       <repositories location="../edu.kit.ipd.sdq.kamp.updatesite/target/repository"/>
     </contributions>
@@ -17,7 +17,7 @@
         <mapRules xsi:type="aggregator:ExclusionRule" name="de.uka.ipd.sdq.dsexplore.feature.feature.group" versionRange="4.0.1.201712071438"/>
       </repositories>
       <repositories location="http://vitruv.tools/updatesite/nightly">
-        <categories name="201806140837.Vitruv Application Development"/>
+        <categories name="201806210841.Vitruv Application Development" versionRange="1.0.0.077-cZrbdL7E7Ac7UEA7cMA"/>
       </repositories>
     </contributions>
   </validationSets>
