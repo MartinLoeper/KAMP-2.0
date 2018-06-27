@@ -12,7 +12,7 @@ public interface IRuleProvider<T extends AbstractArchitectureVersion<M>, M exten
 	void applyAllRules(T version, ChangePropagationStepRegistry registry);
 	void register(KampRuleStub ruleClass) throws RegistryException;
 	long getNumberOfRegisteredRules();
-	void runEarlyHook(Consumer<Set<IRule<?, ?, T, M>>> instances);
+	void runEarlyHook(Consumer<Set<IRule<EObject, EObject, T, M>>> instances);
 	void setConfiguration(IConfiguration config);
 	IConfiguration getConfiguration();
 }

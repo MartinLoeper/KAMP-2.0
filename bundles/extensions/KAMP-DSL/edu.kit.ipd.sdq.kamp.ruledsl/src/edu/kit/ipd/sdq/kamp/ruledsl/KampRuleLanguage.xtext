@@ -10,19 +10,19 @@ import "http://www.eclipse.org/xtext/common/JavaVMTypes" as jvmTypes
 RuleFile:
 	MirBaseFile
 	(javaPackageImports+=JavaImport)*
-	(steps+=Step)*
+	(blocks+=Block)*
 ;
 
-Step:
-	DuplicateAwareStep | IndependentStep
+Block:
+	RecursiveBlock | StandardBlock
 ;
 
-IndependentStep:
+StandardBlock:
 	KampRule
 ;
 
-DuplicateAwareStep:
-	'step' (name=ValidID)? '{' (rules+=KampRule)+ '}'
+RecursiveBlock:
+	'recursive' '{' (rules+=KampRule)+ '}'
 ;
 
 KampRule:

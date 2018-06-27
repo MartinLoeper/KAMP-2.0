@@ -5,31 +5,41 @@ package edu.kit.ipd.sdq.kamp.ruledsl.jvmmodel
 
 import com.google.inject.Inject
 import edu.kit.ipd.sdq.kamp.architecture.AbstractArchitectureVersion
-import edu.kit.ipd.sdq.kamp.model.modificationmarks.AbstractModification
+import edu.kit.ipd.sdq.kamp.model.modificationmarks.AbstractModificationRepository
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.BackwardEReference
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.DuplicateAwareStep
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.Block
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.CausingEntityMarker
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.ForwardEReference
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.IndependentStep
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.Instruction
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.KampRule
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.Lookup
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.RecursiveBlock
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.RuleFile
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.Step
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.RuleReference
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.StandardBlock
+import edu.kit.ipd.sdq.kamp.ruledsl.support.CausingEntityMapping
 import edu.kit.ipd.sdq.kamp.ruledsl.support.ChangePropagationStepRegistry
+import edu.kit.ipd.sdq.kamp.ruledsl.support.IRecursiveRule
 import edu.kit.ipd.sdq.kamp.ruledsl.support.IRule
 import edu.kit.ipd.sdq.kamp.ruledsl.util.EcoreUtil
 import edu.kit.ipd.sdq.kamp.ruledsl.util.ErrorHandlingUtil
 import edu.kit.ipd.sdq.kamp.util.LookupUtil
-import edu.kit.ipd.sdq.kamp.util.ModificationMarkCreationUtil
+import java.util.ArrayList
+import java.util.HashMap
+import java.util.List
 import java.util.Map
-import java.util.Set
-import java.util.stream.Collectors
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.stream.Stream
+import org.eclipse.emf.common.util.BasicEList
+import org.eclipse.emf.common.util.EList
+import org.eclipse.emf.ecore.EObject
 import org.eclipse.jface.dialogs.ErrorDialog
 import org.eclipse.swt.widgets.Shell
 import org.eclipse.ui.PlatformUI
 import org.eclipse.xtend2.lib.StringConcatenationClient
 import org.eclipse.xtext.common.types.JvmDeclaredType
 import org.eclipse.xtext.common.types.JvmGenericType
+import org.eclipse.xtext.common.types.JvmTypeReference
 import org.eclipse.xtext.xbase.jvmmodel.AbstractModelInferrer
 import org.eclipse.xtext.xbase.jvmmodel.IJvmDeclaredTypeAcceptor
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
@@ -38,20 +48,6 @@ import org.osgi.framework.FrameworkUtil
 import static edu.kit.ipd.sdq.kamp.ruledsl.util.EcoreUtil.*
 
 import static extension edu.kit.ipd.sdq.kamp.ruledsl.util.KampRuleLanguageEcoreUtil.*
-import edu.kit.ipd.sdq.kamp.ruledsl.support.IDuplicateAwareRule
-import edu.kit.ipd.sdq.kamp.util.PropagationStepUtil
-import org.eclipse.emf.ecore.EObject
-import org.eclipse.emf.common.util.EList
-import org.eclipse.emf.common.util.BasicEList
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.CausingEntityMarker
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.Instruction
-import edu.kit.ipd.sdq.kamp.ruledsl.support.CausingEntityMapping
-import java.util.ArrayList
-import java.util.List
-import java.util.HashMap
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.RuleReference
-import org.eclipse.xtext.common.types.JvmTypeReference
-import edu.kit.ipd.sdq.kamp.model.modificationmarks.AbstractModificationRepository
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -69,6 +65,9 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 
 	/** associates a variable name with a {@link Lookup} */
 	private Map<Lookup, String> nameForLookup;
+	
+	/** track the index of the currently inserted rule */
+	private AtomicInteger currentRuleIndex = new AtomicInteger();
 	
 	/**
 	 * The dispatch method {@code infer} is called for each instance of the
@@ -93,20 +92,20 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 	 *            rely on linking using the index if isPreIndexingPhase is
 	 *            <code>true</code>.
 	 */
-	def dispatch void infer(Step step, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {		
-		if(step instanceof IndependentStep) {
-			createRule(step as KampRule, acceptor, isPreIndexingPhase, -1);
-		} else if(step instanceof DuplicateAwareStep) {
-			for(rule : step.rules) {
-				createRule(rule, acceptor, isPreIndexingPhase, getStepNumber(rule, step.eContainer as RuleFile));
+	def dispatch void infer(Block block, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {		
+		if(block instanceof StandardBlock) {
+			createRule(block as KampRule, acceptor, isPreIndexingPhase, -1, currentRuleIndex);
+		} else if(block instanceof RecursiveBlock) {
+			for(rule : block.rules) {
+				createRule(rule, acceptor, isPreIndexingPhase, getBlockNumber(rule, block.eContainer as RuleFile), currentRuleIndex);
 			}
 		}	
 	}
 	
-	def int getStepNumber(KampRule rule, RuleFile ruleFile) {
+	def int getBlockNumber(KampRule rule, RuleFile ruleFile) {
 		var i = -1;
-		for(cStep : ruleFile.steps) {
-			if(cStep instanceof DuplicateAwareStep) {
+		for(cStep : ruleFile.blocks) {
+			if(cStep instanceof RecursiveBlock) {
 				i++;
 				
 				if(cStep.rules.contains(rule)) {
@@ -119,7 +118,7 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 	}
 	
 	// stepId == -1 means that it is an independent rule
-	def void createRule(KampRule rule, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase, int stepId) {
+	def void createRule(KampRule rule, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase, int blockId, AtomicInteger currentRuleIndex) {
 		val className = rule.getClassName();
 		val clazz = rule.toClass(className);
 		clazz.packageName = "gen.rule";
@@ -164,12 +163,12 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 				
 				// choose correct implementing interface and add special methods
 				var JvmTypeReference currentInterface = null;
-				if(stepId > -1) {
-					currentInterface = IDuplicateAwareRule.typeRef(sourceType, returnType, typeRef(AbstractArchitectureVersion, typeRef(AbstractModificationRepository, wildcard(), wildcard())), typeRef(AbstractModificationRepository, wildcard(), wildcard()))
+				if(blockId > -1) {
+					currentInterface = IRecursiveRule.typeRef(sourceType, returnType, typeRef(AbstractArchitectureVersion, typeRef(AbstractModificationRepository, wildcard(), wildcard())), typeRef(AbstractModificationRepository, wildcard(), wildcard()))
 					
-					val getStepIdMethod = rule.toMethod("getStepId", typeRef("int")) [
+					val getStepIdMethod = rule.toMethod("getRecursiveBlockId", typeRef("int")) [
 						body = '''
-							return «stepId»;
+							return «blockId»;
 						'''
 					];
 					
@@ -186,7 +185,7 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 				val applyMethod = rule.toMethod(getMethodName(), typeRef("void")) [
 					// parameters += rule.toParameter("version", typeRef(AbstractArchitectureVersion, wildcard()))
 					// parameters += rule.toParameter("registry", typeRef(ChangePropagationStepRegistry))
-					parameters += rule.toParameter("sourceElements", Stream.typeRef(sourceType));
+					parameters += rule.toParameter("sourceElements", Stream.typeRef(typeRef(CausingEntityMapping, sourceType, typeRef(EObject))));
 					
 					nameForLookup.put(null, "input")
 					if(rule.modificationMark !== null) {
@@ -259,6 +258,29 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 				// TODO replace with proper exception handling
 				System.err.println("Rule could not be created. Not fully defined? Name: " + rule.name)
 			}	
+			
+			// create class getter methods
+			val sourceElementClassGetter = rule.toMethod("getSourceElementClass", Class.typeRef(sourceType)) [
+				body = '''
+						return «sourceType».class;
+					'''
+			]
+			theClass.members += sourceElementClassGetter
+			
+			val affectedElementClassGetter = rule.toMethod("getAffectedElementClass", Class.typeRef(returnType)) [
+				body = '''
+						return «returnType».class;
+					'''
+			]
+			theClass.members += affectedElementClassGetter
+			
+			// create the getPosition method
+			val positionMethod = rule.toMethod("getPosition", typeRef("int")) [
+				body = '''
+						return «currentRuleIndex.getAndIncrement() * 10»;
+					'''
+			]
+			theClass.members += positionMethod
 		]);
 	}
 	

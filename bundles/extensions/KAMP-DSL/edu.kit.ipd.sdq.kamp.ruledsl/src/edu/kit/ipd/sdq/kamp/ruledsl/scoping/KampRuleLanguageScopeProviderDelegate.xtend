@@ -3,28 +3,28 @@ package edu.kit.ipd.sdq.kamp.ruledsl.scoping
 
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.BackwardEReference
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.KampRule
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.KampRuleLanguagePackage
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.Lookup
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.PropagationReference
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.RecursiveBlock
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.RuleFile
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.RuleReference
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.StandardBlock
 import org.eclipse.emf.ecore.EClass
 import org.eclipse.emf.ecore.EClassifier
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EReference
+import org.eclipse.emf.ecore.EcorePackage
 import org.eclipse.xtext.resource.EObjectDescription
 import org.eclipse.xtext.scoping.IScope
+import org.eclipse.xtext.scoping.impl.SimpleScope
 import tools.vitruv.dsls.mirbase.mirBase.MetaclassReference
+import tools.vitruv.dsls.mirbase.mirBase.MetamodelImport
 import tools.vitruv.dsls.mirbase.scoping.MirBaseScopeProviderDelegate
 
 import static tools.vitruv.dsls.mirbase.mirBase.MirBasePackage.Literals.*
 
 import static extension edu.kit.ipd.sdq.kamp.ruledsl.util.KampRuleLanguageEcoreUtil.*
-import tools.vitruv.dsls.mirbase.mirBase.MetamodelImport
-import org.eclipse.emf.ecore.EcorePackage
-import org.eclipse.xtext.scoping.impl.SimpleScope
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.PropagationReference
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.RuleReference
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.KampRuleLanguagePackage
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.RuleFile
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.DuplicateAwareStep
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.IndependentStep
 
 class KampRuleLanguageScopeProviderDelegate extends MirBaseScopeProviderDelegate {
 	override getScope(EObject context, EReference reference) {
@@ -40,17 +40,17 @@ class KampRuleLanguageScopeProviderDelegate extends MirBaseScopeProviderDelegate
 			if(ruleFile !== null) {
 				val classifierDescriptions = newArrayList()
 				
-				for(step : ruleFile.steps) {
-					if(step instanceof DuplicateAwareStep) {
-						for(cRule : step.rules) {
+				for(block : ruleFile.blocks) {
+					if(block instanceof RecursiveBlock) {
+						for(cRule : block.rules) {
 							// a rule may not call itself -> cycle and the source element type must match
 							if(!cRule.equals(context.eContainer) && (context as Lookup).previousMetaclass.equals(cRule.source.metaclass))
 								classifierDescriptions += EObjectDescription.create(cRule.name, cRule)
 						}
-					} else if(step instanceof IndependentStep) {
+					} else if(block instanceof StandardBlock) {
 						// a rule may not call itself -> cycle and the source element type must match
-						if(!step.equals(context.eContainer) && (context as Lookup).previousMetaclass.equals((step as KampRule).source.metaclass))
-							classifierDescriptions += EObjectDescription.create((step as KampRule).name, step as KampRule)
+						if(!block.equals(context.eContainer) && (context as Lookup).previousMetaclass.equals((block as KampRule).source.metaclass))
+							classifierDescriptions += EObjectDescription.create((block as KampRule).name, block as KampRule)
 					}
 				}
 				

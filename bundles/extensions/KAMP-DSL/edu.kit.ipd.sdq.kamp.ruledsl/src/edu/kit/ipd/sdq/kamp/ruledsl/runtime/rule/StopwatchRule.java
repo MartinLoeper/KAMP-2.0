@@ -49,7 +49,7 @@ public class StopwatchRule<S extends EObject, A extends EObject, T extends Abstr
 	}
 	
 	@Override
-	public void apply(Stream<S> sourceElements) {
+	public void apply(Stream<CausingEntityMapping<S, EObject>> sourceElements) {
 		
 		this.stopwatch.start();
 		
@@ -118,5 +118,21 @@ public class StopwatchRule<S extends EObject, A extends EObject, T extends Abstr
 	@Override
 	public T getArchitectureVersion() {
 		return this.architectureVersion;
+	}
+
+	@Override
+	public int getPosition() {
+		// we take the position of the observed rule
+		return this.rule.getPosition();
+	}
+
+	@Override
+	public Class<S> getSourceElementClass() {
+		return this.rule.getSourceElementClass();
+	}
+
+	@Override
+	public Class<A> getAffectedElementClass() {
+		return this.rule.getAffectedElementClass();
 	}
 }

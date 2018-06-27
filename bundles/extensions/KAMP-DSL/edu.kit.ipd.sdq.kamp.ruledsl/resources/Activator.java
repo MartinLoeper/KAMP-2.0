@@ -4,6 +4,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
 
+import java.util.function.Consumer;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.swt.widgets.Display;
@@ -114,32 +115,36 @@ public class Activator extends AbstractUIPlugin implements BundleActivator {
 	 		}
 	 	}
         
-        this.ruleProvider.runEarlyHook(rules -> {
-	        // 1. Inject the graph we created for DI in every method which is annotated with @KampGraph
-        	//    The method must have the following parameter types: KampRuleGraph
-        	
-	        Set<Method> annotatedMethods = getReflectionsForSrcPackage().getMethodsAnnotatedWith(KampGraph.class);
-	        annotatedMethods.stream().forEach(m -> {
-		 		// find the corresponding instance
-		 		for(IRule cRule : rules) {
-		 			if(m.getDeclaringClass().equals(cRule.getClass())) {
-		 				// try to inject graph
-		 				try {
-							m.invoke(cRule, this.ruleGraph);
-						} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-							// TODO this might cause too much dialogs... use a newer batch-like api
-							// TODO for InvocationTargetException the causing exception must be displayed
-							Display.getDefault().syncExec(new Runnable() {
-							    public void run() {
-							    	MultiStatus status = RuleProvider.createMultiStatus(null, e);
-									Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-					                ErrorDialog.openError(shell, "Dependency Injection Error", "Could not inject the KampRuleGraph into method \"" + m.getName() + "\" of class \"" + m.getDeclaringClass().getSimpleName() + "\"." + ((e instanceof IllegalArgumentException) ? "Expecting the following signature: " + m.getName() + "(KampRuleGraph)!" : ""), status);
-							    }
-							});
-						}
-		 			}
-		 		}
-		 	});
+        this.ruleProvider.runEarlyHook(new Consumer<Set<IRule>>() {
+
+			@Override
+			public void accept(Set<IRule> rules) {
+		        // 1. Inject the graph we created for DI in every method which is annotated with @KampGraph
+	        	//    The method must have the following parameter types: KampRuleGraph
+	        	
+		        Set<Method> annotatedMethods = getReflectionsForSrcPackage().getMethodsAnnotatedWith(KampGraph.class);
+		        annotatedMethods.stream().forEach(m -> {
+			 		// find the corresponding instance
+			 		for(IRule cRule : rules) {
+			 			if(m.getDeclaringClass().equals(cRule.getClass())) {
+			 				// try to inject graph
+			 				try {
+								m.invoke(cRule, ruleGraph);
+							} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+								// TODO this might cause too much dialogs... use a newer batch-like api
+								// TODO for InvocationTargetException the causing exception must be displayed
+								Display.getDefault().syncExec(new Runnable() {
+								    public void run() {
+								    	MultiStatus status = RuleProvider.createMultiStatus(null, e);
+										Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
+						                ErrorDialog.openError(shell, "Dependency Injection Error", "Could not inject the KampRuleGraph into method \"" + m.getName() + "\" of class \"" + m.getDeclaringClass().getSimpleName() + "\"." + ((e instanceof IllegalArgumentException) ? "Expecting the following signature: " + m.getName() + "(KampRuleGraph)!" : ""), status);
+								    }
+								});
+							}
+			 			}
+			 		}
+			 	});
+			}
         });
 
         System.out.println("KAMP-RuleDSL bundle successfully activated.");

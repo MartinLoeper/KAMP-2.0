@@ -1,6 +1,10 @@
 package edu.kit.ipd.sdq.kamp.ruledsl.generator
 
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.Block
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.KampRule
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.RecursiveBlock
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.RuleFile
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.StandardBlock
 import edu.kit.ipd.sdq.kamp.ruledsl.util.ErrorContext
 import edu.kit.ipd.sdq.kamp.ruledsl.util.RollbarExceptionReporting
 import java.io.BufferedReader
@@ -28,9 +32,12 @@ import org.eclipse.core.resources.IProject
 import org.eclipse.core.resources.IProjectDescription
 import org.eclipse.core.resources.ResourcesPlugin
 import org.eclipse.core.runtime.CoreException
+import org.eclipse.core.runtime.IConfigurationElement
+import org.eclipse.core.runtime.IContributor
 import org.eclipse.core.runtime.IProgressMonitor
 import org.eclipse.core.runtime.NullProgressMonitor
 import org.eclipse.core.runtime.Path
+import org.eclipse.core.runtime.Platform
 import org.eclipse.core.runtime.jobs.IJobManager
 import org.eclipse.core.runtime.jobs.Job
 import org.eclipse.emf.common.util.EList
@@ -44,16 +51,8 @@ import org.eclipse.jdt.ui.PreferenceConstants
 import org.eclipse.pde.core.project.IBundleProjectDescription
 import org.osgi.framework.Bundle
 import org.osgi.framework.FrameworkUtil
-import tools.vitruv.framework.util.bridges.EclipseBridge
 
 import static edu.kit.ipd.sdq.kamp.ruledsl.support.KampRuleLanguageUtil.*
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.Step
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.IndependentStep
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.KampRule
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.DuplicateAwareStep
-import org.eclipse.core.runtime.IContributor
-import org.eclipse.core.runtime.IConfigurationElement
-import org.eclipse.core.runtime.Platform
 
 abstract class KarlJobBase extends Job {
 	
@@ -646,20 +645,20 @@ abstract class KarlJobBase extends Job {
 	def static createActivator(IProject pluginProject, IProgressMonitor monitor, RuleFile ruleFile) {
 		// determine classes to be registered
 		var String rulesToBeRegistered = "";
-		val steps = ruleFile.steps;
+		val blocks = ruleFile.blocks;
 		
 		var int num = 0;
-		for(var int i = 0; i < steps.size; i++) {			
-			val Step cStep = steps.get(i);
-			if(cStep instanceof IndependentStep) {
+		for(var int i = 0; i < blocks.size; i++) {			
+			val Block cBlock = blocks.get(i);
+			if(cBlock instanceof StandardBlock) {
 				if(num > 0) {
 					rulesToBeRegistered += ", ";
 				}
 			
-				rulesToBeRegistered += (cStep as KampRule).name.toFirstUpper + "Rule.class"
+				rulesToBeRegistered += (cBlock as KampRule).name.toFirstUpper + "Rule.class"
 				num++;
-			} else if(cStep instanceof DuplicateAwareStep) {
-				for(cRule : cStep.rules) {
+			} else if(cBlock instanceof RecursiveBlock) {
+				for(cRule : cBlock.rules) {
 					if(num > 0) {
 						rulesToBeRegistered += ", ";
 					}

@@ -19,6 +19,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -100,8 +101,13 @@ public class KampRuleGraph implements Iterable<KampRuleVertex> {
 		}
 		
 		while(!verticesWithoutParent.isEmpty()) {
-			Iterator<KampRuleVertex> it = new HashSet<>(verticesWithoutParent).iterator(); 
+			// make a copy of the original set
+			Iterator<KampRuleVertex> it = new HashSet<>(verticesWithoutParent).iterator();
+			
+			// clear the initial set
 			verticesWithoutParent.clear();
+			
+			// iterate over the new copy of the set
 			while(it.hasNext()) {
 				KampRuleVertex cVertex = it.next();
 				

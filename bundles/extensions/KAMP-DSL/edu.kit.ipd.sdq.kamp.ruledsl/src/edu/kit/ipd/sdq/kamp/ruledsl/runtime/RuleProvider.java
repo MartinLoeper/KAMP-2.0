@@ -1,7 +1,10 @@
 package edu.kit.ipd.sdq.kamp.ruledsl.runtime;
+
+import static edu.kit.ipd.sdq.kamp.architecture.ArchitectureModelLookup.lookUpMarkedObjectsOfAType;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -11,6 +14,7 @@ import java.util.function.Consumer;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -19,15 +23,20 @@ import org.eclipse.ui.PlatformUI;
 import edu.kit.ipd.sdq.kamp.architecture.AbstractArchitectureVersion;
 import edu.kit.ipd.sdq.kamp.model.modificationmarks.AbstractModificationRepository;
 import edu.kit.ipd.sdq.kamp.propagation.AbstractChangePropagationAnalysis;
+import edu.kit.ipd.sdq.kamp.ruledsl.support.CausingEntityMapping;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.ChangePropagationStepRegistry;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.IConfiguration;
+import edu.kit.ipd.sdq.kamp.ruledsl.support.IRecursiveRule;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.IRule;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.IRuleProvider;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.KampRuleLanguageUtil;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.KampRuleStub;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.RegistryException;
 import edu.kit.ipd.sdq.kamp.ruledsl.util.ErrorContext;
+import edu.kit.ipd.sdq.kamp.ruledsl.util.RecursiveRuleBlock;
+import edu.kit.ipd.sdq.kamp.ruledsl.util.ResultMap;
 import edu.kit.ipd.sdq.kamp.ruledsl.util.RollbarExceptionReporting;
+import edu.kit.ipd.sdq.kamp.ruledsl.util.RuleBlock;
 
 /**
  * This class is also called the RuleRegistry.
@@ -47,8 +56,8 @@ import edu.kit.ipd.sdq.kamp.ruledsl.util.RollbarExceptionReporting;
 public class RuleProvider<T extends AbstractArchitectureVersion<M>, M extends AbstractModificationRepository<?, ?>> implements IRuleProvider<T, M> {
 	
 	private static final RollbarExceptionReporting REPORTING = RollbarExceptionReporting.INSTANCE;
-	private final Map<IRule<?, ?, T, M>, KampRuleStub> rules = new HashMap<>();
-	private Consumer<Set<IRule<?, ?, T, M>>> preHook;
+	private final Map<IRule<EObject, EObject, T, M>, KampRuleStub> rules = new LinkedHashMap<>();
+	private Consumer<Set<IRule<EObject, EObject, T, M>>> preHook;
 	private IConfiguration configuration;
 
 	@Override
@@ -64,36 +73,74 @@ public class RuleProvider<T extends AbstractArchitectureVersion<M>, M extends Ab
 			this.preHook.accept(this.rules.keySet());
 		}
 		
-		for(final Entry<IRule<?, ?, T, M>, KampRuleStub> cRuleEntry : this.rules.entrySet()) {
-			if(!cRuleEntry.getValue().isActive()) {
-				continue;
+		// convert the rules into a sortable data structure
+		ArrayList<Entry<IRule<EObject, EObject, T, M>, KampRuleStub>> rules = new ArrayList<Entry<IRule<EObject, EObject, T, M>, KampRuleStub>>(this.rules.entrySet());
+		
+		// 1. sort the rules
+		rules.sort(new Comparator<Entry<IRule<EObject, EObject, T, M>, KampRuleStub>>() {
+
+			@Override
+			public int compare(Entry<IRule<EObject, EObject, T, M>, KampRuleStub> o1, Entry<IRule<EObject, EObject, T, M>, KampRuleStub> o2) {
+				if (o1.getKey().getPosition() < o2.getKey().getPosition()) {
+					return -1;
+				} else if(o1.getKey().getPosition() > o2.getKey().getPosition()) {
+					return 1;
+				} else {
+					return 0;
+				}
+			}
+		});
+		
+		// 2. iterate over rules + prepare rules and ResultMap
+		ResultMap resultMap = new ResultMap();
+		for(Entry<IRule<EObject, EObject, T, M>, KampRuleStub> cRuleEntry : rules) {
+			IRule<?, ?, T, M> cRule = cRuleEntry.getKey();
+			
+			// prepare the rule
+			cRule.setArchitectureVersion(version);
+			cRule.setChangePropagationStepRegistry(registry);
+			
+			// prepare the storage of affected elements
+			resultMap.init(cRule.getAffectedElementClass());
+			resultMap.init(cRule.getSourceElementClass());
+		}
+		
+		// 3. query the seed elements
+		resultMap.populateSeedElements(version);
+		
+		// 4. build recursive and non-recursive blocks
+		List<RuleBlock> blocks = new ArrayList<>();
+		RuleBlock currentBlock = null;
+
+		for(Entry<IRule<EObject, EObject, T, M>, KampRuleStub> cRuleEntry : rules) {
+			IRule<EObject, EObject, T, M> cRule = cRuleEntry.getKey();
+			if(cRule instanceof IRecursiveRule) {
+				if(currentBlock == null || !(currentBlock instanceof RecursiveRuleBlock)) {
+					// create a new recursive block
+					currentBlock = new RecursiveRuleBlock(resultMap);
+					blocks.add(currentBlock);
+				}
+			} else {
+				if(currentBlock == null || currentBlock instanceof RecursiveRuleBlock) {
+					// create new standard block
+					currentBlock = new RuleBlock(resultMap);
+					blocks.add(currentBlock);
+				}
 			}
 			
-			IRule<?, ?, T, M> cRule = cRuleEntry.getKey();
-			System.out.println("Running rule: " + cRule.getClass().toString());
-			try {
-				// prepare the rule
-				cRule.setArchitectureVersion(version);
-				cRule.setChangePropagationStepRegistry(registry);
-				
-				// apply the rule
-				cRule.apply();
-			} catch(final Exception e) {
-				// send exception to our rollbar server for examination and bug tracking
-				REPORTING.log(e, ErrorContext.CUSTOM_RULE, null);
-				
-				// show the exception in the log
-				e.printStackTrace();
-				
-				// display message to user
-				Display.getDefault().syncExec(new Runnable() {
-				    public void run() {
-				    	MultiStatus status = createMultiStatus(e.getLocalizedMessage(), e);
-						Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
-		                ErrorDialog.openError(shell, "Rule caused error", "The following rule caused an " + e.getClass().getSimpleName() + ": " + cRule.getClass(), status);
-				    }
-				});
+			if(cRuleEntry.getValue().isActive()) {
+				currentBlock.addRule(cRule);
 			}
+		}
+		
+		// 5. iterate over blocks and call lookup
+		for(RuleBlock block : blocks) {
+			block.runLookups();
+		}
+		
+		// 6. iterate over blocks and run apply
+		for(RuleBlock block : blocks) {
+			block.runFinalizers();
 		}
 	}
 	
@@ -107,8 +154,8 @@ public class RuleProvider<T extends AbstractArchitectureVersion<M>, M extends Ab
 	public final void register(KampRuleStub ruleStub) throws RegistryException {	
 		if(ruleStub.hasParent()) {
 			// get the dependency first
-			IRule parentRule = null;
-			for(IRule cRule : this.rules.keySet()) {
+			IRule<?, ?, T, M> parentRule = null;
+			for(IRule<?, ?, T, M> cRule : this.rules.keySet()) {
 				if(cRule.getClass().equals(ruleStub.getParent())) {
 					parentRule = cRule;
 				}
@@ -119,7 +166,7 @@ public class RuleProvider<T extends AbstractArchitectureVersion<M>, M extends Ab
 			}
 			
 			try {
-				IRule newRule = ruleStub.getClazz().getConstructor(ruleStub.getParent()).newInstance(parentRule);
+				IRule<EObject, EObject, T, M> newRule = ruleStub.getClazz().getConstructor(ruleStub.getParent()).newInstance(parentRule);
 				this.rules.put(newRule, ruleStub);
 			} catch (InstantiationException e) {
 				throw new RegistryException("Could not access a constructor which accepts the parent rule: " + parentRule.getClass().getSimpleName(), e);
@@ -136,7 +183,7 @@ public class RuleProvider<T extends AbstractArchitectureVersion<M>, M extends Ab
 			}
 		} else {
 			try {
-				IRule newRule = ruleStub.getClazz().newInstance();
+				IRule<EObject, EObject, T, M> newRule = ruleStub.getClazz().newInstance();
 				this.rules.put(newRule, ruleStub);
 			} catch (InstantiationException e) {
 				throw new RegistryException("Could not find a standard constructor for rule: " + ruleStub.getClazz().getSimpleName(), e);
@@ -145,21 +192,6 @@ public class RuleProvider<T extends AbstractArchitectureVersion<M>, M extends Ab
 			}
 		}
 	}
-	
-    public static MultiStatus createMultiStatus(String msg, Throwable t) {
-        List<Status> childStatuses = new ArrayList<>();
-        StackTraceElement[] stackTraces = t.getStackTrace();
-
-        for (StackTraceElement stackTrace: stackTraces) {
-            Status status = new Status(IStatus.ERROR, KampRuleLanguageUtil.BUNDLE_NAME + ".xxxxxxxx", stackTrace.toString());
-            childStatuses.add(status);
-        }
-
-        MultiStatus ms = new MultiStatus(KampRuleLanguageUtil.BUNDLE_NAME + ".xxxxxxxx",
-                IStatus.ERROR, childStatuses.toArray(new Status[] {}), t.toString(), t);
-        
-        return ms;
-    }
 
 	@Override
 	public long getNumberOfRegisteredRules() {
@@ -167,7 +199,7 @@ public class RuleProvider<T extends AbstractArchitectureVersion<M>, M extends Ab
 	}
 
 	@Override
-	public void runEarlyHook(Consumer<Set<IRule<?, ?, T, M>>> preHook) {
+	public void runEarlyHook(Consumer<Set<IRule<EObject, EObject, T, M>>> preHook) {
 		this.preHook = preHook;
 	}
 
@@ -180,4 +212,19 @@ public class RuleProvider<T extends AbstractArchitectureVersion<M>, M extends Ab
 	public IConfiguration getConfiguration() {
 		return this.configuration;
 	}
+	
+	 public static MultiStatus createMultiStatus(String msg, Throwable t) {
+	        List<Status> childStatuses = new ArrayList<>();
+	        StackTraceElement[] stackTraces = t.getStackTrace();
+	
+	        for (StackTraceElement stackTrace: stackTraces) {
+	            Status status = new Status(IStatus.ERROR, KampRuleLanguageUtil.BUNDLE_NAME + ".xxxxxxxx", stackTrace.toString());
+	            childStatuses.add(status);
+	        }
+	
+	        MultiStatus ms = new MultiStatus(KampRuleLanguageUtil.BUNDLE_NAME + ".xxxxxxxx",
+	                IStatus.ERROR, childStatuses.toArray(new Status[] {}), t.toString(), t);
+	        
+	        return ms;
+	    }
 }
