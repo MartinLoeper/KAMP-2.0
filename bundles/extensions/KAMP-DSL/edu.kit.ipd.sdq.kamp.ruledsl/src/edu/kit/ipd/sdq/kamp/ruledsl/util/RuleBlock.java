@@ -20,26 +20,32 @@ import edu.kit.ipd.sdq.kamp.ruledsl.support.IRule;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.KampRuleLanguageUtil;
 
 public class RuleBlock {
-	private final ResultMap resultMap;
+	protected final ResultMap resultMap;
+	protected final SeedMap seedMap;
 	private final List<IRule<EObject, EObject, ?, ?>> rules = new ArrayList<>();
 	private static final RollbarExceptionReporting REPORTING = RollbarExceptionReporting.INSTANCE;
 
-	public RuleBlock(ResultMap resultMap) {
+	public RuleBlock(ResultMap resultMap, SeedMap seedMap) {
 		this.resultMap = resultMap;
+		this.seedMap = seedMap;
 	}
 
 	public void addRule(IRule<EObject, EObject, ?, ?> cRule) {
 		this.rules.add(cRule);
 	}
 
-	public boolean runLookups() {
+	public boolean runLookups(ResultMap sourceMap) {
+		if(sourceMap == null) {
+			sourceMap = this.seedMap;
+		}
+
 		AtomicBoolean newInsertion = new AtomicBoolean();
 		
 		for(IRule<EObject, EObject, ?, ?> cRule : this.rules) {
 			Class<EObject> sourceClass = (Class<EObject>) cRule.getSourceElementClass();
 			Class<EObject> resultClass = (Class<EObject>) cRule.getAffectedElementClass();
 			
-			Stream<CausingEntityMapping<EObject, EObject>> sourceElements = this.resultMap.<EObject>getWithAllSubtypes(sourceClass);
+			Stream<CausingEntityMapping<EObject, EObject>> sourceElements = sourceMap.<EObject>getWithAllSubtypes(sourceClass);
 			try {				
 				cRule.lookup(sourceElements).forEach((e) -> {
 					if(this.resultMap.put(resultClass, e)) {

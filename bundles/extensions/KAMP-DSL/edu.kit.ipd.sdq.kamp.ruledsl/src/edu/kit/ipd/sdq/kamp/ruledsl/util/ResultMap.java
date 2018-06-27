@@ -29,8 +29,8 @@ import edu.kit.ipd.sdq.kamp.ruledsl.support.CausingEntityMapping;
  *
  */
 public class ResultMap {
-	private Map<Class<? extends EObject>, List<CausingEntityMapping<? extends EObject, EObject>>> mapping = new HashMap<>();
-	
+	protected Map<Class<? extends EObject>, List<CausingEntityMapping<? extends EObject, EObject>>> mapping = new HashMap<>();
+
 	/**
 	 * Inits the set for a specific type.
 	 * If it is already initialized, nothing is done.
@@ -68,7 +68,7 @@ public class ResultMap {
 		return addElementToListIfNonExistent(elements, value);
 	}
 	
-	private boolean addElementToListIfNonExistent(List<CausingEntityMapping<? extends EObject, EObject>> list, CausingEntityMapping<? extends EObject, EObject> element) {
+	protected boolean addElementToListIfNonExistent(List<CausingEntityMapping<? extends EObject, EObject>> list, CausingEntityMapping<? extends EObject, EObject> element) {
 		// check if element is non existent
 		for(CausingEntityMapping<? extends EObject, EObject> entry : list) {
 			if(EcoreUtil.equals(entry.getAffectedElement(), element.getAffectedElement())) {
@@ -84,18 +84,5 @@ public class ResultMap {
 	
 	public Set<Class<? extends EObject>> getKeys() {
 		return this.mapping.keySet();
-	}
-
-	public void populateSeedElements(AbstractArchitectureVersion<?> version) {
-		this.getKeys().stream().forEach((clazz) -> {
-			Set<? extends EObject> seedModificationMarks = lookUpMarkedObjectsOfAType(version, clazz);
-			
-			seedModificationMarks.stream().forEach((value) -> {
-				CausingEntityMapping<? extends EObject, EObject> newEntry = new CausingEntityMapping<>(value);
-				List<CausingEntityMapping<? extends EObject, EObject>> elements = this.mapping.get(clazz);
-				
-				addElementToListIfNonExistent(elements, newEntry);
-			});
-		});
 	}
 }

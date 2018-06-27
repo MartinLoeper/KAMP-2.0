@@ -156,10 +156,22 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 				// create fields, setters and getters
 				theClass.members += rule.toField("architectureVersion", typeRef(AbstractArchitectureVersion, typeRef(AbstractModificationRepository, wildcard(), wildcard())));
 				theClass.members += rule.toField("changePropagationStepRegistry", typeRef(ChangePropagationStepRegistry));
-				theClass.members += rule.toGetter("architectureVersion", "architectureVersion", typeRef(AbstractArchitectureVersion, typeRef(AbstractModificationRepository, wildcard(), wildcard())));
-				theClass.members += rule.toGetter("changePropagationStepRegistry", "changePropagationStepRegistry", typeRef(ChangePropagationStepRegistry));			
-				theClass.members += rule.toSetter("architectureVersion", "architectureVersion", typeRef(AbstractArchitectureVersion, typeRef(AbstractModificationRepository, wildcard(), wildcard())))
-				theClass.members += rule.toSetter("changePropagationStepRegistry", "changePropagationStepRegistry", typeRef(ChangePropagationStepRegistry))
+				
+				val architectureVersionGetter = rule.toGetter("architectureVersion", "architectureVersion", typeRef(AbstractArchitectureVersion, typeRef(AbstractModificationRepository, wildcard(), wildcard())));
+				theClass.members += architectureVersionGetter
+				architectureVersionGetter.annotations += annotationRef(Override)
+				
+				val changePropagationStepRegistryGetter = rule.toGetter("changePropagationStepRegistry", "changePropagationStepRegistry", typeRef(ChangePropagationStepRegistry));			
+				theClass.members += changePropagationStepRegistryGetter
+				changePropagationStepRegistryGetter.annotations += annotationRef(Override)
+				
+				val architectureVersionSetter = rule.toSetter("architectureVersion", "architectureVersion", typeRef(AbstractArchitectureVersion, typeRef(AbstractModificationRepository, wildcard(), wildcard())))
+				theClass.members += architectureVersionSetter
+				architectureVersionSetter.annotations += annotationRef(Override)
+				
+				val changePropagationStepRegistrySetter  = rule.toSetter("changePropagationStepRegistry", "changePropagationStepRegistry", typeRef(ChangePropagationStepRegistry))
+				theClass.members += changePropagationStepRegistrySetter
+				changePropagationStepRegistrySetter.annotations += annotationRef(Override)
 				
 				// choose correct implementing interface and add special methods
 				var JvmTypeReference currentInterface = null;
@@ -185,7 +197,7 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 				val applyMethod = rule.toMethod(getMethodName(), typeRef("void")) [
 					// parameters += rule.toParameter("version", typeRef(AbstractArchitectureVersion, wildcard()))
 					// parameters += rule.toParameter("registry", typeRef(ChangePropagationStepRegistry))
-					parameters += rule.toParameter("sourceElements", Stream.typeRef(typeRef(CausingEntityMapping, sourceType, typeRef(EObject))));
+					parameters += rule.toParameter("affectedElements", Stream.typeRef(typeRef(CausingEntityMapping, returnType, typeRef(EObject))));
 					
 					nameForLookup.put(null, "input")
 					if(rule.modificationMark !== null) {
@@ -251,6 +263,7 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 					setBody(it, strategy);
 				];
 
+				lookupMemberMethod.annotations += annotationRef(Override)
 				lookupMemberMethod.returnType = Stream.typeRef(typeRef(CausingEntityMapping, returnType, typeRef(EObject)));
 				theClass.members += lookupMemberMethod
 			} catch(Exception e) {
@@ -265,6 +278,7 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 						return «sourceType».class;
 					'''
 			]
+			sourceElementClassGetter.annotations += annotationRef(Override)
 			theClass.members += sourceElementClassGetter
 			
 			val affectedElementClassGetter = rule.toMethod("getAffectedElementClass", Class.typeRef(returnType)) [
@@ -272,6 +286,7 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 						return «returnType».class;
 					'''
 			]
+			affectedElementClassGetter.annotations += annotationRef(Override)	
 			theClass.members += affectedElementClassGetter
 			
 			// create the getPosition method
@@ -280,6 +295,7 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 						return «currentRuleIndex.getAndIncrement() * 10»;
 					'''
 			]
+			positionMethod.annotations += annotationRef(Override)	
 			theClass.members += positionMethod
 		]);
 	}

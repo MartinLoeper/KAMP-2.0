@@ -4,6 +4,7 @@ import static edu.kit.ipd.sdq.kamp.architecture.ArchitectureModelLookup.lookUpMa
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,7 @@ import edu.kit.ipd.sdq.kamp.ruledsl.util.RecursiveRuleBlock;
 import edu.kit.ipd.sdq.kamp.ruledsl.util.ResultMap;
 import edu.kit.ipd.sdq.kamp.ruledsl.util.RollbarExceptionReporting;
 import edu.kit.ipd.sdq.kamp.ruledsl.util.RuleBlock;
+import edu.kit.ipd.sdq.kamp.ruledsl.util.SeedMap;
 
 /**
  * This class is also called the RuleRegistry.
@@ -106,7 +108,7 @@ public class RuleProvider<T extends AbstractArchitectureVersion<M>, M extends Ab
 		}
 		
 		// 3. query the seed elements
-		resultMap.populateSeedElements(version);
+		SeedMap seedMap = SeedMap.from(resultMap, version);
 		
 		// 4. build recursive and non-recursive blocks
 		List<RuleBlock> blocks = new ArrayList<>();
@@ -117,13 +119,13 @@ public class RuleProvider<T extends AbstractArchitectureVersion<M>, M extends Ab
 			if(cRule instanceof IRecursiveRule) {
 				if(currentBlock == null || !(currentBlock instanceof RecursiveRuleBlock)) {
 					// create a new recursive block
-					currentBlock = new RecursiveRuleBlock(resultMap);
+					currentBlock = new RecursiveRuleBlock(resultMap, seedMap);
 					blocks.add(currentBlock);
 				}
 			} else {
 				if(currentBlock == null || currentBlock instanceof RecursiveRuleBlock) {
 					// create new standard block
-					currentBlock = new RuleBlock(resultMap);
+					currentBlock = new RuleBlock(resultMap, seedMap);
 					blocks.add(currentBlock);
 				}
 			}
@@ -135,7 +137,7 @@ public class RuleProvider<T extends AbstractArchitectureVersion<M>, M extends Ab
 		
 		// 5. iterate over blocks and call lookup
 		for(RuleBlock block : blocks) {
-			block.runLookups();
+			block.runLookups(null);
 		}
 		
 		// 6. iterate over blocks and run apply
