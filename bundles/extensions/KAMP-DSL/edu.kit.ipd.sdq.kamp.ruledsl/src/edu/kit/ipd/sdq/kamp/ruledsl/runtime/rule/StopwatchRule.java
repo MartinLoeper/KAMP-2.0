@@ -1,11 +1,18 @@
 package edu.kit.ipd.sdq.kamp.ruledsl.runtime.rule;
 
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.eclipse.emf.ecore.EObject;
 
 import com.google.common.base.Stopwatch;
 
 import edu.kit.ipd.sdq.kamp.architecture.AbstractArchitectureVersion;
+import edu.kit.ipd.sdq.kamp.model.modificationmarks.AbstractModificationRepository;
 import edu.kit.ipd.sdq.kamp.propagation.AbstractChangePropagationAnalysis;
+import edu.kit.ipd.sdq.kamp.ruledsl.support.CausingEntityMapping;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.ChangePropagationStepRegistry;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.IRule;
 
@@ -15,16 +22,18 @@ import edu.kit.ipd.sdq.kamp.ruledsl.support.IRule;
  * @author Martin Löper
  *
  */
-public class StopwatchRule implements IRule {
+public class StopwatchRule<S extends EObject, A extends EObject, T extends AbstractArchitectureVersion<M>, M extends AbstractModificationRepository<?, ?>> implements IRule<S, A, T, M> {
 	private final Stopwatch stopwatch;
-	private final IRule rule;
+	private final IRule<S, A, T, M> rule;
 	private final long iterations;
+	private T architectureVersion;
+	private ChangePropagationStepRegistry changePropagationStepRegistry;
 	
 	/**
 	 * Creates a Stopwatch (wrapper) rule for the given {@code rule}.
 	 * @param rule the rule which will be observed
 	 */
-	public StopwatchRule(IRule rule) {
+	public StopwatchRule(IRule<S, A, T, M> rule) {
 		this(rule, 1);
 	}
 	
@@ -33,19 +42,19 @@ public class StopwatchRule implements IRule {
 	 * @param rule the rule which will be observed
 	 * @param iterations the number of times the {@link IRule#apply(AbstractArchitectureVersion, ChangePropagationStepRegistry, AbstractChangePropagationAnalysis)} method of {@code rule} is called
 	 */
-	public StopwatchRule(IRule rule, long iterations) {
+	public StopwatchRule(IRule<S, A, T, M> rule, long iterations) {
 		this.stopwatch = Stopwatch.createUnstarted();
 		this.rule = rule;
 		this.iterations = iterations;
 	}
 	
 	@Override
-	public void apply(AbstractArchitectureVersion<?> version, ChangePropagationStepRegistry registry) {
+	public void apply(Stream<S> sourceElements) {
 		
 		this.stopwatch.start();
 		
 		for(long i=0; i < this.iterations; i++) {
-			this.rule.apply(version, registry);
+			this.rule.apply(sourceElements);
 		}
 		
 		this.stopwatch.stop();
@@ -78,5 +87,36 @@ public class StopwatchRule implements IRule {
 	 */
 	public String getElapsedTimeAsString() {
 		return this.stopwatch.toString();
+	}
+
+	@Override
+	public Stream<CausingEntityMapping<A, EObject>> lookup(Stream<CausingEntityMapping<S, EObject>> sourceElements) {
+		this.stopwatch.start();
+		
+		Set<CausingEntityMapping<A, EObject>> elements = this.rule.lookup(sourceElements).collect(Collectors.toSet());
+		
+		this.stopwatch.stop();
+		
+		return elements.stream();
+	}
+
+	@Override
+	public void setArchitectureVersion(T architectureVersion) {
+		this.architectureVersion = architectureVersion;
+	}
+
+	@Override
+	public void setChangePropagationStepRegistry(ChangePropagationStepRegistry registry) {
+		this.changePropagationStepRegistry = registry;
+	}
+
+	@Override
+	public ChangePropagationStepRegistry getChangePropagationStepRegistry() {
+		return this.changePropagationStepRegistry;
+	}
+
+	@Override
+	public T getArchitectureVersion() {
+		return this.architectureVersion;
 	}
 }

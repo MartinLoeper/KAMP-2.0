@@ -17,6 +17,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
 import edu.kit.ipd.sdq.kamp.architecture.AbstractArchitectureVersion;
+import edu.kit.ipd.sdq.kamp.model.modificationmarks.AbstractModificationRepository;
 import edu.kit.ipd.sdq.kamp.propagation.AbstractChangePropagationAnalysis;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.ChangePropagationStepRegistry;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.IConfiguration;
@@ -43,15 +44,15 @@ import edu.kit.ipd.sdq.kamp.ruledsl.util.RollbarExceptionReporting;
  * @author Martin Loeper
  *
  */
-public class RuleProvider implements IRuleProvider {
+public class RuleProvider<T extends AbstractArchitectureVersion<M>, M extends AbstractModificationRepository<?, ?>> implements IRuleProvider<T, M> {
 	
 	private static final RollbarExceptionReporting REPORTING = RollbarExceptionReporting.INSTANCE;
-	private final Map<IRule, KampRuleStub> rules = new HashMap<>();
-	private Consumer<Set<IRule>> preHook;
+	private final Map<IRule<?, ?, T, M>, KampRuleStub> rules = new HashMap<>();
+	private Consumer<Set<IRule<?, ?, T, M>>> preHook;
 	private IConfiguration configuration;
 
 	@Override
-	public final void applyAllRules(AbstractArchitectureVersion version, ChangePropagationStepRegistry registry) {
+	public final void applyAllRules(T version, ChangePropagationStepRegistry registry) {
 		if(!REPORTING.isInitialized()) {
 			REPORTING.init();
 		}
@@ -63,15 +64,20 @@ public class RuleProvider implements IRuleProvider {
 			this.preHook.accept(this.rules.keySet());
 		}
 		
-		for(final Entry<IRule, KampRuleStub> cRuleEntry : this.rules.entrySet()) {
+		for(final Entry<IRule<?, ?, T, M>, KampRuleStub> cRuleEntry : this.rules.entrySet()) {
 			if(!cRuleEntry.getValue().isActive()) {
 				continue;
 			}
 			
-			IRule cRule = cRuleEntry.getKey();
+			IRule<?, ?, T, M> cRule = cRuleEntry.getKey();
 			System.out.println("Running rule: " + cRule.getClass().toString());
 			try {
-				cRule.apply(version, registry);
+				// prepare the rule
+				cRule.setArchitectureVersion(version);
+				cRule.setChangePropagationStepRegistry(registry);
+				
+				// apply the rule
+				cRule.apply();
 			} catch(final Exception e) {
 				// send exception to our rollbar server for examination and bug tracking
 				REPORTING.log(e, ErrorContext.CUSTOM_RULE, null);
@@ -161,7 +167,7 @@ public class RuleProvider implements IRuleProvider {
 	}
 
 	@Override
-	public void runEarlyHook(Consumer<Set<IRule>> preHook) {
+	public void runEarlyHook(Consumer<Set<IRule<?, ?, T, M>>> preHook) {
 		this.preHook = preHook;
 	}
 
