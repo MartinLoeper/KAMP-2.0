@@ -17,7 +17,7 @@
         <mapRules xsi:type="aggregator:ExclusionRule" name="de.uka.ipd.sdq.dsexplore.feature.feature.group" versionRange="4.0.1.201712071438"/>
       </repositories>
       <repositories location="http://vitruv.tools/updatesite/nightly">
-        <categories name="201806210841.Vitruv Application Development" versionRange="1.0.0.077-cZrbdL7E7Ac7UEA7cMA"/>
+        <categories name="201806280844.Vitruv Application Development" versionRange="1.0.0.077-cZrbnh7E7Ac7UEc7cMM"/>
       </repositories>
     </contributions>
   </validationSets>
