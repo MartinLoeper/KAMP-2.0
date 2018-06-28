@@ -40,8 +40,8 @@ public class RuleBlock {
 			// this separation ensures, we can distinguish between looked up elements and seeded elements
 			// at the end when applying affected elements
 			Stream<CausingEntityMapping<EObject, EObject>> sourceElements = Stream.concat(
-						this.resultMap.<EObject>getWithAllSubtypes(sourceClass),
-						this.seedMap.<EObject>getWithAllSubtypes(sourceClass));
+						this.resultMap.<EObject>getWithAllSubtypes(sourceClass, true),
+						this.seedMap.<EObject>getWithAllSubtypes(sourceClass, true));
 
 			try {
 				// delay insertion to avoid concurrent modification exception!
@@ -91,7 +91,7 @@ public class RuleBlock {
 		for(IRule<EObject, EObject, ?, ?> cRule : this.rules) {
 			Class<EObject> resultClass = (Class<EObject>) cRule.getAffectedElementClass();
 			
-			Stream<CausingEntityMapping<EObject, EObject>> resultElements = this.resultMap.<EObject>getWithAllSubtypes(resultClass);
+			Stream<CausingEntityMapping<EObject, EObject>> resultElements = this.resultMap.<EObject>getWithAllSubtypes(resultClass, false);
 			try {				
 				cRule.apply(resultElements);
 			} catch(final Exception e) {

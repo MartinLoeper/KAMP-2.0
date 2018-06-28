@@ -51,7 +51,7 @@ public class ResultMap {
 		return this.mapping.get(clazz).stream().map(e -> (CausingEntityMapping<T, EObject>) e);
 	}
 	
-	public <T extends EObject> Stream<CausingEntityMapping<T, EObject>> getWithAllSubtypes(Class<T> clazz) {
+	public <T extends EObject> Stream<CausingEntityMapping<T, EObject>> getWithAllSubtypes(Class<T> clazz, boolean clearCausingEntities) {
 		return this.mapping
 				.entrySet()
 				.stream()
@@ -67,7 +67,7 @@ public class ResultMap {
 				})
 				.flatMap(e -> e.getValue()
 						.stream()
-						.map(el -> (CausingEntityMapping<T, EObject>) new CausingEntityMapping<EObject, EObject>(el.getAffectedElement(), el))
+						.map(el -> (clearCausingEntities) ? (CausingEntityMapping<T, EObject>) new CausingEntityMapping<EObject, EObject>(el.getAffectedElement()) : (CausingEntityMapping<T, EObject>) new CausingEntityMapping<EObject, EObject>(el.getAffectedElement(), el))
 						);
 	}
 	
