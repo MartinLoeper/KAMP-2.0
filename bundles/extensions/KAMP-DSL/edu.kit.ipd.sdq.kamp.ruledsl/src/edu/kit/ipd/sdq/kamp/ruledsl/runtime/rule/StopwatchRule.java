@@ -49,7 +49,7 @@ public class StopwatchRule<S extends EObject, A extends EObject, T extends Abstr
 	}
 	
 	@Override
-	public void apply(Stream<CausingEntityMapping<S, EObject>> sourceElements) {
+	public void apply(Stream<CausingEntityMapping<A, EObject>> sourceElements) {
 		
 		this.stopwatch.start();
 		

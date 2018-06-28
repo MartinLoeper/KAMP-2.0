@@ -1,8 +1,9 @@
-package edu.kit.ipd.sdq.kamp.ruledsl.util;
+package edu.kit.ipd.sdq.kamp.ruledsl.support;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.eclipse.core.runtime.IStatus;
@@ -14,16 +15,10 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
-import edu.kit.ipd.sdq.kamp.ruledsl.runtime.RuleProvider;
-import edu.kit.ipd.sdq.kamp.ruledsl.support.CausingEntityMapping;
-import edu.kit.ipd.sdq.kamp.ruledsl.support.IRule;
-import edu.kit.ipd.sdq.kamp.ruledsl.support.KampRuleLanguageUtil;
-
 public class RuleBlock {
 	protected final ResultMap resultMap;
 	protected final SeedMap seedMap;
 	private final List<IRule<EObject, EObject, ?, ?>> rules = new ArrayList<>();
-	private static final RollbarExceptionReporting REPORTING = RollbarExceptionReporting.INSTANCE;
 
 	public RuleBlock(ResultMap resultMap, SeedMap seedMap) {
 		this.resultMap = resultMap;
@@ -34,24 +29,42 @@ public class RuleBlock {
 		this.rules.add(cRule);
 	}
 
-	public boolean runLookups(ResultMap sourceMap) {
-		if(sourceMap == null) {
-			sourceMap = this.seedMap;
-		}
-
-		AtomicBoolean newInsertion = new AtomicBoolean();
+	public boolean runLookups() {
+		AtomicBoolean newInsertion = new AtomicBoolean(false);
 		
 		for(IRule<EObject, EObject, ?, ?> cRule : this.rules) {
 			Class<EObject> sourceClass = (Class<EObject>) cRule.getSourceElementClass();
 			Class<EObject> resultClass = (Class<EObject>) cRule.getAffectedElementClass();
-			
-			Stream<CausingEntityMapping<EObject, EObject>> sourceElements = sourceMap.<EObject>getWithAllSubtypes(sourceClass);
-			try {				
+
+			// use seed map and result map elements as source
+			// this separation ensures, we can distinguish between looked up elements and seeded elements
+			// at the end when applying affected elements
+			Stream<CausingEntityMapping<EObject, EObject>> sourceElements = Stream.concat(
+						this.resultMap.<EObject>getWithAllSubtypes(sourceClass),
+						this.seedMap.<EObject>getWithAllSubtypes(sourceClass));
+
+			try {
+				// delay insertion to avoid concurrent modification exception!
+				List<CausingEntityMapping<EObject, EObject>> newElements = new ArrayList<>();
 				cRule.lookup(sourceElements).forEach((e) -> {
-					if(this.resultMap.put(resultClass, e)) {
+					newElements.add(e);
+				});
+				
+				// batch insert
+				for(CausingEntityMapping<EObject, EObject> e : newElements) {
+					// we do not put the element in based on resultClass, but based on actual class
+					// this is important because a lookup may return a more specific element (aka subclass)
+					// of its declared type
+					
+					// we must init a set if not already present
+					// this is necessary because new subtypes may be introduced (see above)
+					Class<EObject> eClass = (Class<EObject>) e.getAffectedElement().getClass();
+					this.resultMap.init(eClass);
+					
+					if(this.resultMap.put(eClass, e)) {
 						newInsertion.set(true);
 					}
-				});
+				}
 			} catch(final Exception e) {
 				displayRuleException(e, cRule);
 			}
@@ -61,16 +74,13 @@ public class RuleBlock {
 	}
 	
 	protected void displayRuleException(Exception e, IRule<?, ?, ?, ?> cRule) {
-		// send exception to our rollbar server for examination and bug tracking
-		REPORTING.log(e, ErrorContext.CUSTOM_RULE, null);
-		
 		// show the exception in the log
 		e.printStackTrace();
 		
 		// display message to user
 		Display.getDefault().syncExec(new Runnable() {
 		    public void run() {
-		    	MultiStatus status = RuleProvider.createMultiStatus(e.getLocalizedMessage(), e);
+		    	MultiStatus status = IRuleProvider.createMultiStatus(e.getLocalizedMessage(), e);
 				Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
                 ErrorDialog.openError(shell, "Rule caused error", "The following rule caused an " + e.getClass().getSimpleName() + ": " + cRule.getClass(), status);
 		    }
@@ -88,5 +98,13 @@ public class RuleBlock {
 				displayRuleException(e, cRule);
 			}
 		}
+	}
+	
+	/**
+	 * Returns the number of contained active rules.
+	 * @return the number of active rules inside this block
+	 */
+	public int size() {
+		return this.rules.size();
 	}
 }

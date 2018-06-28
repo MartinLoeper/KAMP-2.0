@@ -1,4 +1,4 @@
-package edu.kit.ipd.sdq.kamp.ruledsl.util;
+package edu.kit.ipd.sdq.kamp.ruledsl.support;
 
 public class RecursiveRuleBlock extends RuleBlock {
 
@@ -7,14 +7,12 @@ public class RecursiveRuleBlock extends RuleBlock {
 	}
 
 	@Override
-	public boolean runLookups(ResultMap sourceMap) {
+	public boolean runLookups() {
 		boolean newInsertions = false;
-		ResultMap currentMap = this.seedMap;
 		do {
-			newInsertions = super.runLookups(currentMap);
-			currentMap = this.resultMap;
+			newInsertions = super.runLookups();
 		} while(newInsertions);
 		
-		return false;
+		return false;	// per definition, no special meaning
 	}
 }

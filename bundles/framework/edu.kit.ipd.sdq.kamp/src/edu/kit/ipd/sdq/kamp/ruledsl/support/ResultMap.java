@@ -1,4 +1,4 @@
-package edu.kit.ipd.sdq.kamp.ruledsl.util;
+package edu.kit.ipd.sdq.kamp.ruledsl.support;
 
 import static edu.kit.ipd.sdq.kamp.architecture.ArchitectureModelLookup.lookUpMarkedObjectsOfAType;
 
@@ -7,14 +7,17 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.palladiosimulator.pcm.repository.RepositoryComponent;
 
 import edu.kit.ipd.sdq.kamp.architecture.AbstractArchitectureVersion;
-import edu.kit.ipd.sdq.kamp.ruledsl.support.CausingEntityMapping;
 
 /**
  * This is a special implementation of a typesafe heterogeneous map.
@@ -49,7 +52,23 @@ public class ResultMap {
 	}
 	
 	public <T extends EObject> Stream<CausingEntityMapping<T, EObject>> getWithAllSubtypes(Class<T> clazz) {
-		return this.mapping.entrySet().stream().filter(e -> clazz.isAssignableFrom(e.getKey())).flatMap(e -> e.getValue().stream().map(el -> (CausingEntityMapping<T, EObject>) el));
+		return this.mapping
+				.entrySet()
+				.stream()
+				.filter(new Predicate<Entry<Class<? extends EObject>, List<CausingEntityMapping<? extends EObject, EObject>>>>() {
+
+					@Override
+					public boolean test(
+							Entry<Class<? extends EObject>, List<CausingEntityMapping<? extends EObject, EObject>>> e) {
+						boolean isAssignable = clazz.isAssignableFrom(e.getKey());
+						
+						return isAssignable;
+					}
+				})
+				.flatMap(e -> e.getValue()
+						.stream()
+						.map(el -> (CausingEntityMapping<T, EObject>) new CausingEntityMapping<EObject, EObject>(el.getAffectedElement(), el))
+						);
 	}
 	
 	/**
@@ -72,6 +91,11 @@ public class ResultMap {
 		// check if element is non existent
 		for(CausingEntityMapping<? extends EObject, EObject> entry : list) {
 			if(EcoreUtil.equals(entry.getAffectedElement(), element.getAffectedElement())) {
+				// add causing entites to existing element
+				for(EObject ce : element.getCausingEntities()) {
+					entry.addCausingEntityDistinct(ce);
+				}
+				
 				return false;
 			}
 		}

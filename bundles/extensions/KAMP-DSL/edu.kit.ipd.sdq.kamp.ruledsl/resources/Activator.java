@@ -4,7 +4,8 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
 
-import java.util.function.Consumer;
+import org.eclipse.emf.ecore.EObject;
+import java.util.function.BiConsumer;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.swt.widgets.Display;
@@ -21,6 +22,8 @@ import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
 
+import edu.kit.ipd.sdq.kamp.architecture.AbstractArchitectureVersion;
+import edu.kit.ipd.sdq.kamp.model.modificationmarks.AbstractModificationRepository;
 import edu.kit.ipd.sdq.kamp.ruledsl.runtime.KampConfiguration;
 import edu.kit.ipd.sdq.kamp.ruledsl.runtime.KampGraph;
 import edu.kit.ipd.sdq.kamp.ruledsl.runtime.KampRule;
@@ -29,6 +32,7 @@ import edu.kit.ipd.sdq.kamp.ruledsl.runtime.graph.GraphException;
 import edu.kit.ipd.sdq.kamp.ruledsl.runtime.graph.KampRuleGraph;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.KampRuleStub;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.RegistryException;
+import edu.kit.ipd.sdq.kamp.ruledsl.support.RuleBlock;
 import edu.kit.ipd.sdq.kamp.ruledsl.runtime.graph.KampRuleVertex;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.IConfiguration;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.IRule;
@@ -39,7 +43,7 @@ import gen.rule.*;
 
 public class Activator extends AbstractUIPlugin implements BundleActivator {
 
-	private IRuleProvider ruleProvider;
+	private IRuleProvider<AbstractArchitectureVersion<AbstractModificationRepository<?, ?>>, AbstractModificationRepository<?, ?>> ruleProvider;
 	private final KampRuleGraph ruleGraph = new KampRuleGraph();
 	private static final RollbarExceptionReporting REPORTING = RollbarExceptionReporting.INSTANCE;
 	private static Reflections reflections;
@@ -48,7 +52,7 @@ public class Activator extends AbstractUIPlugin implements BundleActivator {
     	super.start(context);
         
     	// build the rule provider, which contains all rules which will be examined in list form (instead of graph)
-        this.ruleProvider = new RuleProvider();
+        this.ruleProvider = new RuleProvider<AbstractArchitectureVersion<AbstractModificationRepository<?, ?>>, AbstractModificationRepository<?, ?>>();
         
         // build the rule graph
         registerRules();
@@ -71,7 +75,7 @@ public class Activator extends AbstractUIPlugin implements BundleActivator {
             		// we have to abort the registration because the DI is not guaranteed to work from now on...
             		Display.getDefault().syncExec(new Runnable() {
         			    public void run() {
-        			    	MultiStatus status = RuleProvider.createMultiStatus(null, e);
+        			    	MultiStatus status = IRuleProvider.createMultiStatus(null, e);
         					Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
         	                ErrorDialog.openError(shell, "Rule Registration Error", "The rules could not be instantiated and registered correctly. They were registered until the exception occured. Total rules registered so far: " + ruleProvider.getNumberOfRegisteredRules() + ". Rule causing exception: " + cRuleStub.getClazz().getSimpleName(), status);
         			    }
@@ -82,7 +86,7 @@ public class Activator extends AbstractUIPlugin implements BundleActivator {
         } catch(GraphException e) {
         	Display.getDefault().syncExec(new Runnable() {
 			    public void run() {
-			    	MultiStatus status = RuleProvider.createMultiStatus("You created a cycle in you rule hierarchy.", e);
+			    	MultiStatus status = IRuleProvider.createMultiStatus("You created a cycle in you rule hierarchy.", e);
 					Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 	                ErrorDialog.openError(shell, "Dependency Injection Error", null, status);
 			    }
@@ -101,7 +105,7 @@ public class Activator extends AbstractUIPlugin implements BundleActivator {
 					} catch (InstantiationException | IllegalAccessException e) {
 						Display.getDefault().syncExec(new Runnable() {
 						    public void run() {
-						    	MultiStatus status = RuleProvider.createMultiStatus(null, e);
+						    	MultiStatus status = IRuleProvider.createMultiStatus(null, e);
 								Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 				                ErrorDialog.openError(shell, "Dependency Injection Error", "Could not instantiate the Configuration class. Did you forget or override the standard constructor?", status);
 						    }
@@ -115,10 +119,10 @@ public class Activator extends AbstractUIPlugin implements BundleActivator {
 	 		}
 	 	}
         
-        this.ruleProvider.runEarlyHook(new Consumer<Set<IRule>>() {
+        this.ruleProvider.runEarlyHook(new BiConsumer<Set<IRule<EObject, EObject, AbstractArchitectureVersion<AbstractModificationRepository<?, ?>>, AbstractModificationRepository<?, ?>>>, List<RuleBlock>>() {
 
 			@Override
-			public void accept(Set<IRule> rules) {
+			public void accept(Set<IRule<EObject, EObject, AbstractArchitectureVersion<AbstractModificationRepository<?, ?>>, AbstractModificationRepository<?, ?>>> rules, List<RuleBlock> blocks) {
 		        // 1. Inject the graph we created for DI in every method which is annotated with @KampGraph
 	        	//    The method must have the following parameter types: KampRuleGraph
 	        	
@@ -135,7 +139,7 @@ public class Activator extends AbstractUIPlugin implements BundleActivator {
 								// TODO for InvocationTargetException the causing exception must be displayed
 								Display.getDefault().syncExec(new Runnable() {
 								    public void run() {
-								    	MultiStatus status = RuleProvider.createMultiStatus(null, e);
+								    	MultiStatus status = IRuleProvider.createMultiStatus(null, e);
 										Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
 						                ErrorDialog.openError(shell, "Dependency Injection Error", "Could not inject the KampRuleGraph into method \"" + m.getName() + "\" of class \"" + m.getDeclaringClass().getSimpleName() + "\"." + ((e instanceof IllegalArgumentException) ? "Expecting the following signature: " + m.getName() + "(KampRuleGraph)!" : ""), status);
 								    }

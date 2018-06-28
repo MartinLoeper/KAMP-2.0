@@ -1,4 +1,4 @@
-package edu.kit.ipd.sdq.kamp.ruledsl.util;
+package edu.kit.ipd.sdq.kamp.ruledsl.support;
 
 import static edu.kit.ipd.sdq.kamp.architecture.ArchitectureModelLookup.lookUpMarkedObjectsOfAType;
 
@@ -10,7 +10,6 @@ import java.util.Set;
 import org.eclipse.emf.ecore.EObject;
 
 import edu.kit.ipd.sdq.kamp.architecture.AbstractArchitectureVersion;
-import edu.kit.ipd.sdq.kamp.ruledsl.support.CausingEntityMapping;
 
 public class SeedMap extends ResultMap {
 	private SeedMap(ResultMap resultMap) {

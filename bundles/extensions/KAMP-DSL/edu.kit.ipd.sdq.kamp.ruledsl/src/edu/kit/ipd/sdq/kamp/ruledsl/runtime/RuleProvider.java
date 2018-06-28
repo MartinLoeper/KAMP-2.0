@@ -1,44 +1,33 @@
 package edu.kit.ipd.sdq.kamp.ruledsl.runtime;
 
-import static edu.kit.ipd.sdq.kamp.architecture.ArchitectureModelLookup.lookUpMarkedObjectsOfAType;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.MultiStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.jface.dialogs.ErrorDialog;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.PlatformUI;
 
 import edu.kit.ipd.sdq.kamp.architecture.AbstractArchitectureVersion;
 import edu.kit.ipd.sdq.kamp.model.modificationmarks.AbstractModificationRepository;
 import edu.kit.ipd.sdq.kamp.propagation.AbstractChangePropagationAnalysis;
-import edu.kit.ipd.sdq.kamp.ruledsl.support.CausingEntityMapping;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.ChangePropagationStepRegistry;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.IConfiguration;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.IRecursiveRule;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.IRule;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.IRuleProvider;
-import edu.kit.ipd.sdq.kamp.ruledsl.support.KampRuleLanguageUtil;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.KampRuleStub;
+import edu.kit.ipd.sdq.kamp.ruledsl.support.RecursiveRuleBlock;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.RegistryException;
-import edu.kit.ipd.sdq.kamp.ruledsl.util.ErrorContext;
-import edu.kit.ipd.sdq.kamp.ruledsl.util.RecursiveRuleBlock;
-import edu.kit.ipd.sdq.kamp.ruledsl.util.ResultMap;
+import edu.kit.ipd.sdq.kamp.ruledsl.support.ResultMap;
+import edu.kit.ipd.sdq.kamp.ruledsl.support.RuleBlock;
+import edu.kit.ipd.sdq.kamp.ruledsl.support.SeedMap;
 import edu.kit.ipd.sdq.kamp.ruledsl.util.RollbarExceptionReporting;
-import edu.kit.ipd.sdq.kamp.ruledsl.util.RuleBlock;
-import edu.kit.ipd.sdq.kamp.ruledsl.util.SeedMap;
 
 /**
  * This class is also called the RuleRegistry.
@@ -59,7 +48,7 @@ public class RuleProvider<T extends AbstractArchitectureVersion<M>, M extends Ab
 	
 	private static final RollbarExceptionReporting REPORTING = RollbarExceptionReporting.INSTANCE;
 	private final Map<IRule<EObject, EObject, T, M>, KampRuleStub> rules = new LinkedHashMap<>();
-	private Consumer<Set<IRule<EObject, EObject, T, M>>> preHook;
+	private BiConsumer<Set<IRule<EObject, EObject, T, M>>, List<RuleBlock>> preHook;
 	private IConfiguration configuration;
 
 	@Override
@@ -69,11 +58,6 @@ public class RuleProvider<T extends AbstractArchitectureVersion<M>, M extends Ab
 		}
 				
 		System.out.println("Applying all custom dsl rules...");
-		
-		if(this.preHook != null) {
-			System.out.println("Running pre hook...");
-			this.preHook.accept(this.rules.keySet());
-		}
 		
 		// convert the rules into a sortable data structure
 		ArrayList<Entry<IRule<EObject, EObject, T, M>, KampRuleStub>> rules = new ArrayList<Entry<IRule<EObject, EObject, T, M>, KampRuleStub>>(this.rules.entrySet());
@@ -135,9 +119,25 @@ public class RuleProvider<T extends AbstractArchitectureVersion<M>, M extends Ab
 			}
 		}
 		
+		// remove empty blocks
+		// empty blocks occur, if all rules inside a block are inactive
+		Iterator<RuleBlock> blockIt = blocks.iterator();
+		while(blockIt.hasNext()) {
+			RuleBlock cBlock = blockIt.next();
+			if(cBlock.size() == 0) {
+				blockIt.remove();
+			}
+		}
+		
+		// run the pre hooks which allow visualization
+		if(this.preHook != null) {
+			System.out.println("Running pre hook...");
+			this.preHook.accept(this.rules.keySet(), blocks);
+		}
+		
 		// 5. iterate over blocks and call lookup
 		for(RuleBlock block : blocks) {
-			block.runLookups(null);
+			block.runLookups();
 		}
 		
 		// 6. iterate over blocks and run apply
@@ -201,7 +201,7 @@ public class RuleProvider<T extends AbstractArchitectureVersion<M>, M extends Ab
 	}
 
 	@Override
-	public void runEarlyHook(Consumer<Set<IRule<EObject, EObject, T, M>>> preHook) {
+	public void runEarlyHook(BiConsumer<Set<IRule<EObject, EObject, T, M>>, List<RuleBlock>> preHook) {
 		this.preHook = preHook;
 	}
 
@@ -214,19 +214,4 @@ public class RuleProvider<T extends AbstractArchitectureVersion<M>, M extends Ab
 	public IConfiguration getConfiguration() {
 		return this.configuration;
 	}
-	
-	 public static MultiStatus createMultiStatus(String msg, Throwable t) {
-	        List<Status> childStatuses = new ArrayList<>();
-	        StackTraceElement[] stackTraces = t.getStackTrace();
-	
-	        for (StackTraceElement stackTrace: stackTraces) {
-	            Status status = new Status(IStatus.ERROR, KampRuleLanguageUtil.BUNDLE_NAME + ".xxxxxxxx", stackTrace.toString());
-	            childStatuses.add(status);
-	        }
-	
-	        MultiStatus ms = new MultiStatus(KampRuleLanguageUtil.BUNDLE_NAME + ".xxxxxxxx",
-	                IStatus.ERROR, childStatuses.toArray(new Status[] {}), t.toString(), t);
-	        
-	        return ms;
-	    }
 }

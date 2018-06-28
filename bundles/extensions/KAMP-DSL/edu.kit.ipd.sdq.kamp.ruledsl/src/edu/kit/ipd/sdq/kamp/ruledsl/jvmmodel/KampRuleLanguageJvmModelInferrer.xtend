@@ -178,14 +178,16 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 				if(blockId > -1) {
 					currentInterface = IRecursiveRule.typeRef(sourceType, returnType, typeRef(AbstractArchitectureVersion, typeRef(AbstractModificationRepository, wildcard(), wildcard())), typeRef(AbstractModificationRepository, wildcard(), wildcard()))
 					
-					val getStepIdMethod = rule.toMethod("getRecursiveBlockId", typeRef("int")) [
-						body = '''
-							return «blockId»;
-						'''
-					];
-					
-					getStepIdMethod.annotations += annotationRef(Override)					
-					theClass.members += getStepIdMethod
+					// we do not need this information at runtime right now
+					// the way we build blocks is based on rule position
+//					val getStepIdMethod = rule.toMethod("getRecursiveBlockId", typeRef("int")) [
+//						body = '''
+//							return «blockId»;
+//						'''
+//					];
+//					
+//					getStepIdMethod.annotations += annotationRef(Override)					
+//					theClass.members += getStepIdMethod
 				} else {
 					currentInterface = IRule.typeRef(sourceType, returnType, typeRef(AbstractArchitectureVersion, typeRef(AbstractModificationRepository, wildcard(), wildcard())), typeRef(AbstractModificationRepository, wildcard(), wildcard()));
 				}
@@ -226,7 +228,7 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 				val lookupMethodName = rule.getLookupMethodName(rule.lookups.last);
 				try {
 					val lookupMethod = rule.toMethod(lookupMethodName, null) [
-					parameters += rule.toParameter(rule.source.metaclass.name.toFirstLower + "Mapping", typeRef(CausingEntityMapping, sourceType, typeRef(EObject)))		
+					parameters += rule.toParameter(rule.source.metaclass.name.toFirstLower + "Mapping", Stream.typeRef(typeRef(CausingEntityMapping, sourceType, typeRef(EObject))))		
 					//if(rule.isVersionParameterRequired()) {	// pass it always as we would have the BiFunction declaration in the utility method of apply
 						parameters += rule.toParameter("version", typeRef(AbstractArchitectureVersion, wildcard()))
 					//}
@@ -235,7 +237,7 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 					
 					//«generateSourceMarkerParameter(hasSourceMarkerFinal, rule.source.metaclass.name.toFirstLower)»
 					val StringConcatenationClient strategy = '''
-								«typeRef(Stream, typeRef(CausingEntityMapping, typeRef(rule.source.metaclass.instanceClass), typeRef(EObject)))» input = «Stream».of(«rule.source.metaclass.name.toFirstLower + "Mapping"»)«IF hasSourceMarkerFinal».peek(e -> e.addCausingEntityDistinct(«rule.source.metaclass.name.toFirstLower + "Mapping"».getAffectedElement()));«ELSE»;«ENDIF»
+								«typeRef(Stream, typeRef(CausingEntityMapping, typeRef(rule.source.metaclass.instanceClass), typeRef(EObject)))» input = «rule.source.metaclass.name.toFirstLower + "Mapping"»«IF hasSourceMarkerFinal».peek(e -> e.addCausingEntityDistinct(e.getAffectedElement()));«ELSE»;«ENDIF»
 								
 								«FOR x : rule.lookups»
 									«x.generateCodeForRule(theClass, isRuleMarkedForCausingEntities(x, causingEntityLookups))»
@@ -257,7 +259,7 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 					parameters += rule.toParameter("sourceElements", Stream.typeRef(typeRef(CausingEntityMapping, sourceType, typeRef(EObject))));
 					
 					val StringConcatenationClient strategy = '''								
-								return sourceElements.flatMap(e -> «lookupMethodName»(e, architectureVersion));
+								return «lookupMethodName»(sourceElements, architectureVersion);
 							''';
 
 					setBody(it, strategy);
