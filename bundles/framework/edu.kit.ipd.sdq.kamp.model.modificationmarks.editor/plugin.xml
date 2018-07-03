@@ -73,6 +73,18 @@
                menubarPath="edit">
          </action>
       </objectContribution>
+      <objectContribution
+            adaptable="false"
+            id="edu.kit.ipd.sdq.kamp.model.modificationmarks.AbstractModificationID"
+            objectClass="edu.kit.ipd.sdq.kamp.model.modificationmarks.AbstractModification">
+         <action
+               class="edu.kit.ipd.sdq.kamp.model.modificationmarks.editor.RunOcl"
+               icon="../edu.kit.ipd.sdq.kamp/icons/run.png"
+               id="edu.kit.ipd.sdq.kamp.model.modificationmarks.editor.RunOcl"
+               label="RunOCL"
+               menubarPath="edit">
+         </action>
+      </objectContribution>
    </extension>
 
 </plugin>

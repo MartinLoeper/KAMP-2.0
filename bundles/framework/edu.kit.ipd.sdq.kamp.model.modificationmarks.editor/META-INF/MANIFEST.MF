@@ -18,3 +18,4 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.ide;visibility:=reexport,
  edu.kit.ipd.sdq.kamp
 Bundle-ActivationPolicy: lazy
+Import-Package: thesis
