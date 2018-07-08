@@ -50,8 +50,8 @@ public class RunXtend implements IActionDelegate {
 			AbstractModification<? extends EObject, ? extends EObject> element = (AbstractModification<? extends EObject, ? extends EObject>) selectedElement;
 			CrossReferenceProvider provider = this.getArchitectureVersion(element);
 			RepositoryComponent repositoryComponent = (RepositoryComponent) element;
-			Collection<? extends EObject> result = KampXtendTest.run(Stream.of(repositoryComponent), provider).collect(Collectors.toList());
-			
+			Collection<? extends EObject> result = KampXtendTest.evaluateRule(Stream.of(repositoryComponent), provider).collect(Collectors.toList());
+			 
 			for(EObject obj : result) {
 				System.out.println(obj);
 			}
