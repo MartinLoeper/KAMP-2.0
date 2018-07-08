@@ -18,5 +18,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.ui.ide;visibility:=reexport,
  edu.kit.ipd.sdq.kamp,
  Evaluation_OCL;bundle-version="1.0.0",
- Xtend_Evaluation;bundle-version="1.0.0"
+ Xtend_Evaluation;bundle-version="1.0.0",
+ org.palladiosimulator.pcm
 Bundle-ActivationPolicy: lazy
+Import-Package: edu.kit.ipd.sdq.kamp4is.core
