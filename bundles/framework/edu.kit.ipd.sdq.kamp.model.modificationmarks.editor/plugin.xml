@@ -84,6 +84,13 @@
                label="RunOCL"
                menubarPath="edit">
          </action>
+         <action
+               class="edu.kit.ipd.sdq.kamp.model.modificationmarks.editor.RunXtend"
+               icon="../edu.kit.ipd.sdq.kamp/icons/run.png"
+               id="edu.kit.ipd.sdq.kamp.model.modificationmarks.editor.RunXtend"
+               label="RunXtend"
+               menubarPath="edit">
+         </action>
       </objectContribution>
    </extension>
 
