@@ -1,7 +1,14 @@
 package edu.kit.ipd.sdq.kamp4is.core;
 
-import org.eclipse.core.resources.IProject;
+import static edu.kit.ipd.sdq.kamp.architecture.ArchitectureModelLookup.lookUpMarkedObjectsOfAType;
 
+import java.util.stream.Stream;
+
+import org.eclipse.core.resources.IProject;
+import org.eclipse.emf.ecore.EObject;
+import org.palladiosimulator.pcm.repository.BasicComponent;
+
+import thesis.KampXtendTest;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.ChangePropagationStepRegistry;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.DefaultConfiguration;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.IConfiguration;
@@ -40,6 +47,13 @@ public class ISChangePropagationAnalysis extends AbstractISChangePropagationAnal
 	
 	@Override
 	public void runChangePropagationAnalysis(ISArchitectureVersion version) {
+		System.out.println("TEST:");
+		for(BasicComponent obj : lookUpMarkedObjectsOfAType(version, BasicComponent.class)) {
+			KampXtendTest.evaluateRule(Stream.of(obj), version.getECrossReferenceAdapter()).forEach(c -> {
+				System.out.println(c);
+			});
+		}
+		
 		// TODO: check if this setup is appropriate!
 		this.setChangePropagationDueToDataDependencies(ISModificationmarksFactory.eINSTANCE.createISChangePropagationDueToDataDependencies());
 		version.getModificationMarkRepository().getChangePropagationSteps().add(this.getChangePropagationDueToDataDependencies());

@@ -17,6 +17,8 @@ import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.PlatformUI;
+import org.palladiosimulator.pcm.core.composition.AssemblyContext;
+import org.palladiosimulator.pcm.repository.BasicComponent;
 import org.palladiosimulator.pcm.repository.CompositeComponent;
 import org.palladiosimulator.pcm.repository.RepositoryComponent;
 import edu.kit.ipd.sdq.kamp.architecture.AbstractArchitectureVersion;
@@ -50,12 +52,13 @@ public class RunXtend implements IActionDelegate {
 		if (selectedElement != null && selectedElement instanceof AbstractModification) {
 			AbstractModification<? extends EObject, ? extends EObject> element = (AbstractModification<? extends EObject, ? extends EObject>) selectedElement;
 			CrossReferenceProvider provider = this.getArchitectureVersion(element);
-			CompositeComponent compositeComponent = (CompositeComponent) element.getAffectedElement();
+			BasicComponent compositeComponent = (BasicComponent) element.getAffectedElement();
 			Collection<? extends EObject> result = KampXtendTest.evaluateRule(Stream.of(compositeComponent), provider.getECrossReferenceAdapter()).collect(Collectors.toList());
 			 
+			System.out.println("RESULTS FOR " + compositeComponent.getEntityName());
 			for(EObject obj : result) {
-				CompositeComponent cComponent = (CompositeComponent) obj;
-				System.out.println(cComponent.getEntityName());
+				EObject cComponent = (EObject) obj;
+				System.out.println(cComponent);
 			}
 		}
 	}
