@@ -54,7 +54,8 @@ public class RunXtend implements IActionDelegate {
 			Collection<? extends EObject> result = KampXtendTest.evaluateRule(Stream.of(compositeComponent), provider.getECrossReferenceAdapter()).collect(Collectors.toList());
 			 
 			for(EObject obj : result) {
-				System.out.println(obj);
+				CompositeComponent cComponent = (CompositeComponent) obj;
+				System.out.println(cComponent.getEntityName());
 			}
 		}
 	}
