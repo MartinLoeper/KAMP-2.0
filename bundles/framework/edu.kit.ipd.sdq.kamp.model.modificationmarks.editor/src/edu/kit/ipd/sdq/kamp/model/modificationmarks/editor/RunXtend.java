@@ -9,6 +9,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -26,6 +27,7 @@ import edu.kit.ipd.sdq.kamp.architecture.AbstractArchitectureVersionPersistency;
 import edu.kit.ipd.sdq.kamp.architecture.CrossReferenceProvider;
 import edu.kit.ipd.sdq.kamp.model.modificationmarks.AbstractModification;
 import edu.kit.ipd.sdq.kamp.model.modificationmarks.AbstractModificationRepository;
+import edu.kit.ipd.sdq.kamp.ruledsl.support.CausingEntityMapping;
 import edu.kit.ipd.sdq.kamp4is.core.ISArchitectureVersionPersistency;
 import thesis.KampXtendTest;
 
@@ -52,14 +54,15 @@ public class RunXtend implements IActionDelegate {
 		if (selectedElement != null && selectedElement instanceof AbstractModification) {
 			AbstractModification<? extends EObject, ? extends EObject> element = (AbstractModification<? extends EObject, ? extends EObject>) selectedElement;
 			CrossReferenceProvider provider = this.getArchitectureVersion(element);
-			BasicComponent compositeComponent = (BasicComponent) element.getAffectedElement();
-			Collection<? extends EObject> result = KampXtendTest.evaluateRule(Stream.of(compositeComponent), provider.getECrossReferenceAdapter()).collect(Collectors.toList());
+			CompositeComponent compositeComponent = (CompositeComponent) element.getAffectedElement();
+			CausingEntityMapping<CompositeComponent, EObject> ce = new CausingEntityMapping<CompositeComponent, EObject>(compositeComponent);
+			Collection<CausingEntityMapping<RepositoryComponent, EObject>> result = KampXtendTest.evaluateRule(Stream.of(ce), provider.getECrossReferenceAdapter()).collect(Collectors.toList());
 			 
-			System.out.println("RESULTS FOR " + compositeComponent.getEntityName());
-			for(EObject obj : result) {
-				EObject cComponent = (EObject) obj;
-				System.out.println(cComponent);
-			}
+//			System.out.println("RESULTS FOR " + compositeComponent.getEntityName());
+//			for(EObject obj : result) {
+//				EObject cComponent = (EObject) obj;
+//				System.out.println(cComponent);
+//			}
 		}
 	}
 	

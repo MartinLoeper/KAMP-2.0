@@ -6,9 +6,15 @@ import java.util.stream.Stream;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.palladiosimulator.pcm.core.composition.AssemblyContext;
 import org.palladiosimulator.pcm.repository.BasicComponent;
+import org.palladiosimulator.pcm.repository.CompositeComponent;
+import org.palladiosimulator.pcm.repository.RepositoryComponent;
+import org.palladiosimulator.pcm.subsystem.SubSystem;
 
 import thesis.KampXtendTest;
+import edu.kit.ipd.sdq.kamp.ruledsl.support.CausingEntityMapping;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.ChangePropagationStepRegistry;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.DefaultConfiguration;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.IConfiguration;
@@ -47,10 +53,13 @@ public class ISChangePropagationAnalysis extends AbstractISChangePropagationAnal
 	
 	@Override
 	public void runChangePropagationAnalysis(ISArchitectureVersion version) {
-		System.out.println("TEST:");
-		for(BasicComponent obj : lookUpMarkedObjectsOfAType(version, BasicComponent.class)) {
-			KampXtendTest.evaluateRule(Stream.of(obj), version.getECrossReferenceAdapter()).forEach(c -> {
-				System.out.println(c);
+		System.err.println("TEST:");
+		for(CompositeComponent obj : lookUpMarkedObjectsOfAType(version, CompositeComponent.class)) {
+			KampXtendTest.evaluateRule(Stream.of(new CausingEntityMapping<CompositeComponent, EObject>(obj)), version.getECrossReferenceAdapter()).forEach(c -> {
+				System.err.println(((RepositoryComponent) c.getAffectedElement()).getEntityName());
+				for(EObject causingEntity : c.getCausingEntities()) {
+					System.err.println("-" + ((AssemblyContext) causingEntity).getEntityName());
+				}
 			});
 		}
 		
