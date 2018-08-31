@@ -32,7 +32,7 @@ public class KarlProjectCreationJob extends KarlJobBase {
 		   	syncManifests(project, config.assignedProjectName);
 		    createActivator(project, subMonitor.split(1), config.getRootRuleFile)
 			//createServiceBase(project, subMonitor.split(1));
-		   	moveRuleSourceFiles(subMonitor.split(1), project, config.sourceFileUris, config.sourceFileNames);
+		   	moveRuleSourceFiles(subMonitor.split(1), project, config.sourceFileUris, config.sourceFileNames, config.sourceFilePaths);
 		    hideSrcGenFolder(root.getProject(config.assignedProjectName));
 		    
 		    setupProject(subMonitor.split(3), project)

@@ -17,6 +17,9 @@ import com.google.inject.Singleton
 import org.eclipse.xtext.workspace.IProjectConfigProvider
 import com.google.inject.Guice
 import com.google.inject.util.Modules
+import org.eclipse.xtext.resource.ILocationInFileProvider
+import org.eclipse.xtext.xbase.typesystem.computation.ITypeComputer
+import org.eclipse.xtext.xbase.compiler.XbaseCompiler
 
 /**
  * This is the Guice module which is used to run the KampRuleLanguage core (such as generator).
@@ -27,6 +30,14 @@ class KampRuleLanguageRuntimeModule extends AbstractKampRuleLanguageRuntimeModul
 	override bindIGlobalScopeProvider() {
 		return KampRuleLanguageGlobalScopeProvider
 	}
+	
+	def Class<? extends ITypeComputer> bindITypeComputer() {
+		return KampRuleLanguageTypeComputer
+	}
+	
+	def Class<? extends XbaseCompiler> bindXbaseCompiler() {
+        return KampRuleLanguageCompiler
+    }
 	
 	override configureIScopeProviderDelegate(Binder binder) {
 		binder.bind(IScopeProvider)

@@ -3,6 +3,15 @@
  */
 package edu.kit.ipd.sdq.kamp.ruledsl.validation
 
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.KampRuleLanguagePackage
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.ModelImport
+import org.eclipse.core.internal.resources.ResourceException
+import org.eclipse.emf.ecore.resource.Resource.IOWrappedException
+import org.eclipse.emf.ecore.resource.ResourceSet
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl
+import org.eclipse.emf.ecore.xmi.PackageNotFoundException
+import org.eclipse.xtext.validation.Check
+import edu.kit.ipd.sdq.kamp.ruledsl.runtime.KarlModelLoader;
 
 /**
  * This class contains custom validation rules. 
@@ -11,15 +20,39 @@ package edu.kit.ipd.sdq.kamp.ruledsl.validation
  */
 class KampRuleLanguageValidator extends AbstractKampRuleLanguageValidator {
 	
-//	public static val INVALID_NAME = 'invalidName'
-//
-//	@Check
-//	def checkGreetingStartsWithCapital(Greeting greeting) {
-//		if (!Character.isUpperCase(greeting.name.charAt(0))) {
-//			warning('Name should start with a capital', 
-//					KampRuleLanguagePackage.Literals.GREETING__NAME,
-//					INVALID_NAME)
-//		}
-//	}
-	
+	public static val INVALID_IMPORT_WRONG_TYPE = 'invalidImport__notModelFile'
+	public static val INVALID_IMPORT_UNCAUGHT_ERROR = 'invalidImport__unknownError'
+	public static val INVALID_IMPORT_FILE_NOT_FOUND = 'invalidImport__notFound'
+
+	@Check(FAST)
+	def checkValidModelImport(ModelImport modelImport) {
+		val filePath = modelImport.file;
+		val alias = modelImport.name;
+		try {
+			KarlModelLoader.INSTANCE.loadModelFromFile(filePath, alias, false);
+		} catch(Exception e) {
+			if(e instanceof IOWrappedException) {
+				val wrappedException = e.cause;
+				if(wrappedException instanceof PackageNotFoundException) {
+					error('This is not a valid model file', 
+						KampRuleLanguagePackage.Literals.MODEL_IMPORT__FILE,
+						INVALID_IMPORT_WRONG_TYPE)	
+				} else if(wrappedException instanceof ResourceException) {
+					error('Could not find the specified file', 
+						KampRuleLanguagePackage.Literals.MODEL_IMPORT__FILE,
+						INVALID_IMPORT_FILE_NOT_FOUND)	
+				} else {
+					error('Could not import model', 
+						KampRuleLanguagePackage.Literals.MODEL_IMPORT__FILE,
+						INVALID_IMPORT_UNCAUGHT_ERROR,
+						e.message)	
+				}
+			} else {
+				error('Could not import model', 
+					KampRuleLanguagePackage.Literals.MODEL_IMPORT__FILE,
+					INVALID_IMPORT_UNCAUGHT_ERROR,
+					e.message)	
+			}
+		}
+	}	
 }

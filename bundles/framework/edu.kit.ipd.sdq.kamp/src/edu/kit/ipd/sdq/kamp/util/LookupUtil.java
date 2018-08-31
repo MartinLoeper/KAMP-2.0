@@ -46,8 +46,8 @@ public final class LookupUtil {
 	 * @return a collection containing all elements of type {@code targetClass} which reference one of the given {@code sourceElements} - duplicates are removed
 	 * @throws UnsupportedOperationException thrown if the given {@code version} does not implement the CrossReferenceProvider interface or returns null from getECrossReferenceAdapter
 	 */
-	public static final <T extends EObject, M extends EObject> Collection<CausingEntityMapping<T, EObject>> lookupBackwardReference(AbstractArchitectureVersion<?> version, Class<T> targetClass, String featureName, Collection<CausingEntityMapping<M, EObject>> sourceElements, boolean addCausingEntities, Class<? extends M> ...projectionClasses) {
-		return lookupBackwardReference(version, targetClass, featureName, sourceElements.stream(), addCausingEntities, projectionClasses);
+	public static final <T extends EObject, M extends EObject> Collection<CausingEntityMapping<T, EObject>> lookupBackwardReference(AbstractArchitectureVersion<?> version, Class<T> targetClass, String featureName, Collection<CausingEntityMapping<M, EObject>> sourceElements, boolean addCausingEntities) {
+		return lookupBackwardReference(version, targetClass, featureName, sourceElements.stream(), addCausingEntities);
 	}
 	
 	/**
@@ -61,7 +61,7 @@ public final class LookupUtil {
 	 * @return a collection containing all elements of type {@code targetClass} which reference one of the given {@code sourceElements} - duplicates are removed
 	 * @throws UnsupportedOperationException thrown if the given {@code version} does not implement the CrossReferenceProvider interface or returns null from getECrossReferenceAdapter
 	 */
-	public static final <T extends EObject, M extends EObject> Collection<CausingEntityMapping<T, EObject>> lookupBackwardReference(AbstractArchitectureVersion<?> version, Class<T> targetClass, String featureName, Stream<CausingEntityMapping<M, EObject>> sourceStream, boolean addCausingEntities, Class<? extends M> ...projectionClasses) {
+	public static final <T extends EObject, M extends EObject> Collection<CausingEntityMapping<T, EObject>> lookupBackwardReference(AbstractArchitectureVersion<?> version, Class<T> targetClass, String featureName, Stream<CausingEntityMapping<M, EObject>> sourceStream, boolean addCausingEntities) {
 		if(!(version instanceof CrossReferenceProvider)) {
 			throw new UnsupportedOperationException("The given ArchitectureVersion does not support following backreferences. It must implement CrossReferenceProvider to do so.");
 		}
@@ -79,7 +79,7 @@ public final class LookupUtil {
 			public Stream<CausingEntityMapping<T, EObject>> apply(CausingEntityMapping<M, EObject> cem) {
 				Collection<Setting> settings = crossReferenceAdapter.getInverseReferences(cem.getAffectedElement(), true);
 						
-				return settings.stream().filter(setting -> isTypeMatching(projectionClasses, cem.getAffectedElement()) && targetClass.isAssignableFrom(setting.getEObject().getClass()) && (featureName == null || setting.getEStructuralFeature().getName().equals(featureName))).map(Setting::getEObject).filter(distinctByEqualityHelper()).map(new Function<EObject, CausingEntityMapping<T, EObject>>() {
+				return settings.stream().filter(setting -> targetClass.isAssignableFrom(setting.getEObject().getClass()) && (featureName == null || setting.getEStructuralFeature().getName().equals(featureName))).map(Setting::getEObject).filter(distinctByEqualityHelper()).map(new Function<EObject, CausingEntityMapping<T, EObject>>() {
 
 					@Override
 					public CausingEntityMapping<T, EObject> apply(EObject obj) {
@@ -123,7 +123,7 @@ public final class LookupUtil {
 //		
 //	}
 	
-	public static final <M extends EObject, T extends EObject> Stream<CausingEntityMapping<T, EObject>> lookupForwardReference(Stream<CausingEntityMapping<M, EObject>> sourceElements, boolean isFeatureMany, String featureName, Class<T> targetClass, boolean addCausingEntities, Class<? extends T> ...projectionClasses) {
+	public static final <M extends EObject, T extends EObject> Stream<CausingEntityMapping<T, EObject>> lookupForwardReference(Stream<CausingEntityMapping<M, EObject>> sourceElements, boolean isFeatureMany, String featureName, Class<T> targetClass, boolean addCausingEntities) {
 		Stream<CausingEntityMapping<T, EObject>> stream;
 		
 		if(isFeatureMany) {
@@ -137,9 +137,7 @@ public final class LookupUtil {
 					List<CausingEntityMapping<T, EObject>> causingEntityMappings = new ArrayList<>();
 					
 					for(T element : elements) {
-						boolean typeIsMatching = isTypeMatching(projectionClasses, element);
-						
-						if(element != null && typeIsMatching) {
+						if(element != null) {
 							CausingEntityMapping<T, EObject> newMapping = new CausingEntityMapping<>(element, e);
 							if(addCausingEntities) {
 								newMapping.addCausingEntityDistinct(element);
@@ -161,9 +159,7 @@ public final class LookupUtil {
 					@SuppressWarnings("unchecked")
 					T element = (T) e.getAffectedElement().eGet(e.getAffectedElement().eClass().getEStructuralFeature(featureName));
 					
-					boolean typeIsMatching = isTypeMatching(projectionClasses, element);
-					
-					if(element == null || !typeIsMatching)
+					if(element == null)
 						return null;
 					
 					CausingEntityMapping<T, EObject> newMapping = new CausingEntityMapping<>(element, e);

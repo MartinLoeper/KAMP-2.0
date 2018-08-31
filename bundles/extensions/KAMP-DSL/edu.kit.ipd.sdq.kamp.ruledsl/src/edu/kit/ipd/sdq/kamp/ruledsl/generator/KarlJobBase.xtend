@@ -186,23 +186,28 @@ abstract class KarlJobBase extends Job {
 		}
 	}
 	
-	def static moveRuleSourceFiles(IProgressMonitor monitor, IProject destinationProject, URI[] sourceFiles, String[] jFileNames) {				
-		// TODO check if user removed gen folder??
-		val IFolder genFolder = destinationProject.getFolder("gen");
-		val IFolder ruleFolder = genFolder.getFolder("rule");
-		
-		if(!ruleFolder.exists) {
-			ruleFolder.create(true, false, monitor);
-		}
-		
+	def static moveRuleSourceFiles(IProgressMonitor monitor, IProject destinationProject, URI[] sourceFiles, String[] jFileNames, List<String[]> jFilePaths) {						
 		for(var int i = 0; i < sourceFiles.size; i++) {
+			// TODO check if user removed gen folder??
+			val IFolder genFolder = destinationProject.getFolder("gen");
+			var IFolder topFolder = genFolder;
+			
+			val segments = jFilePaths.get(i);
+			for(var j = 1; j < segments.length; j++) {
+				val pathSegment = segments.get(j);
+				topFolder = topFolder.getFolder(pathSegment);
+				if(!topFolder.exists) {
+					topFolder.create(true, false, monitor);
+				}	
+			}
+			
 			val sourceFile = sourceFiles.get(i)
 			val jFileName = jFileNames.get(i)
 			val workspaceLocation = ResourcesPlugin.getWorkspace().getRoot().getLocation();
 			val sourcePath = new Path(workspaceLocation.toOSString + File.separator + sourceFile.toPlatformString(false));
 			val File srcFile = sourcePath.toFile
 			
-			val IFile cFile = ruleFolder.getFile(jFileName);
+			val IFile cFile = topFolder.getFile(jFileName);
 			
 			// delete file if present
 			if(cFile.exists) {

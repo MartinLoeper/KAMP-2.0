@@ -4,13 +4,36 @@ hidden(WS, SL_COMMENT)
 generate kampRuleLanguage "http://www.kit.edu/ipd/sdq/kamp/ruledsl/KampRuleLanguage"
 
 import "http://www.eclipse.org/emf/2002/Ecore" as ecore
-import "http://www.kit.edu/ipd/sdq/vitruvius/dsls/mirbase/MirBase" as mirbase
 import "http://www.eclipse.org/xtext/common/JavaVMTypes" as jvmTypes
+import "http://www.eclipse.org/xtext/xbase/Xbase" as xbase
 
 RuleFile:
 	MirBaseFile
 	(javaPackageImports+=JavaImport)*
+	(modelImports+=ModelImport)*
+	(intancePredicates+=InstancePredicateDeclaration)*
+	(instances+=InstanceIdDeclaration)*
 	(blocks+=Block)*
+;
+
+ModelImport:
+	'import-model' file=STRING 'as' name=ValidID
+;
+
+InstanceDeclaration:
+	InstanceIdDeclaration | InstancePredicateDeclaration
+;
+
+ModelInstanceReference:
+	model=[ModelImport] '::' instance=[ecore::EObject|QualifiedName] 
+;
+
+InstancePredicateDeclaration:
+	'find' name=ID ':' type=UnnamedMetaclassReference body=XBlockExpression
+;
+
+InstanceIdDeclaration:
+	'instance' name=ID ':' instanceReference=ModelInstanceReference
 ;
 
 Block:
@@ -27,10 +50,22 @@ RecursiveBlock:
 
 KampRule:
 	'rule' name=ValidID ':'
-	source=UnnamedMetaclassReference
+	source=RuleSource
 	(instructions+=Instruction)+
 	';'
 	(modificationMark=ModificationMark)?
+;
+
+RuleSource:
+	MetaclassRuleSource | InstanceRuleSource
+;
+
+MetaclassRuleSource:
+	'metaclass(' metaclassReference=UnnamedMetaclassReference ')'
+;
+
+InstanceRuleSource:
+	'instance(' instanceReference=[InstanceDeclaration|ID] ')'
 ;
 
 ModificationMark:
@@ -42,7 +77,19 @@ Instruction:
 ;
 
 Lookup:
-	PropagationReference | RuleReference
+	PropagationReference | RuleReference | Projection
+;
+
+Projection returns Projection: 
+	TypeProjection | InstanceProjection
+;
+
+InstanceProjection:
+	'{' instanceDeclarationReference=[InstanceDeclaration|ID] '}'
+;
+
+TypeProjection:
+	'<' types+=[jvmTypes::JvmType|QualifiedName] ('AND' types+=[jvmTypes::JvmType|QualifiedName])* '>'
 ;
 
 RuleReference:
@@ -58,13 +105,29 @@ PropagationReference:
 ;
 
 ForwardEReference returns ForwardEReference:
-	'->' feature=[ecore::EReference] ('(' projections+=[jvmTypes::JvmType|QualifiedName] ('OR' projections+=[jvmTypes::JvmType|QualifiedName])* ')')?
+	'->' ForwardReferenceTarget
 ;
 
-BackwardEReference: 
-	'<-' ('(' projections+=[jvmTypes::JvmType|QualifiedName] ('OR' projections+=[jvmTypes::JvmType|QualifiedName])* ')')? mclass=UnnamedMetaclassReference ('[' feature=[ecore::EStructuralFeature|ValidID] ']')?
-; 
+ForwardReferenceTarget:
+	MetaclassForwardReferenceTarget | StructuralFeatureReferenceTarget | InstanceForwardReferenceTarget
+;
 
+MetaclassForwardReferenceTarget:
+	'metaclass(' metaclassReference=UnnamedMetaclassReference ')'
+;
+
+StructuralFeatureReferenceTarget:
+	'feature(' feature=[ecore::EReference] ')'
+;
+
+InstanceForwardReferenceTarget:
+	'instance(' instanceReference=[InstanceDeclaration|ID] ')' 
+;
+
+BackwardEReference:
+	'<-' mclass=UnnamedMetaclassReference ('[' feature=[ecore::EStructuralFeature|ValidID] ']')?
+; 
+ 
 JavaImport:
 	'import-package' javaType=QualifiedName
 ;

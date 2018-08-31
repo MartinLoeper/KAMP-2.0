@@ -1,44 +1,71 @@
 package edu.kit.ipd.sdq.kamp.ruledsl.util
 
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.BackwardEReference
-//import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.CollectElements
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.ForwardEReference
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.Lookup
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.MetaclassRuleSource
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.PropagationReference
-import org.eclipse.emf.ecore.EClass
-import tools.vitruv.dsls.mirbase.mirBase.MetaclassReference
-import static edu.kit.ipd.sdq.kamp.ruledsl.util.EcoreUtil.*
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.RuleReference
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.RuleSource
+import org.eclipse.emf.ecore.EClass
+
+import static edu.kit.ipd.sdq.kamp.ruledsl.util.EcoreUtil.*
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceRuleSource
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceIdDeclaration
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstancePredicateDeclaration
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.MetaclassForwardReferenceTarget
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.StructuralFeatureReferenceTarget
 
 final class KampRuleLanguageEcoreUtil {
-	private new() {
-		
+	private new() {}
+	
+	/**
+	 * Returns the type of the forward reference's feature.
+	 */
+	def static dispatch EClass getMetaclass(StructuralFeatureReferenceTarget refTarget) {
+		val feature = refTarget.feature;
+		if(feature !== null) {
+			return feature.EType as EClass;
+		}
+	}
+	
+	def static dispatch EClass getMetaclass(MetaclassForwardReferenceTarget metaclassTarget) {
+		metaclassTarget.metaclassReference.metaclass
 	}
 	
 	/**
-	 * <p>Returns the Metaclass ({@link EClass}) that is associated with a
-	 * grammar element.
-	 * 
-	 * <p>The 'associated' Metaclass is the class referenced by a {@link MetaclassReference},
-	 * or the type of the (set of) Metaclass(es) returned by a {@link PropagationReference}. 
+	 * Returns the metaclass of the given metaclass rule source.
 	 */
-	def static dispatch EClass getMetaclass(ForwardEReference ref) {
-		ref.feature.EType as EClass
+	def static dispatch EClass getMetaclass(MetaclassRuleSource metaclassRuleSource) {
+		metaclassRuleSource.metaclassReference.metaclass;
 	}
 	
-	/** see #getMetaclass(ForwardEReference) */
-	def static dispatch EClass getMetaclass(MetaclassReference ref) {
-		ref.metaclass
+	def static dispatch EClass getMetaclass(InstanceRuleSource instanceRuleSource) {
+		getMetaclass(instanceRuleSource.instanceReference)
 	}
 	
+	def static dispatch EClass getMetaclass(InstanceIdDeclaration instanceIdDeclaration) {
+		return instanceIdDeclaration.instanceReference.instance.eClass;
+	}
+	
+	def static dispatch EClass getMetaclass(InstancePredicateDeclaration instancePredicateDeclaration) {
+		return instancePredicateDeclaration.type.metaclass;
+	}
+	
+	/**
+	 * Returns the metaclass of the given backward reference.
+	 */
 	def static dispatch EClass getMetaclass(BackwardEReference ref) {
 		// TODO is this cast risky?? which of those subclasses of eclassifier is possible? EClassifierImpl, EClassImpl, EDataTypeImpl, EEnumImpl
 		ref.mclass.metaclass as EClass;
 	}
 	
+	/**
+	 * Returns the metaclass of the last lookup of the given RuleReference's target rule.
+	 */
 	def static dispatch EClass getMetaclass(RuleReference ref) {
 		val Lookup lastLookup = ref.rule.instructions.filter[i | i instanceof Lookup].map(i | Lookup.cast(i)).last;
-		getMetaclass(lastLookup);
+		
+		return getMetaclass(lastLookup);
 	}
 	
 	/**
@@ -46,7 +73,15 @@ final class KampRuleLanguageEcoreUtil {
 	 */
 	def static getPreviousMetaclass(Lookup ref) {
 		getMetaclass(
-			getPreviousSiblingOfType(ref, MetaclassReference, Lookup)
+			getPreviousSiblingOfType(ref, getLookupChainTypes())
 		)
+	}
+	
+	def static getPreviousInstanceClass(Lookup ref) {
+		getPreviousMetaclass(ref).instanceClass
 	}	
+	
+	def static getLookupChainTypes() {
+		return newArrayList(RuleSource, Lookup);
+	}
 }
