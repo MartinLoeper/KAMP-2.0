@@ -57,7 +57,11 @@ KampRule:
 ;
 
 RuleSource:
-	MetaclassRuleSource | InstanceRuleSource
+	MetaclassRuleSource | InstanceRuleSource | ExternalRuleSource
+;
+
+ExternalRuleSource:
+	'rule(' rule=[KampRule|ValidID] ')'
 ;
 
 MetaclassRuleSource:
@@ -93,7 +97,7 @@ TypeProjection:
 ;
 
 RuleReference:
-	'=>' 'RULE' '[' rule=[KampRule|ValidID] ']'
+	'->' 'rule(' rule=[KampRule|ValidID] ')'
 ;
 
 CausingEntityMarker:

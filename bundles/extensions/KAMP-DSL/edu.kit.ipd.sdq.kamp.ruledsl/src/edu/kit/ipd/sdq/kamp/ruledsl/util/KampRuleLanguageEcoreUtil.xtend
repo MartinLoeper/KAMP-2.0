@@ -19,6 +19,7 @@ import org.eclipse.emf.ecore.EClass
 
 import static edu.kit.ipd.sdq.kamp.ruledsl.util.EcoreUtil.*
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceForwardReferenceTarget
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.ExternalRuleSource
 
 final class KampRuleLanguageEcoreUtil {
 	private new() {}
@@ -88,6 +89,12 @@ final class KampRuleLanguageEcoreUtil {
 	 */
 	def static dispatch EClass getMetaclass(RuleReference ref) {
 		val Lookup lastLookup = ref.rule.instructions.filter[i | i instanceof Lookup].map(i | Lookup.cast(i)).last;
+		
+		return getMetaclass(lastLookup);
+	}
+	
+	def static dispatch EClass getMetaclass(ExternalRuleSource ruleSource) {
+		val Lookup lastLookup = ruleSource.rule.instructions.filter[i | i instanceof Lookup].map(i | Lookup.cast(i)).last;
 		
 		return getMetaclass(lastLookup);
 	}
