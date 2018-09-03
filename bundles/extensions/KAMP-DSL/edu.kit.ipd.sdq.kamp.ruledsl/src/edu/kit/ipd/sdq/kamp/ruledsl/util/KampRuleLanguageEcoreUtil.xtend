@@ -2,6 +2,10 @@ package edu.kit.ipd.sdq.kamp.ruledsl.util
 
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.BackwardReferenceInstanceSource
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.BackwardReferenceMetaclassSource
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.ExternalRuleSource
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InlineInstancePredicateProjection
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceDeclaration
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceForwardReferenceTarget
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceIdDeclaration
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstancePredicateDeclaration
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceProjection
@@ -16,10 +20,9 @@ import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.StructuralFeatureForwardRef
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.TypeProjection
 import edu.kit.ipd.sdq.kamp.ruledsl.scoping.KampRuleLanguageScopeProviderDelegate
 import org.eclipse.emf.ecore.EClass
+import org.eclipse.xtext.EcoreUtil2
 
 import static edu.kit.ipd.sdq.kamp.ruledsl.util.EcoreUtil.*
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceForwardReferenceTarget
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.ExternalRuleSource
 
 final class KampRuleLanguageEcoreUtil {
 	private new() {}
@@ -46,6 +49,14 @@ final class KampRuleLanguageEcoreUtil {
 		getMetaclass(instanceProjection.instanceDeclarationReference)
 	} 
 	
+	def static dispatch EClass getMetaclass(InstanceDeclaration instanceDeclaration) {
+		if(instanceDeclaration instanceof InstanceIdDeclaration) {
+			getMetaclass(instanceDeclaration as InstanceIdDeclaration)
+		} else if(instanceDeclaration instanceof InstancePredicateDeclaration) {
+			getMetaclass(instanceDeclaration as InstancePredicateDeclaration)
+		}
+	} 
+	
 	def static dispatch EClass getMetaclass(MetaclassForwardReferenceTarget metaclassTarget) {
 		metaclassTarget.metaclassReference.metaclass
 	}
@@ -67,6 +78,11 @@ final class KampRuleLanguageEcoreUtil {
 	
 	def static dispatch EClass getMetaclass(InstancePredicateDeclaration instancePredicateDeclaration) {
 		return instancePredicateDeclaration.type.metaclass;
+	}
+	
+	def static dispatch EClass getMetaclass(InlineInstancePredicateProjection inlineInstancePredicateProjection) {
+		// has the same type as preceding lookup
+		return getPreviousMetaclass(EcoreUtil2.getContainerOfType(inlineInstancePredicateProjection, Lookup));
 	}
 	
 	def static dispatch EClass getMetaclass(BackwardReferenceInstanceSource instanceSource) {

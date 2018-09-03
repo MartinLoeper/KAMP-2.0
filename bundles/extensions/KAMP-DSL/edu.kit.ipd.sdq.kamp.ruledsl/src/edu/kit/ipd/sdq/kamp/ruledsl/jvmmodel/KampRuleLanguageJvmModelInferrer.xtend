@@ -49,6 +49,9 @@ import static edu.kit.ipd.sdq.kamp.ruledsl.util.EcoreUtil.*
 import static extension edu.kit.ipd.sdq.kamp.ruledsl.util.KampRuleLanguageEcoreUtil.*
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.StructuralFeatureForwardReferenceTarget
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.BackwardReferenceMetaclassSource
+import edu.kit.ipd.sdq.kamp.ruledsl.support.RecursiveRuleBlock
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InlineInstancePredicateProjection
+import java.util.UUID
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -95,6 +98,29 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
  						body = ''''''
  					}
 				]
+			}
+			
+			for(block : ruleFile.blocks) {
+				val rules = newArrayList()
+				if(block instanceof KampRule) {
+					rules.add(block as KampRule)
+				} else {
+					rules += (rules as RecursiveBlock).rules;
+				}
+
+				for(inlinePredicate : rules.map[rule | rule.instructions].flatten.filter[i | i instanceof InlineInstancePredicateProjection]) {
+					val type = inlinePredicate.metaclass;
+					val predicate = inlinePredicate as InlineInstancePredicateProjection;
+					members += predicate.toMethod("find" + UUID.randomUUID().toString().replace("-", ""), typeRef(boolean)) [
+	 					val context = predicate.toParameter('it', typeRef(type.instanceClass))
+	 					parameters += context
+	 					if (predicate.body !== null) { 
+	 						body = predicate.body
+	 					} else {
+	 						body = ''''''
+	 					}
+					]
+				}
 			}
 		]
 		

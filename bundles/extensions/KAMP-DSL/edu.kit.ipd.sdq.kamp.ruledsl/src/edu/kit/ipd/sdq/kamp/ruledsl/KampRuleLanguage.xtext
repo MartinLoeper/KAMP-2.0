@@ -85,8 +85,13 @@ Lookup:
 ;
 
 Projection returns Projection: 
-	TypeProjection | InstanceProjection
+	TypeProjection | InstanceProjection | InlineInstancePredicateProjection
 ;
+
+InlineInstancePredicateProjection:
+	'[' body=XBlockExpression ']'
+;
+
 
 InstanceProjection:
 	'[' instanceDeclarationReference=[InstanceDeclaration|ID] ']'
