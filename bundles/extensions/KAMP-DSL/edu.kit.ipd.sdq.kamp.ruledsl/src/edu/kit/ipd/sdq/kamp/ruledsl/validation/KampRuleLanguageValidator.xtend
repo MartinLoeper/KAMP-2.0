@@ -31,15 +31,25 @@ class KampRuleLanguageValidator extends AbstractKampRuleLanguageValidator {
 	
 	public static val INVALID_METACLASS_FORWARD_REFERENCE_TARGET = 'invalidMetaclassForwardReferenceTarget'
 	public static val INVALID_BACKWARD_REFERENCE_METACLASS_SOURCE = 'invalidBackwardReferenceMetaclassSource';
+	public static val INVALID_BACKWARD_REFERENCE_METACLASS_SOURCE__FEATURE = 'invalidBackwardReferenceMetaclassSource__feature';
 
 	@Check(FAST)
 	def checkValidBackwardReferenceMetaclassSource(BackwardReferenceMetaclassSource backwardReferenceMetaclassSource) {
 		val lookup = EcoreUtil2.getContainerOfType(backwardReferenceMetaclassSource, Lookup);
 		val previousMetaclass = KampRuleLanguageEcoreUtil.getPreviousMetaclass(lookup);
 		
-		val backwardReferenceMetaclass = backwardReferenceMetaclassSource.mclass.metaclass;
+		val backwardReferenceMetaclass = backwardReferenceMetaclassSource?.mclass?.metaclass;
 		if(backwardReferenceMetaclass !== null) {
 			val referenceWithSubtypeExists = backwardReferenceMetaclass.EAllReferences.exists[i |
+				val refType = i.EReferenceType;
+				if (KampRuleLanguageScopeProviderDelegate.isSubtype(previousMetaclass, refType)) {
+					return true;
+				} else {
+					return false;
+				}
+			]
+			
+			val referencesWithSupertype = backwardReferenceMetaclass.EAllReferences.filter[i |
 				val refType = i.EReferenceType;
 				if (KampRuleLanguageScopeProviderDelegate.isSubtype(refType, previousMetaclass)) {
 					return true;
@@ -49,11 +59,31 @@ class KampRuleLanguageValidator extends AbstractKampRuleLanguageValidator {
 			]
 			
 			if(!referenceWithSubtypeExists) {
-				warning("The source of the lookup does not provide any reference with the target type: " + backwardReferenceMetaclassSource.mclass.metaclass.instanceClass.simpleName, 
-					backwardReferenceMetaclassSource, 
-					KampRuleLanguagePackage.Literals.BACKWARD_REFERENCE_METACLASS_SOURCE__MCLASS,
-					INVALID_BACKWARD_REFERENCE_METACLASS_SOURCE
-				);
+				var message = "The source of the lookup does not provide any reference with the target type or its subtype: " + backwardReferenceMetaclassSource.mclass.metaclass.instanceClass.simpleName + ".";
+				if(referencesWithSupertype.length > 0) {
+					message += "The source contains " + referencesWithSupertype.length + " references with supertype instead.";
+					warning(message, 
+						backwardReferenceMetaclassSource, 
+						KampRuleLanguagePackage.Literals.BACKWARD_REFERENCE_METACLASS_SOURCE__MCLASS,
+						INVALID_BACKWARD_REFERENCE_METACLASS_SOURCE
+					);
+					
+					// if a feature is set, highlight the feature with a warning, too
+					if(backwardReferenceMetaclassSource.feature !== null) {
+						warning("The feature references a supertype. The reference does not guarantee to contain the desired type '" + previousMetaclass.instanceClass.simpleName 
+							+ "'. It contains '" + backwardReferenceMetaclassSource.feature.EType.instanceClass.simpleName + "' instead.", 
+							backwardReferenceMetaclassSource, 
+							KampRuleLanguagePackage.Literals.BACKWARD_REFERENCE_METACLASS_SOURCE__FEATURE,
+							INVALID_BACKWARD_REFERENCE_METACLASS_SOURCE__FEATURE
+						);
+					}
+				} else {
+					error(message + " There is also no reference with the target supertype. This lookup is very unlikely to match anything.", 
+						backwardReferenceMetaclassSource, 
+						KampRuleLanguagePackage.Literals.BACKWARD_REFERENCE_METACLASS_SOURCE__MCLASS,
+						INVALID_BACKWARD_REFERENCE_METACLASS_SOURCE
+					);
+				}
 			}
 		}
 	}
@@ -74,12 +104,41 @@ class KampRuleLanguageValidator extends AbstractKampRuleLanguageValidator {
 				}
 			]
 			
+			val referencesWithSupertype = previousMetaclass.EAllReferences.filter[i |
+				val refType = i.EReferenceType;
+				if (KampRuleLanguageScopeProviderDelegate.isSubtype(refType, forwardReferenceMetaclass)) {
+					return true;
+				} else {
+					return false;
+				}
+			]
+			
 			if(!referenceWithSubtypeExists) {
-				warning("The source of the lookup does not provide any reference with the target type: " + forwardReferenceMetaclass.instanceClass.simpleName, 
-					metaclassForwardReferenceTarget, 
-					KampRuleLanguagePackage.Literals.METACLASS_FORWARD_REFERENCE_TARGET__METACLASS_REFERENCE,
-					INVALID_METACLASS_FORWARD_REFERENCE_TARGET
-				);
+				var message = "The source of the lookup does not provide any reference with the target type or its subtype: " + forwardReferenceMetaclass.instanceClass.simpleName + ".";
+				
+				if(referencesWithSupertype.length > 0) {
+					message += " The source contains " + referencesWithSupertype.length + " references with supertype instead: ";
+					for (var i = 0; i < referencesWithSupertype.length; i++) {
+						val reference = referencesWithSupertype.get(i); 
+						if(i > 0) {
+							message += ", "
+						}
+						message += "'" + reference.name + "'";
+					}
+					message += ". You should create a feature(...)-lookup if you know want to narrow down the lookup's target set."
+					
+					warning(message, 
+						metaclassForwardReferenceTarget, 
+						KampRuleLanguagePackage.Literals.METACLASS_FORWARD_REFERENCE_TARGET__METACLASS_REFERENCE,
+						INVALID_METACLASS_FORWARD_REFERENCE_TARGET
+					);
+				} else {
+					error(message + " There is also no reference with the target supertype. This lookup is very unlikely to match anything.", 
+						metaclassForwardReferenceTarget, 
+						KampRuleLanguagePackage.Literals.METACLASS_FORWARD_REFERENCE_TARGET__METACLASS_REFERENCE,
+						INVALID_METACLASS_FORWARD_REFERENCE_TARGET
+					);
+				}
 			}
 		}
 	}

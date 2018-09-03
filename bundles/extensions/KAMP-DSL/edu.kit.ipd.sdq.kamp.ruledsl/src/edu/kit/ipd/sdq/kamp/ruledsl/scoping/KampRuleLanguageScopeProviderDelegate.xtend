@@ -57,7 +57,23 @@ class KampRuleLanguageScopeProviderDelegate extends MirBaseScopeProviderDelegate
 
 		// BackwardReferenceMetaclassSource - feature
 		else if(context instanceof BackwardReferenceMetaclassSource && reference.equals(KampRuleLanguagePackage.Literals.BACKWARD_REFERENCE_METACLASS_SOURCE__FEATURE)) {
-			return createFilteredEReferenceScope((context as BackwardReferenceMetaclassSource)?.mclass, (context as Lookup)?.previousMetaclass)
+			val targetEClass = (context as Lookup)?.previousMetaclass;
+			val sourceMetaclass = (context as BackwardReferenceMetaclassSource)?.metaclass;
+			
+			val featuresOfSource = sourceMetaclass.EAllStructuralFeatures;
+			if (sourceMetaclass !== null && targetEClass !== null) {
+				// determine features of subclasses
+				var features = featuresOfSource.filter[feature | targetEClass.isSubtype(feature.EType)].toList;
+				
+				// determine features of superclasses
+				features += featuresOfSource.filter[feature | feature.EType.isSubtype(targetEClass)];
+				
+				val descriptions = features.map[f |
+					EObjectDescription.create(f.name, f)
+				].toList;
+				
+				return new SimpleScope(SimpleScope.NULLSCOPE, descriptions);
+			} 
 		}
 		
 		// BackwardReferenceInstanceSource - instanceReference
@@ -73,7 +89,7 @@ class KampRuleLanguageScopeProviderDelegate extends MirBaseScopeProviderDelegate
 				if(i instanceof InstanceIdDeclaration) {
 					val iDecl = i as InstanceIdDeclaration;
 					iDecl.metaclass.EAllReferences.forEach[sourceReference |
-						if(sourceReference.EReferenceType.isSubtype(previousMetaclass)) {
+						if(previousMetaclass.isSubtype(sourceReference.EReferenceType)) {
 							classifierDescriptions += EObjectDescription.create(iDecl.name, i)
 						}
 					]
@@ -85,7 +101,7 @@ class KampRuleLanguageScopeProviderDelegate extends MirBaseScopeProviderDelegate
 				if(i instanceof InstancePredicateDeclaration) {
 					val iPredicateDecl = i as InstancePredicateDeclaration;
 					iPredicateDecl.metaclass.EAllReferences.forEach[sourceReference |
-						if(sourceReference.EReferenceType.isSubtype(previousMetaclass)) {
+						if(previousMetaclass.isSubtype(sourceReference.EReferenceType)) {
 							classifierDescriptions += EObjectDescription.create(iPredicateDecl.name, i)
 						}
 					]
@@ -371,7 +387,7 @@ class KampRuleLanguageScopeProviderDelegate extends MirBaseScopeProviderDelegate
 	 * Returns true if the given subType is either the same type as superType or
 	 * a real subtype.
 	 */
-	public static def Boolean isSubtype(EClass superType, EClassifier subType) {
+	public static def Boolean isSubtype(EClassifier superType, EClassifier subType) {
 		if(subType.equals(superType)) {
 			return true
 		}
