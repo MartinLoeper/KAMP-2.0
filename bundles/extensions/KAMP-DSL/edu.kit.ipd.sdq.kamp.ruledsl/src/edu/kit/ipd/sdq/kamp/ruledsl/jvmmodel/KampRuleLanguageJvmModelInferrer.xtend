@@ -111,7 +111,7 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 				for(inlinePredicate : rules.map[rule | rule.instructions].flatten.filter[i | i instanceof InlineInstancePredicateProjection]) {
 					val type = inlinePredicate.metaclass;
 					val predicate = inlinePredicate as InlineInstancePredicateProjection;
-					members += predicate.toMethod("find" + UUID.randomUUID().toString().replace("-", ""), typeRef(boolean)) [
+					members += predicate.toMethod("findInline" + UUID.randomUUID().toString().replace("-", ""), typeRef(boolean)) [
 	 					val context = predicate.toParameter('it', typeRef(type.instanceClass))
 	 					parameters += context
 	 					if (predicate.body !== null) { 

@@ -291,6 +291,7 @@ abstract class KarlJobBase extends Job {
 		importedPackages.add("edu.kit.ipd.sdq.kamp.architecture")
 		importedPackages.add("edu.kit.ipd.sdq.kamp.util");
 		importedPackages.add("edu.kit.ipd.sdq.kamp.model.modificationmarks");
+		importedPackages.add("org.eclipse.xtext.xbase.lib");
 		
 //		importedPackages.add("edu.kit.ipd.sdq.kamp4bp.core");	
 //		importedPackages.add("edu.kit.ipd.sdq.kamp4is.core")
