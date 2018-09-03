@@ -37,7 +37,6 @@ import org.eclipse.jface.dialogs.ErrorDialog
 import org.eclipse.swt.widgets.Shell
 import org.eclipse.ui.PlatformUI
 import org.eclipse.xtend2.lib.StringConcatenationClient
-import org.eclipse.xtext.common.types.JvmDeclaredType
 import org.eclipse.xtext.common.types.JvmGenericType
 import org.eclipse.xtext.common.types.JvmTypeReference
 import org.eclipse.xtext.xbase.jvmmodel.AbstractModelInferrer
@@ -48,8 +47,8 @@ import org.osgi.framework.FrameworkUtil
 import static edu.kit.ipd.sdq.kamp.ruledsl.util.EcoreUtil.*
 
 import static extension edu.kit.ipd.sdq.kamp.ruledsl.util.KampRuleLanguageEcoreUtil.*
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.MetaclassForwardReferenceTarget
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.StructuralFeatureReferenceTarget
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.StructuralFeatureForwardReferenceTarget
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.BackwardReferenceMetaclassSource
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -374,15 +373,7 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 	}
 	
 	def Class<?> getReturnType(Lookup lastLookup) {
-		if(lastLookup instanceof ForwardEReference) {
-			lastLookup.metaclass.instanceClass
-		} else if(lastLookup instanceof BackwardEReference) {
-			lastLookup.mclass.metaclass.instanceClass
-		} else if(lastLookup instanceof RuleReference) {
-			lastLookup.rule.lookups.last.returnType
-		} else {
-			throw new UnsupportedOperationException("Missing return type determination for lookup type: " + lastLookup.class);
-		}
+		lastLookup.metaclass.instanceClass
 	}
 	
 	def dispatch String getLookupMethodName(KampRule rule, Lookup lookup) {
@@ -394,7 +385,7 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 	}
 	
 	def dispatch String getLookupMethodName(KampRule rule, BackwardEReference reference) {
-		'lookup' + reference.mclass.metaclass.name.toFirstUpper + 'from' + rule.source.metaclass.name
+		'lookup' + reference.metaclass.name.toFirstUpper + 'from' + rule.source.metaclass.name
 	}
 	
 	// this one is the entry point and must address the interface method which must be overridden
@@ -423,7 +414,7 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 	/**
 	 * @see #generateCodeForRule(Lookup, JvmGenericType)
 	 */
-	def dispatch generateCodeForRule(StructuralFeatureReferenceTarget ref, JvmGenericType typeToAddTo, boolean addToCausingEntities) {
+	def dispatch generateCodeForRule(StructuralFeatureForwardReferenceTarget ref, JvmGenericType typeToAddTo, boolean addToCausingEntities) {
 		var varName = '''marked«ref.metaclass.name.toFirstUpper»__''' + getLookupNumber(ref)
 		nameForLookup.put(ref, varName)
 		
@@ -450,8 +441,8 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 	/**
 	 * @see #generateCodeForRule(Lookup, JvmGenericType)
 	 */
-	def dispatch generateCodeForRule(BackwardEReference ref, JvmGenericType typeToAddTo, boolean addToCausingEntities) {
-		var varName = '''backmarked«ref.mclass.metaclass.name.toFirstUpper»__''' + getLookupNumber(ref); 
+	def dispatch generateCodeForRule(BackwardReferenceMetaclassSource ref, JvmGenericType typeToAddTo, boolean addToCausingEntities) {
+		var varName = '''backmarked«ref.metaclass.name.toFirstUpper»__''' + getLookupNumber(ref); 
 		nameForLookup.put(ref, varName)
 		
 		/*
@@ -470,7 +461,7 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 		*/
 		
 		'''
-			«Stream.canonicalName»<CausingEntityMapping<«ref.metaclass.instanceTypeName», EObject>> «varName» = «LookupUtil.canonicalName».lookupBackwardReference(version, «ref.mclass.metaclass.instanceTypeName».class, ''' + getFeatureName(ref) + ''', «nameForLookup.get(getPreviousSiblingOfType(ref, Lookup))», «addToCausingEntities»).stream();
+			«Stream.canonicalName»<CausingEntityMapping<«ref.metaclass.instanceTypeName», EObject>> «varName» = «LookupUtil.canonicalName».lookupBackwardReference(version, «ref.metaclass.instanceTypeName».class, ''' + getFeatureName(ref) + ''', «nameForLookup.get(getPreviousSiblingOfType(ref, Lookup))», «addToCausingEntities»).stream();
 		'''
 	}
 	
@@ -486,7 +477,7 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 		'''
 	}
 	
-	def getFeatureName(BackwardEReference reference) {
+	def getFeatureName(BackwardReferenceMetaclassSource reference) {
 		return if(reference.feature !== null) "\"" + reference.feature.name + "\"" else null;
 	}
 	

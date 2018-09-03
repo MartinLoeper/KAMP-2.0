@@ -3,15 +3,20 @@
  */
 package edu.kit.ipd.sdq.kamp.ruledsl.validation
 
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.BackwardReferenceMetaclassSource
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.KampRuleLanguagePackage
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.Lookup
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.MetaclassForwardReferenceTarget
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.ModelImport
+import edu.kit.ipd.sdq.kamp.ruledsl.runtime.KarlModelLoader
+import edu.kit.ipd.sdq.kamp.ruledsl.scoping.KampRuleLanguageScopeProviderDelegate
+import edu.kit.ipd.sdq.kamp.ruledsl.util.KampRuleLanguageEcoreUtil
 import org.eclipse.core.internal.resources.ResourceException
 import org.eclipse.emf.ecore.resource.Resource.IOWrappedException
-import org.eclipse.emf.ecore.resource.ResourceSet
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl
 import org.eclipse.emf.ecore.xmi.PackageNotFoundException
+import org.eclipse.xtext.EcoreUtil2
 import org.eclipse.xtext.validation.Check
-import edu.kit.ipd.sdq.kamp.ruledsl.runtime.KarlModelLoader;
+import tools.vitruv.dsls.mirbase.mirBase.MirBaseFile
 
 /**
  * This class contains custom validation rules. 
@@ -23,6 +28,61 @@ class KampRuleLanguageValidator extends AbstractKampRuleLanguageValidator {
 	public static val INVALID_IMPORT_WRONG_TYPE = 'invalidImport__notModelFile'
 	public static val INVALID_IMPORT_UNCAUGHT_ERROR = 'invalidImport__unknownError'
 	public static val INVALID_IMPORT_FILE_NOT_FOUND = 'invalidImport__notFound'
+	
+	public static val INVALID_METACLASS_FORWARD_REFERENCE_TARGET = 'invalidMetaclassForwardReferenceTarget'
+	public static val INVALID_BACKWARD_REFERENCE_METACLASS_SOURCE = 'invalidBackwardReferenceMetaclassSource';
+
+	@Check(FAST)
+	def checkValidBackwardReferenceMetaclassSource(BackwardReferenceMetaclassSource backwardReferenceMetaclassSource) {
+		val lookup = EcoreUtil2.getContainerOfType(backwardReferenceMetaclassSource, Lookup);
+		val previousMetaclass = KampRuleLanguageEcoreUtil.getPreviousMetaclass(lookup);
+		
+		val backwardReferenceMetaclass = backwardReferenceMetaclassSource.mclass.metaclass;
+		if(backwardReferenceMetaclass !== null) {
+			val referenceWithSubtypeExists = backwardReferenceMetaclass.EAllReferences.exists[i |
+				val refType = i.EReferenceType;
+				if (KampRuleLanguageScopeProviderDelegate.isSubtype(refType, previousMetaclass)) {
+					return true;
+				} else {
+					return false;
+				}
+			]
+			
+			if(!referenceWithSubtypeExists) {
+				warning("The source of the lookup does not provide any reference with the target type: " + backwardReferenceMetaclassSource.mclass.metaclass.instanceClass.simpleName, 
+					backwardReferenceMetaclassSource, 
+					KampRuleLanguagePackage.Literals.BACKWARD_REFERENCE_METACLASS_SOURCE__MCLASS,
+					INVALID_BACKWARD_REFERENCE_METACLASS_SOURCE
+				);
+			}
+		}
+	}
+
+	@Check(FAST)
+	def checkValidMetaclassForwardReferenceTarget(MetaclassForwardReferenceTarget metaclassForwardReferenceTarget) {
+		val lookup = EcoreUtil2.getContainerOfType(metaclassForwardReferenceTarget, Lookup);
+		val previousMetaclass = KampRuleLanguageEcoreUtil.getPreviousMetaclass(lookup);
+		
+		val forwardReferenceMetaclass = metaclassForwardReferenceTarget.metaclassReference?.metaclass;
+		if(forwardReferenceMetaclass !== null) {
+			val referenceWithSubtypeExists = previousMetaclass.EAllReferences.exists[i |
+				val refType = i.EReferenceType;
+				if (KampRuleLanguageScopeProviderDelegate.isSubtype(forwardReferenceMetaclass, refType)) {
+					return true;
+				} else {
+					return false;
+				}
+			]
+			
+			if(!referenceWithSubtypeExists) {
+				warning("The source of the lookup does not provide any reference with the target type: " + forwardReferenceMetaclass.instanceClass.simpleName, 
+					metaclassForwardReferenceTarget, 
+					KampRuleLanguagePackage.Literals.METACLASS_FORWARD_REFERENCE_TARGET__METACLASS_REFERENCE,
+					INVALID_METACLASS_FORWARD_REFERENCE_TARGET
+				);
+			}
+		}
+	}
 
 	@Check(FAST)
 	def checkValidModelImport(ModelImport modelImport) {
@@ -54,5 +114,8 @@ class KampRuleLanguageValidator extends AbstractKampRuleLanguageValidator {
 					e.message)	
 			}
 		}
-	}	
+	}
+	
+	// disable mir base check for vitruvius: not working correctly for CPRL
+	override checkVitruviusDependencies(MirBaseFile mirBaseFile) {}
 }

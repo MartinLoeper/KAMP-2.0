@@ -1,11 +1,12 @@
 
 package edu.kit.ipd.sdq.kamp.ruledsl.scoping
 
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.BackwardEReference
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.ForwardEReference
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceForwardReferenceTarget
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceIdDeclaration
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstancePredicateDeclaration
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceProjection
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceRuleSource
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.KampRule
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.KampRuleLanguagePackage
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.Lookup
@@ -14,6 +15,7 @@ import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.RecursiveBlock
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.RuleFile
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.RuleReference
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.StandardBlock
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.StructuralFeatureForwardReferenceTarget
 import edu.kit.ipd.sdq.kamp.ruledsl.runtime.KarlModelLoader
 import edu.kit.ipd.sdq.kamp.ruledsl.util.CustomEObjectDescription
 import java.io.IOException
@@ -24,8 +26,10 @@ import org.eclipse.emf.ecore.EClass
 import org.eclipse.emf.ecore.EClassifier
 import org.eclipse.emf.ecore.ENamedElement
 import org.eclipse.emf.ecore.EObject
+import org.eclipse.emf.ecore.EPackage
 import org.eclipse.emf.ecore.EReference
 import org.eclipse.emf.ecore.EcorePackage
+import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.emf.ecore.util.EcoreUtil
 import org.eclipse.xtext.naming.QualifiedName
 import org.eclipse.xtext.resource.EObjectDescription
@@ -34,30 +38,66 @@ import org.eclipse.xtext.scoping.IScope
 import org.eclipse.xtext.scoping.impl.SimpleScope
 import tools.vitruv.dsls.mirbase.mirBase.MetaclassReference
 import tools.vitruv.dsls.mirbase.mirBase.MetamodelImport
+import tools.vitruv.dsls.mirbase.mirBase.MirBasePackage
 import tools.vitruv.dsls.mirbase.scoping.MirBaseScopeProviderDelegate
 
 import static tools.vitruv.dsls.mirbase.mirBase.MirBasePackage.Literals.*
+
 import static extension edu.kit.ipd.sdq.kamp.ruledsl.util.KampRuleLanguageEcoreUtil.*
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.MetaclassForwardReferenceTarget
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.StructuralFeatureReferenceTarget
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.TypeProjection
-import org.eclipse.xtext.scoping.Scopes
+import org.eclipse.xtext.EcoreUtil2
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.BackwardReferenceInstanceSource
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.BackwardEReference
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.BackwardReferenceMetaclassSource
 
 class KampRuleLanguageScopeProviderDelegate extends MirBaseScopeProviderDelegate {
 	override getScope(EObject context, EReference reference) {
-		/*
-		if (context instanceof KampRule && reference.equals(METACLASS_REFERENCE__METACLASS))
+		if (context instanceof KampRule && reference.equals(METACLASS_REFERENCE__METACLASS)) {
 			return IScope.NULLSCOPE 
-		else 
-		*/
+		}
+
+		// BackwardReferenceMetaclassSource - feature
+		else if(context instanceof BackwardReferenceMetaclassSource && reference.equals(KampRuleLanguagePackage.Literals.BACKWARD_REFERENCE_METACLASS_SOURCE__FEATURE)) {
+			return createFilteredEReferenceScope((context as BackwardReferenceMetaclassSource)?.mclass, (context as Lookup)?.previousMetaclass)
+		}
 		
-		// BACKWARD_REFERENCE - Feature
-		if (context instanceof BackwardEReference && reference.equals(KampRuleLanguagePackage.Literals.BACKWARD_EREFERENCE__FEATURE)) {
-			return createFilteredEReferenceScope((context as BackwardEReference)?.mclass, (context as Lookup)?.previousMetaclass)
+		// BackwardReferenceInstanceSource - instanceReference
+		else if(context instanceof BackwardReferenceInstanceSource && reference.equals(KampRuleLanguagePackage.Literals.BACKWARD_REFERENCE_INSTANCE_SOURCE__INSTANCE_REFERENCE)) {
+			val previousMetaclass = getPreviousMetaclass(EcoreUtil2.getContainerOfType(context, Lookup));
+			val backwardRef = context as BackwardEReference;
+			val rule = backwardRef.eContainer as KampRule
+			val ruleFile = rule.eContainer as RuleFile;
+			val classifierDescriptions = newArrayList()
+			
+			// retrieve instance declarations
+			ruleFile.instances.forEach[i |
+				if(i instanceof InstanceIdDeclaration) {
+					val iDecl = i as InstanceIdDeclaration;
+					iDecl.metaclass.EAllReferences.forEach[sourceReference |
+						if(sourceReference.EReferenceType.isSubtype(previousMetaclass)) {
+							classifierDescriptions += EObjectDescription.create(iDecl.name, i)
+						}
+					]
+				}
+			]
+			
+			// retrieve instance predicates
+			ruleFile.intancePredicates.forEach[i |
+				if(i instanceof InstancePredicateDeclaration) {
+					val iPredicateDecl = i as InstancePredicateDeclaration;
+					iPredicateDecl.metaclass.EAllReferences.forEach[sourceReference |
+						if(sourceReference.EReferenceType.isSubtype(previousMetaclass)) {
+							classifierDescriptions += EObjectDescription.create(iPredicateDecl.name, i)
+						}
+					]
+				}
+			]
+			
+			return new SimpleScope(IScope.NULLSCOPE, classifierDescriptions)
 		}
 		
 		// InstanceForwardReferenceTarget - Instance 
 		else if (context instanceof InstanceForwardReferenceTarget && reference.equals(KampRuleLanguagePackage.Literals.INSTANCE_FORWARD_REFERENCE_TARGET__INSTANCE_REFERENCE)) {
+			val previousMetaclass = getPreviousMetaclass(EcoreUtil2.getContainerOfType(context, Lookup));
 			val forwardRef = context as ForwardEReference;
 			val rule = forwardRef.eContainer as KampRule
 			val ruleFile = rule.eContainer as RuleFile;
@@ -67,7 +107,11 @@ class KampRuleLanguageScopeProviderDelegate extends MirBaseScopeProviderDelegate
 			ruleFile.instances.forEach[i |
 				if(i instanceof InstanceIdDeclaration) {
 					val iDecl = i as InstanceIdDeclaration;
-					classifierDescriptions += EObjectDescription.create(iDecl.name, i)
+					previousMetaclass.EAllReferences.forEach[sourceReference |
+						if(iDecl.metaclass.isSubtype(sourceReference.EReferenceType)) {
+							classifierDescriptions += EObjectDescription.create(iDecl.name, i)
+						}
+					]
 				}
 			]
 			
@@ -75,25 +119,52 @@ class KampRuleLanguageScopeProviderDelegate extends MirBaseScopeProviderDelegate
 			ruleFile.intancePredicates.forEach[i |
 				if(i instanceof InstancePredicateDeclaration) {
 					val iPredicateDecl = i as InstancePredicateDeclaration;
-					classifierDescriptions += EObjectDescription.create(iPredicateDecl.name, i)
+					previousMetaclass.EAllReferences.forEach[sourceReference |
+						if(iPredicateDecl.metaclass.isSubtype(sourceReference.EReferenceType)) {
+							classifierDescriptions += EObjectDescription.create(iPredicateDecl.name, i)
+						}
+					]
 				}
 			]
 			
 			return new SimpleScope(IScope.NULLSCOPE, classifierDescriptions)
 		}
 		
-		// MetaclassForwardReferenceTarget - MetaclassReference
-		else if (context instanceof MetaclassForwardReferenceTarget && reference.equals(KampRuleLanguagePackage.Literals.METACLASS_FORWARD_REFERENCE_TARGET__METACLASS_REFERENCE)) {
-			return createEReferenceScope(getPreviousMetaclass((context as Lookup)));
-		} 
-		
 		// StructuralFeatureReferenceTarget - Feature
-		else if (context instanceof StructuralFeatureReferenceTarget && reference.equals(KampRuleLanguagePackage.Literals.STRUCTURAL_FEATURE_REFERENCE_TARGET__FEATURE)) {
+		else if (context instanceof StructuralFeatureForwardReferenceTarget && reference.equals(KampRuleLanguagePackage.Literals.STRUCTURAL_FEATURE_FORWARD_REFERENCE_TARGET__FEATURE)) {
 			val previousMetaclass = getPreviousMetaclass((context as Lookup));
 			val scopes = createEReferenceScope(previousMetaclass);
 
 			return scopes;
 		} 
+		
+		// InstanceProjection - instanceDeclarationReference
+		else if(context instanceof InstanceProjection && reference.equals(KampRuleLanguagePackage.Literals.INSTANCE_PROJECTION__INSTANCE_DECLARATION_REFERENCE)) {
+			val previousMetaclass = getPreviousMetaclass((context as Lookup));
+			val ruleFile = retrieveRuleFile(context);
+			val classifierDescriptions = newArrayList()
+			
+			ruleFile.intancePredicates.forEach[i |
+				val iPredicateDecl = i as InstancePredicateDeclaration;
+				if(previousMetaclass.isSubtype(iPredicateDecl.metaclass)) {
+					classifierDescriptions += EObjectDescription.create(iPredicateDecl.name, i)
+				}
+			]
+			
+			ruleFile.instances.forEach[i |
+				val iPredicateIdDecl = i as InstanceIdDeclaration;
+				if(previousMetaclass.isSubtype(iPredicateIdDecl.metaclass)) {
+					classifierDescriptions += EObjectDescription.create(iPredicateIdDecl.name, i)
+				}
+			]
+			
+			return new SimpleScope(IScope.NULLSCOPE, classifierDescriptions)
+		}
+		
+		// InstanceRuleSource - instanceReference
+		else if(context instanceof InstanceRuleSource && reference.equals(KampRuleLanguagePackage.Literals.INSTANCE_RULE_SOURCE__INSTANCE_REFERENCE)) {
+			
+		}
 		
 		// RuleReference - Rule
 		else if(context instanceof RuleReference && reference.equals(KampRuleLanguagePackage.Literals.RULE_REFERENCE__RULE)) {
@@ -105,12 +176,12 @@ class KampRuleLanguageScopeProviderDelegate extends MirBaseScopeProviderDelegate
 					if(block instanceof RecursiveBlock) {
 						for(cRule : block.rules) {
 							// a rule may not call itself -> cycle and the source element type must match
-							if(!cRule.equals(context.eContainer) && (context as Lookup).previousMetaclass.equals(getMetaclass(cRule.source)))
+							if(!cRule.equals(context.eContainer) && (context as Lookup).previousMetaclass.isSubtype(getMetaclass(cRule.source)))
 								classifierDescriptions += EObjectDescription.create(cRule.name, cRule)
 						}
 					} else if(block instanceof StandardBlock) {
 						// a rule may not call itself -> cycle and the source element type must match
-						if(!block.equals(context.eContainer) && (context as Lookup).previousMetaclass.equals((block as KampRule).source.metaclass))
+						if(!block.equals(context.eContainer) && (context as Lookup).previousMetaclass.isSubtype((block as KampRule).source.metaclass))
 							classifierDescriptions += EObjectDescription.create((block as KampRule).name, block as KampRule)
 					}
 				}
@@ -191,7 +262,7 @@ class KampRuleLanguageScopeProviderDelegate extends MirBaseScopeProviderDelegate
 		}
 
 		// ALL - METACLASS
-		else if (reference.equals(METACLASS_REFERENCE__METACLASS)) {
+		if (reference.equals(METACLASS_REFERENCE__METACLASS)) {
 			return createQualifiedEClassScope((context as MetaclassReference).metamodel, true, false);
 		}
 
@@ -206,6 +277,13 @@ class KampRuleLanguageScopeProviderDelegate extends MirBaseScopeProviderDelegate
 		}
 		
 		return cObj as RuleFile;
+	}
+	
+	public static def getEClassForInstanceClass(Resource res, String canonicalClassName) {
+		return getAllImportedEClasses(res).findFirst[
+			println(it.instanceClass.canonicalName)
+			it.instanceClass.canonicalName == canonicalClassName
+		]
 	}
 	
 	// FIXME copied from MirBaseScopeProviderDelegate
@@ -259,7 +337,41 @@ class KampRuleLanguageScopeProviderDelegate extends MirBaseScopeProviderDelegate
 		}
 	}
 	
-	def Boolean isSubtype(EClass superType, EClassifier subType) {
+	public static def getAllImportedEClasses(Resource res) {
+		val imports = _getMetamodelImports(res)
+		return imports.map[i | collectEClasses(i.package, true)].flatten.toSet
+	}
+	
+	private static def _getMetamodelImports(Resource res) {
+		var contents = res._getAllContentsOfEClass(MirBasePackage.eINSTANCE.getMetamodelImport, true).toList
+		val validImports = contents.filter(MetamodelImport).filter[package !== null].map[it.name = it.name ?: it.package.name; it]
+
+		return validImports
+	}
+	
+	private static def _getAllContentsOfEClass(Resource res, EClass namedParent, boolean allContents) {
+		var contents = if (allContents)
+				res.allContents.toList
+			else
+				res.contents
+
+		return contents.filter[eClass.equals(namedParent)]
+	}
+	
+	private static def Iterable<EClass> collectEClasses(EPackage pckg, boolean includeSubpackages) {
+		var recursiveResult = <EClass>newArrayList();
+		if (includeSubpackages) {
+			recursiveResult += pckg.ESubpackages.map[it | collectEClasses(it, includeSubpackages)].flatten
+		}
+		val result = pckg.EClassifiers.filter(EClass);
+		return recursiveResult + result;
+	}
+	
+	/**
+	 * Returns true if the given subType is either the same type as superType or
+	 * a real subtype.
+	 */
+	public static def Boolean isSubtype(EClass superType, EClassifier subType) {
 		if(subType.equals(superType)) {
 			return true
 		}

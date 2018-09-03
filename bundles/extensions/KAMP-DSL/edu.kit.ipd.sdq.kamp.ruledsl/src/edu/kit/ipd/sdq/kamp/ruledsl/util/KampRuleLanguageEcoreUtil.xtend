@@ -1,19 +1,24 @@
 package edu.kit.ipd.sdq.kamp.ruledsl.util
 
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.BackwardEReference
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.BackwardReferenceInstanceSource
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.BackwardReferenceMetaclassSource
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceIdDeclaration
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstancePredicateDeclaration
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceProjection
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceRuleSource
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.Lookup
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.MetaclassForwardReferenceTarget
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.MetaclassRuleSource
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.PropagationReference
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.RuleReference
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.RuleSource
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.StructuralFeatureForwardReferenceTarget
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.TypeProjection
+import edu.kit.ipd.sdq.kamp.ruledsl.scoping.KampRuleLanguageScopeProviderDelegate
 import org.eclipse.emf.ecore.EClass
 
 import static edu.kit.ipd.sdq.kamp.ruledsl.util.EcoreUtil.*
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceRuleSource
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceIdDeclaration
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstancePredicateDeclaration
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.MetaclassForwardReferenceTarget
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.StructuralFeatureReferenceTarget
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceForwardReferenceTarget
 
 final class KampRuleLanguageEcoreUtil {
 	private new() {}
@@ -21,12 +26,24 @@ final class KampRuleLanguageEcoreUtil {
 	/**
 	 * Returns the type of the forward reference's feature.
 	 */
-	def static dispatch EClass getMetaclass(StructuralFeatureReferenceTarget refTarget) {
-		val feature = refTarget.feature;
-		if(feature !== null) {
-			return feature.EType as EClass;
-		}
+	def static dispatch EClass getMetaclass(StructuralFeatureForwardReferenceTarget refTarget) {
+		return refTarget?.feature?.EType as EClass;
 	}
+	
+	/**
+	 * Returns the type of the type projection.
+	 * Please note: Only the first type of a type projection is used for the typing.
+	 * Please note: Only imported metaclasses are found
+	 */
+	def static dispatch EClass getMetaclass(TypeProjection typeProjection) {
+		val eClass = KampRuleLanguageScopeProviderDelegate.getEClassForInstanceClass(typeProjection.eResource, typeProjection.types?.head?.qualifiedName);
+	
+		return eClass
+	} 
+	
+	def static dispatch EClass getMetaclass(InstanceProjection instanceProjection) {
+		getMetaclass(instanceProjection.instanceDeclarationReference)
+	} 
 	
 	def static dispatch EClass getMetaclass(MetaclassForwardReferenceTarget metaclassTarget) {
 		metaclassTarget.metaclassReference.metaclass
@@ -51,12 +68,19 @@ final class KampRuleLanguageEcoreUtil {
 		return instancePredicateDeclaration.type.metaclass;
 	}
 	
+	def static dispatch EClass getMetaclass(BackwardReferenceInstanceSource instanceSource) {
+		getMetaclass(instanceSource.instanceReference)
+	}
+	
+	def static dispatch EClass getMetaclass(InstanceForwardReferenceTarget instanceForwardReferenceTarget) {
+		getMetaclass(instanceForwardReferenceTarget.instanceReference)
+	}
+	
 	/**
-	 * Returns the metaclass of the given backward reference.
+	 * Returns the metaclass of the given backward reference metaclass source.
 	 */
-	def static dispatch EClass getMetaclass(BackwardEReference ref) {
-		// TODO is this cast risky?? which of those subclasses of eclassifier is possible? EClassifierImpl, EClassImpl, EDataTypeImpl, EEnumImpl
-		ref.mclass.metaclass as EClass;
+	def static dispatch EClass getMetaclass(BackwardReferenceMetaclassSource metaclassSource) {
+		metaclassSource.mclass.metaclass
 	}
 	
 	/**

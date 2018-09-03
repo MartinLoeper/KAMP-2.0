@@ -85,7 +85,7 @@ Projection returns Projection:
 ;
 
 InstanceProjection:
-	'{' instanceDeclarationReference=[InstanceDeclaration|ID] '}'
+	'[' instanceDeclarationReference=[InstanceDeclaration|ID] ']'
 ;
 
 TypeProjection:
@@ -109,14 +109,14 @@ ForwardEReference returns ForwardEReference:
 ;
 
 ForwardReferenceTarget:
-	MetaclassForwardReferenceTarget | StructuralFeatureReferenceTarget | InstanceForwardReferenceTarget
+	MetaclassForwardReferenceTarget | StructuralFeatureForwardReferenceTarget | InstanceForwardReferenceTarget
 ;
 
 MetaclassForwardReferenceTarget:
 	'metaclass(' metaclassReference=UnnamedMetaclassReference ')'
 ;
 
-StructuralFeatureReferenceTarget:
+StructuralFeatureForwardReferenceTarget:
 	'feature(' feature=[ecore::EReference] ')'
 ;
 
@@ -125,8 +125,20 @@ InstanceForwardReferenceTarget:
 ;
 
 BackwardEReference:
-	'<-' mclass=UnnamedMetaclassReference ('[' feature=[ecore::EStructuralFeature|ValidID] ']')?
+	'<-' BackwardReferenceSource
 ; 
+
+BackwardReferenceSource:
+	BackwardReferenceMetaclassSource | BackwardReferenceInstanceSource
+;
+
+BackwardReferenceMetaclassSource:
+	'metaclass(' mclass=UnnamedMetaclassReference (',' feature=[ecore::EStructuralFeature|ValidID])? ')'
+;
+
+BackwardReferenceInstanceSource:
+	'instance(' instanceReference=[InstanceDeclaration|ID] ')'
+;
  
 JavaImport:
 	'import-package' javaType=QualifiedName
