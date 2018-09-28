@@ -1,9 +1,12 @@
 package edu.kit.ipd.sdq.kamp.ruledsl.support;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.core.runtime.IStatus;
@@ -19,6 +22,7 @@ public class RuleBlock {
 	protected final ResultMap resultMap;
 	protected final SeedMap seedMap;
 	private final List<IRule<EObject, EObject, ?, ?>> rules = new ArrayList<>();
+	private boolean finished;
 
 	public RuleBlock(ResultMap resultMap, SeedMap seedMap) {
 		this.resultMap = resultMap;
@@ -28,28 +32,35 @@ public class RuleBlock {
 	public void addRule(IRule<EObject, EObject, ?, ?> cRule) {
 		this.rules.add(cRule);
 	}
+	
+	public boolean isFinished() {
+		return this.finished;
+	}
 
-	public boolean runLookups() {
-		AtomicBoolean newInsertion = new AtomicBoolean(false);
+	public BlockResult runLookups(BlockResult previousRunResult) {
+		finished = true;
+		List<Result<EObject, EObject>> ruleResults = new ArrayList<>();
 		
 		for(IRule<EObject, EObject, ?, ?> cRule : this.rules) {
 			Class<EObject> sourceClass = (Class<EObject>) cRule.getSourceElementClass();
-			Class<EObject> resultClass = (Class<EObject>) cRule.getAffectedElementClass();
+			//Class<EObject> resultClass = (Class<EObject>) cRule.getAffectedElementClass();
 
 			// use seed map and result map elements as source
 			// this separation ensures, we can distinguish between looked up elements and seeded elements
 			// at the end when applying affected elements
-			Stream<CausingEntityMapping<EObject, EObject>> sourceElements = Stream.concat(
-						this.resultMap.<EObject>getWithAllSubtypes(sourceClass, true),
-						this.seedMap.<EObject>getWithAllSubtypes(sourceClass, true));
+			Set<CausingEntityMapping<EObject, EObject>> sourceElements = this.resultMap.<EObject>getWithAllSubtypes(sourceClass, true).collect(Collectors.toSet());
+			sourceElements.addAll(this.seedMap.<EObject>getWithAllSubtypes(sourceClass, true).collect(Collectors.toSet()));
 
 			try {
 				// delay insertion to avoid concurrent modification exception!
 				List<CausingEntityMapping<EObject, EObject>> newElements = new ArrayList<>();
-				cRule.lookup(sourceElements).forEach((e) -> {
-					newElements.add(e);
+				Result<EObject, EObject> source = new Result<>(sourceElements);
+				RuleResult<EObject, EObject> ruleResult = cRule.lookup(source);
+				ruleResults.add(ruleResult);
+				ruleResult.getOutputElements().forEach((e) -> {
+					newElements.add(e);					
 				});
-				
+
 				// batch insert
 				for(CausingEntityMapping<EObject, EObject> e : newElements) {
 					// we do not put the element in based on resultClass, but based on actual class
@@ -62,7 +73,7 @@ public class RuleBlock {
 					this.resultMap.init(eClass);
 					
 					if(this.resultMap.put(eClass, e)) {
-						newInsertion.set(true);
+						finished = false;
 					}
 				}
 			} catch(final Exception e) {
@@ -70,7 +81,7 @@ public class RuleBlock {
 			}
 		}
 		
-		return newInsertion.get();
+		return new BlockResult(ruleResults, previousRunResult);
 	}
 	
 	protected void displayRuleException(Exception e, IRule<?, ?, ?, ?> cRule) {
@@ -88,16 +99,16 @@ public class RuleBlock {
 	}
 	
 	public void runFinalizers() {
-		for(IRule<EObject, EObject, ?, ?> cRule : this.rules) {
-			Class<EObject> resultClass = (Class<EObject>) cRule.getAffectedElementClass();
-			
-			Stream<CausingEntityMapping<EObject, EObject>> resultElements = this.resultMap.<EObject>getWithAllSubtypes(resultClass, false);
-			try {				
-				cRule.apply(resultElements);
-			} catch(final Exception e) {
-				displayRuleException(e, cRule);
-			}
-		}
+//		for(IRule<EObject, EObject, ?, ?> cRule : this.rules) {
+//			Class<EObject> resultClass = (Class<EObject>) cRule.getAffectedElementClass();
+//			
+//			Stream<CausingEntityMapping<EObject, EObject>> resultElements = this.resultMap.<EObject>getWithAllSubtypes(resultClass, false);
+//			try {				
+//				cRule.apply(resultElements);
+//			} catch(final Exception e) {
+//				displayRuleException(e, cRule);
+//			}
+//		}
 	}
 	
 	/**

@@ -7,12 +7,12 @@ public class RecursiveRuleBlock extends RuleBlock {
 	}
 
 	@Override
-	public boolean runLookups() {
-		boolean newInsertions = false;
+	public BlockResult runLookups(BlockResult previousRunResult) {
+		BlockResult result = previousRunResult;
 		do {
-			newInsertions = super.runLookups();
-		} while(newInsertions);
+			result = super.runLookups(result);
+		} while(!isFinished());
 		
-		return false;	// per definition, no special meaning
+		return result;
 	}
 }

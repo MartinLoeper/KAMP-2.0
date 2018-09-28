@@ -285,6 +285,7 @@ abstract class KarlJobBase extends Job {
 		// add the kamp packages here because we should resolve the bin folder dependencies via import not require
 		// ruledsl
 		importedPackages.add("edu.kit.ipd.sdq.kamp.ruledsl.support");
+		importedPackages.add("edu.kit.ipd.sdq.kamp.ruledsl.support.lookup");
 		
 		// kamp core
 		importedPackages.add("edu.kit.ipd.sdq.kamp.propagation");
@@ -334,7 +335,7 @@ abstract class KarlJobBase extends Job {
 		var int k = 0;
 		for (String entry : importedPackages) {
 			if(k != 0) {
-				importStringBuilder.append(",");
+				importStringBuilder.append(", \n ");
 			}
 			importStringBuilder.append(entry);
 			k++;

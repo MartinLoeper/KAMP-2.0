@@ -208,7 +208,7 @@ class KampRuleLanguageProposalProvider extends AbstractKampRuleLanguageProposalP
 	
 	// from: https://github.com/vogella/eclipse.platform.ui/blob/master/bundles/org.eclipse.ui.ide/src/org/eclipse/ui/internal/ide/model/WorkbenchFile.java
 	public static QualifiedName IMAGE_CACHE_KEY = new QualifiedName(WorkbenchPlugin.PI_WORKBENCH, "WorkbenchFileImage"); 
-	public def ImageDescriptor getBaseImage(IResource resource) {
+	public static def ImageDescriptor getBaseImage(IResource resource) {
 		var IContentType contentType = null;
 		// do we need to worry about checking here?
 		if (resource instanceof IFile) {

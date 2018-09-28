@@ -7,12 +7,14 @@ import java.util.LinkedHashMap;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Function;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.ecore.util.EcoreUtil.EqualityHelper;
+import org.palladiosimulator.pcm.core.entity.NamedElement;
 
 /**
  * This class maps an affected element to its corresponding causing entity.
@@ -23,10 +25,9 @@ import org.eclipse.emf.ecore.util.EcoreUtil.EqualityHelper;
  * @param <U> the type of affected element
  * @param <V> the type of causing entity
  */
-public final class CausingEntityMapping<U extends EObject, V extends EObject> {
+public final class CausingEntityMapping<U extends EObject, V extends EObject> extends ViewerTreeParent {
 	private final U affectedElement;
 	private final Set<V> causingEntities;
-	private Map<EObject, CausingEntityMapping<?, ?>> parents = new LinkedHashMap<>();
 	
 	/**
 	 * Creates a new mapping from an affected element to causing entities.
@@ -36,8 +37,7 @@ public final class CausingEntityMapping<U extends EObject, V extends EObject> {
 	 */
 	public CausingEntityMapping(U affectedElement, Set<V> causingEntities) {
 		this.affectedElement = affectedElement;
-		this.causingEntities = causingEntities;
-		this.parents.put(affectedElement, this);
+		this.causingEntities = new HashSet<>(causingEntities);
 	}
 
 	/**
@@ -53,7 +53,6 @@ public final class CausingEntityMapping<U extends EObject, V extends EObject> {
 		
 		this.affectedElement = affectedElement;
 		this.causingEntities = newSet;
-		this.parents.put(affectedElement, this);
 	}
 	
 	public CausingEntityMapping(U affectedElement) {
@@ -62,71 +61,8 @@ public final class CausingEntityMapping<U extends EObject, V extends EObject> {
 	
 	public CausingEntityMapping(U affectedElement, CausingEntityMapping<?, V> cem) {
 		this(affectedElement, cem.getCausingEntities());
-		this.parents = cem.getParents();
-		this.parents.put(affectedElement, this);
 	}
-	
-	/**
-	 * Returns a copy of the parent causing entities.
-	 * @return parent causing entities
-	 */
-	public Map<EObject, CausingEntityMapping<?, ?>> getParents() {
-		return new LinkedHashMap<>(this.parents);
-	}
-	
-	/**
-	 * Returns an iterator over the elements on the path between marked element and affected element.
-	 * Please note that this path is unique if we traverse it backwards from affected element to marked element.
-	 * Use iterator.previous() in order to do so.
-	 * @return an iterator for the lookup path
-	 */
-	public ListIterator<Map.Entry<EObject, CausingEntityMapping<?, ?>>> getParentIterator() {
-		return new ArrayList<Map.Entry<EObject, CausingEntityMapping<?, ?>>>(getParents().entrySet()).listIterator(getParents().size());
-	}
-	
-	/**
-	 * Returns the first parent element on the path back to the source element with the given {@code parentType}.
-	 * @param parentType the type of the parent to look for - we also check for subtypes
-	 * @throws thrown if no parent element of the given {@parentType} or subtype could be found.
-	 * @return the parent element with the given type on the path back to the source of marked elements
-	 */
-	public <T extends EObject> T getParentOfType(Class<T> parentType) {
-		return getParentMappingOfType(parentType).getAffectedElement();
-	}
-	
-	/**
-	 * Return the parent mapping. 
-	 * @throws NoSuchElementException thrown if there is no parent and this is effectively one of the marked elements
-	 * @return the direct predecessor (aka parent) mapping
-	 */
-	public CausingEntityMapping<?, ?> getParentMapping() {
-		ListIterator<Entry<EObject, CausingEntityMapping<?, ?>>> it = getParentIterator();
-		it.previous();	// skip the current element
-		return it.previous().getValue();
-	}
-	
-	/**
-	 * Returns the parent of all elements in the path. This is the marked element.
-	 * @return the marked element
-	 */
-	public CausingEntityMapping<?, ?> getSourceMapping() {
-		return getParents().values().iterator().next();
-	}
-	
-	@SuppressWarnings("unchecked")
-	public <T extends EObject> CausingEntityMapping<T, ?> getParentMappingOfType(Class<T> parentType) {
-		ListIterator<Entry<EObject, CausingEntityMapping<?, ?>>> iterator = getParentIterator();
-		while (iterator.hasPrevious()) {
-			Entry<EObject, CausingEntityMapping<?, ?>> parent = iterator.previous();
-			if(parentType.isAssignableFrom(parent.getValue().getAffectedElement().getClass())) {
-				// cast is safe because we check it in the if clause above
-				return (CausingEntityMapping<T, ?>) parent.getValue();
-			}
-		}
-		
-		throw new NoSuchElementException("An element with the given type '" + parentType.getSimpleName() + "' could not be found. Please note that the type must exactly match. Subtypes are not matched!");
-	}
-	
+
 	/**
 	 * Returns the affected element.
 	 * @return the affected element
@@ -154,5 +90,79 @@ public final class CausingEntityMapping<U extends EObject, V extends EObject> {
 		}
 		
 		this.causingEntities.add(element);
+	}
+	
+	public void addCausingEntityItem(V causingEntity) {
+		addChild(new ViewerTreeObject(causingEntity) {
+			
+			@Override
+			public String getName() {
+				return getNameFromEObject(causingEntity);
+			}
+		});
+	}
+	
+	public static String getNameFromEObject(EObject eobj) {
+		String name = null;
+		
+		if(eobj instanceof NamedElement) {
+			return ((NamedElement) eobj).getEntityName();
+		}
+		
+		name = EcoreUtil.getID(eobj);
+		
+		if(name != null) {
+			return name;
+		}
+		
+		return EcoreUtil.getIdentification(eobj);
+	}
+
+	@Override
+	public String getName() {
+		return getNameFromEObject(this.getAffectedElement());
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj == null && this.getAffectedElement() != null) {
+			return false;
+		}
+		
+		if(obj instanceof CausingEntityMapping) {
+			CausingEntityMapping<EObject, EObject> affectedObject = (CausingEntityMapping<EObject, EObject>) obj;
+	
+			return this.getAffectedElement().equals(affectedObject.getAffectedElement());
+		}
+		
+		return false;
+	}
+	
+	@Override
+	public ViewerTreeObject[] getChildren() {
+		return getCausingEntities().stream().map(new Function<EObject, ViewerTreeObject>() {
+
+			@Override
+			public ViewerTreeObject apply(EObject eobj) {
+				return new ViewerTreeObject(eobj) {
+					
+					@Override
+					public String getName() {
+						return CausingEntityMapping.getNameFromEObject(eobj);
+					}
+				};
+			}
+			
+		}).toArray(ViewerTreeObject[]::new);
+	}
+	
+	@Override
+	public boolean hasChildren() {
+		return getChildren().length > 0;
+	}
+	
+	@Override
+	public int hashCode() {
+		return this.getAffectedElement().hashCode();
 	}
 }

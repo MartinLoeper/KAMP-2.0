@@ -24,6 +24,10 @@ import org.eclipse.emf.ecore.util.EcoreUtil.EqualityHelper;
 import edu.kit.ipd.sdq.kamp.architecture.AbstractArchitectureVersion;
 import edu.kit.ipd.sdq.kamp.architecture.CrossReferenceProvider;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.CausingEntityMapping;
+import edu.kit.ipd.sdq.kamp.ruledsl.support.LookupResult;
+import edu.kit.ipd.sdq.kamp.ruledsl.support.Result;
+import edu.kit.ipd.sdq.kamp.ruledsl.support.RuleResult;
+import edu.kit.ipd.sdq.kamp.ruledsl.support.lookup.AbstractLookup;
 
 /**
  * This is a utility class which provides utility methods for the most common lookups which are shared across
@@ -34,6 +38,23 @@ import edu.kit.ipd.sdq.kamp.ruledsl.support.CausingEntityMapping;
  */
 public final class LookupUtil {
 	private LookupUtil() {}
+	
+	public static final <I extends EObject, O extends EObject> RuleResult<I, O> runLookups(Result<?, I> source, AbstractLookup<EObject, EObject>[] lookups, String ruleName) {
+		Result<EObject, EObject> currentLookupSource = (Result<EObject, EObject>) source;
+		List<LookupResult<EObject, EObject>> lookupResults = new ArrayList<>();
+		
+		for(AbstractLookup<EObject, EObject> lookup : lookups) {
+			LookupResult<EObject, EObject> lookupResult = lookup.invoke(currentLookupSource);
+			lookupResults.add(lookupResult);
+
+			currentLookupSource = lookupResult;
+		}
+		
+		// we cannot ensure the cast at this point - it must be ensured by the xText scoping of the rule
+		Result<EObject, O> lastLookupSource = (Result<EObject, O>) currentLookupSource;
+		
+		return new RuleResult<I, O>(source.getOutputElements(), lastLookupSource.getOutputElements(), ruleName, lookupResults);
+	}
 	
 	/**
 	 * Returns a collection containing all elements which reference one of the {@code sourceElements} and which are assignable from {@code targetClass}.
