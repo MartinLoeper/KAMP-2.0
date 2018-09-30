@@ -16,20 +16,22 @@ public class LookupResult<I extends EObject, O extends EObject> extends Result<I
 		
 		this.transitions = transitions;
 		this.lookupName = lookupName;
-		
-		addChild(new ViewerTreeParent() {
 			
-			{
-				for(Transition<I, O> transition : transitions) {
-					addChild(transition);
+		if(transitions != null && transitions.size() > 0) {
+			addChild(new ViewerTreeParent() {
+				
+				{
+					for(Transition<I, O> transition : transitions) {
+						addChild(transition);
+					}
 				}
-			}
-			
-			@Override
-			public String getName() {
-				return "Transitions";
-			}
-		});
+				
+				@Override
+				public String getName() {
+					return "Transitions";
+				}
+			});
+		}
 	}
 	
 	public Set<Transition<I, O>> getTransitions() {
