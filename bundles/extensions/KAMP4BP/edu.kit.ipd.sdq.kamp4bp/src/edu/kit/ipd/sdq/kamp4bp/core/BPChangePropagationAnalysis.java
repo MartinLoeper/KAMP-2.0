@@ -10,6 +10,10 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.handlers.HandlerUtil;
 import org.palladiosimulator.pcm.core.entity.Entity;
 import org.palladiosimulator.pcm.repository.DataType;
 import org.palladiosimulator.pcm.repository.Interface;
@@ -27,10 +31,12 @@ import de.uhd.ifi.se.pcm.bppcm.organizationenvironmentmodel.Role;
 import edu.kit.ipd.sdq.kamp.architecture.ArchitectureModelLookup;
 import edu.kit.ipd.sdq.kamp.model.modificationmarks.AbstractModification;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.KampRuleLanguageFacade;
+import edu.kit.ipd.sdq.kamp.ruledsl.support.ChangePropagationResult;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.ChangePropagationStepRegistry;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.DefaultConfiguration;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.IConfiguration;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.KampRuleLanguageFacade.KampLanguageService;
+import edu.kit.ipd.sdq.kamp.ruledsl.viewer.views.KampRuleLanguageView;
 import edu.kit.ipd.sdq.kamp4is.model.modificationmarks.ISModifyDataType;
 import edu.kit.ipd.sdq.kamp4is.model.modificationmarks.ISModifyInterface;
 import edu.kit.ipd.sdq.kamp4is.model.modificationmarks.ISModifySignature;
@@ -108,7 +114,13 @@ public class BPChangePropagationAnalysis extends AbstractISChangePropagationAnal
 			// version.getModificationMarkRepository().getChangePropagationSteps().add(...);, see an example in AbstractISChangePropagationAnalysis#calculateInterfaceAndComponentPropagation(S version)
 			
 			if(config.isKampDslEnabled()) {
-				provider.applyAllRules(version, registry);
+				ChangePropagationResult result = provider.applyAllRules(version, registry);
+				
+				// update the CPRL view
+				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+				IViewPart viewPart = page.showView(KampRuleLanguageView.ID);
+				KampRuleLanguageView view = (KampRuleLanguageView) viewPart;
+				view.update(result);
 			}
 		} catch (Exception e) {
 			// should be only thrown if service is not available or bundle could not be installed

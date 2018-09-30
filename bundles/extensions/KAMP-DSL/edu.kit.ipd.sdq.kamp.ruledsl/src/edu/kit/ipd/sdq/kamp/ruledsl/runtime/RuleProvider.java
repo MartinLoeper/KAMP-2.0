@@ -12,10 +12,13 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.mwe.core.container.CompositeComponent;
 
 import edu.kit.ipd.sdq.kamp.architecture.AbstractArchitectureVersion;
 import edu.kit.ipd.sdq.kamp.model.modificationmarks.AbstractModificationRepository;
 import edu.kit.ipd.sdq.kamp.propagation.AbstractChangePropagationAnalysis;
+import edu.kit.ipd.sdq.kamp.ruledsl.support.BlockResult;
+import edu.kit.ipd.sdq.kamp.ruledsl.support.ChangePropagationResult;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.ChangePropagationStepRegistry;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.IConfiguration;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.IRecursiveRule;
@@ -52,10 +55,12 @@ public class RuleProvider<T extends AbstractArchitectureVersion<M>, M extends Ab
 	private IConfiguration configuration;
 
 	@Override
-	public final void applyAllRules(T version, ChangePropagationStepRegistry registry) {
+	public final ChangePropagationResult applyAllRules(T version, ChangePropagationStepRegistry registry) {
 		if(!REPORTING.isInitialized()) {
 			REPORTING.init();
 		}
+		
+		Object markedElements = version.getModificationMarkRepository().getSeedModifications();
 				
 		System.out.println("Applying all custom dsl rules...");
 		
@@ -136,14 +141,17 @@ public class RuleProvider<T extends AbstractArchitectureVersion<M>, M extends Ab
 		}
 		
 		// 5. iterate over blocks and call lookup
+		List<BlockResult> blockResults = new ArrayList<>();
 		for(RuleBlock block : blocks) {
-			block.runLookups();
+			blockResults.add(block.runLookups(null));
 		}
 		
 		// 6. iterate over blocks and run apply
 		for(RuleBlock block : blocks) {
 			block.runFinalizers();
 		}
+		
+		return new ChangePropagationResult(blockResults, seedMap, resultMap);
 	}
 	
 	/**

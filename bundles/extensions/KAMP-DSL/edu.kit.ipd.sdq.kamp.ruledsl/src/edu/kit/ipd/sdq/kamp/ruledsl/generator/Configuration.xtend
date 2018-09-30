@@ -19,6 +19,7 @@ class Configuration {
 	private final Set<String> packageUris = newHashSet;
 	private final List<URI> jFileUris = newArrayList();
     private final List<String> jFileNames = newArrayList();
+    private final List<String[]> jFilePaths = newArrayList();
 	private final RuleFile ruleFile;	// the root rule file
 	
 	new(Resource resource, IFileSystemAccessExtension2 fileSystemAccess) {
@@ -45,8 +46,14 @@ class Configuration {
     			val cFileName = res.simpleName.replace('.', '/') + '.java';        			
 	        	jFileNames.add(cFileName);
 	        	
-	        	val cUri = fileSystemAccess.getURI("gen/rule/" + cFileName);
+	        	val packageName = res.packageName;
+	        	val packageFragments = packageName.split("\\.");
+	        	val cPackageStr = String.join("/", packageFragments);
+	        	
+	        	val cUri = fileSystemAccess.getURI(cPackageStr + "/" + cFileName);
 	        	jFileUris.add(cUri);
+	        	
+	        	jFilePaths.add(packageFragments);
 	        	
 	        	println("Generated file is located under: " + cUri);
 	        }
@@ -93,5 +100,9 @@ class Configuration {
 	
 	def getRootRuleFile() {
 		return ruleFile
+	}
+	
+	def getSourceFilePaths() {
+		return jFilePaths
 	}
 }

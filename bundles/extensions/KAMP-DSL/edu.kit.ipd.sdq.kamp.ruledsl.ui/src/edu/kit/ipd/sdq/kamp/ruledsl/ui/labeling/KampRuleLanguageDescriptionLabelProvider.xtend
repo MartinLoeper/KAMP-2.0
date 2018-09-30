@@ -4,6 +4,9 @@
 package edu.kit.ipd.sdq.kamp.ruledsl.ui.labeling
 
 import org.eclipse.xtext.xbase.ui.labeling.XbaseDescriptionLabelProvider
+import org.eclipse.xtext.resource.IEObjectDescription
+import com.google.inject.Inject
+import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider
 
 /**
  * Provides labels for IEObjectDescriptions and IResourceDescriptions.
@@ -11,12 +14,20 @@ import org.eclipse.xtext.xbase.ui.labeling.XbaseDescriptionLabelProvider
  * See https://www.eclipse.org/Xtext/documentation/304_ide_concepts.html#label-provider
  */
 class KampRuleLanguageDescriptionLabelProvider extends XbaseDescriptionLabelProvider {
-
-	// Labels and icons can be computed like this:
 	
-//	override text(IEObjectDescription ele) {
-//		ele.name.toString
-//	}
+	override text(IEObjectDescription ele) {
+		val userDataName = ele.getUserData("name");
+		if(userDataName !== null) {
+			return userDataName;
+		} else {
+			super.text(ele);
+		}
+	}
+	
+	override getText(Object element) {
+		super.getText(element)
+	}
+
 //	 
 //	override image(IEObjectDescription ele) {
 //		ele.EClass.name + '.gif'

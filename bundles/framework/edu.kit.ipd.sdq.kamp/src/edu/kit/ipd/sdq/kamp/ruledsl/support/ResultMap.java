@@ -1,23 +1,16 @@
 package edu.kit.ipd.sdq.kamp.ruledsl.support;
 
-import static edu.kit.ipd.sdq.kamp.architecture.ArchitectureModelLookup.lookUpMarkedObjectsOfAType;
-
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.palladiosimulator.pcm.repository.RepositoryComponent;
-
-import edu.kit.ipd.sdq.kamp.architecture.AbstractArchitectureVersion;
 
 /**
  * This is a special implementation of a typesafe heterogeneous map.
@@ -31,7 +24,7 @@ import edu.kit.ipd.sdq.kamp.architecture.AbstractArchitectureVersion;
  * @author Martin Loeper
  *
  */
-public class ResultMap {
+public class ResultMap extends ViewerTreeParent {
 	protected Map<Class<? extends EObject>, List<CausingEntityMapping<? extends EObject, EObject>>> mapping = new HashMap<>();
 
 	/**
@@ -103,10 +96,22 @@ public class ResultMap {
 		// element is not present, add it
 		list.add(element);
 		
+		// add to visual representation
+		addItemToTree(element);
+		
 		return true;
 	}
 	
+	protected void addItemToTree(CausingEntityMapping<? extends EObject, EObject> element) {
+		addChild(element);
+	}
+
 	public Set<Class<? extends EObject>> getKeys() {
 		return this.mapping.keySet();
+	}
+
+	@Override
+	public String getName() {
+		return "Result Set";
 	}
 }

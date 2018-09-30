@@ -24,6 +24,12 @@ public class SeedMap extends ResultMap {
 		}
 	}
 	
+	@Override
+	protected void addItemToTree(CausingEntityMapping<? extends EObject, EObject> element) {
+		// do nothing, handle everything in .from() method
+		// nothing is inserted afterwards
+	}
+	
 	/**
 	 * Computes the seed element map.
 	 * @param version the architecture version to use for seed element retrieval
@@ -32,7 +38,7 @@ public class SeedMap extends ResultMap {
 	public static SeedMap from(ResultMap resultMap, AbstractArchitectureVersion<?> version) {	
 		SeedMap newSeedMap = new SeedMap(resultMap);
 		
-		newSeedMap.getKeys().stream().forEach((clazz) -> {
+		for(Class<? extends EObject> clazz : newSeedMap.getKeys()) {
 			Set<? extends EObject> seedModificationMarks = lookUpMarkedObjectsOfAType(version, clazz);
 			
 			seedModificationMarks.stream().forEach((value) -> {
@@ -41,8 +47,35 @@ public class SeedMap extends ResultMap {
 				
 				newSeedMap.addElementToListIfNonExistent(elements, newEntry);
 			});
-		});
+			
+			if(seedModificationMarks.size() > 0) {
+				newSeedMap.addChild(new ViewerTreeParent() {
+	
+					{
+						for(EObject element : seedModificationMarks) {
+							addChild(new ViewerTreeObject(element) {
+								
+								@Override
+								public String getName() {
+									return CausingEntityMapping.getNameFromEObject(element);
+								}
+							});
+						}
+					}
+					
+					@Override
+					public String getName() {
+						return clazz.getSimpleName();
+					}
+				});
+			}
+		};
 		
 		return newSeedMap;
+	}
+	
+	@Override
+	public String getName() {
+		return "Input Set";
 	}
 }

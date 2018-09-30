@@ -3,6 +3,20 @@
  */
 package edu.kit.ipd.sdq.kamp.ruledsl.validation
 
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.BackwardReferenceMetaclassSource
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.KampRuleLanguagePackage
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.Lookup
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.MetaclassForwardReferenceTarget
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.ModelImport
+import edu.kit.ipd.sdq.kamp.ruledsl.runtime.KarlModelLoader
+import edu.kit.ipd.sdq.kamp.ruledsl.scoping.KampRuleLanguageScopeProviderDelegate
+import edu.kit.ipd.sdq.kamp.ruledsl.util.KampRuleLanguageEcoreUtil
+import org.eclipse.core.internal.resources.ResourceException
+import org.eclipse.emf.ecore.resource.Resource.IOWrappedException
+import org.eclipse.emf.ecore.xmi.PackageNotFoundException
+import org.eclipse.xtext.EcoreUtil2
+import org.eclipse.xtext.validation.Check
+import tools.vitruv.dsls.mirbase.mirBase.MirBaseFile
 
 /**
  * This class contains custom validation rules. 
@@ -11,15 +25,156 @@ package edu.kit.ipd.sdq.kamp.ruledsl.validation
  */
 class KampRuleLanguageValidator extends AbstractKampRuleLanguageValidator {
 	
-//	public static val INVALID_NAME = 'invalidName'
-//
-//	@Check
-//	def checkGreetingStartsWithCapital(Greeting greeting) {
-//		if (!Character.isUpperCase(greeting.name.charAt(0))) {
-//			warning('Name should start with a capital', 
-//					KampRuleLanguagePackage.Literals.GREETING__NAME,
-//					INVALID_NAME)
-//		}
-//	}
+	public static val INVALID_IMPORT_WRONG_TYPE = 'invalidImport__notModelFile'
+	public static val INVALID_IMPORT_UNCAUGHT_ERROR = 'invalidImport__unknownError'
+	public static val INVALID_IMPORT_FILE_NOT_FOUND = 'invalidImport__notFound'
 	
+	public static val INVALID_METACLASS_FORWARD_REFERENCE_TARGET = 'invalidMetaclassForwardReferenceTarget'
+	public static val INVALID_BACKWARD_REFERENCE_METACLASS_SOURCE = 'invalidBackwardReferenceMetaclassSource';
+	public static val INVALID_BACKWARD_REFERENCE_METACLASS_SOURCE__FEATURE = 'invalidBackwardReferenceMetaclassSource__feature';
+
+	@Check(FAST)
+	def checkValidBackwardReferenceMetaclassSource(BackwardReferenceMetaclassSource backwardReferenceMetaclassSource) {
+		val lookup = EcoreUtil2.getContainerOfType(backwardReferenceMetaclassSource, Lookup);
+		val previousMetaclass = KampRuleLanguageEcoreUtil.getPreviousMetaclass(lookup);
+		
+		val backwardReferenceMetaclass = backwardReferenceMetaclassSource?.mclass?.metaclass;
+		if(backwardReferenceMetaclass !== null) {
+			val referenceWithSubtypeExists = backwardReferenceMetaclass.EAllReferences.exists[i |
+				val refType = i.EReferenceType;
+				if (KampRuleLanguageScopeProviderDelegate.isSubtype(previousMetaclass, refType)) {
+					return true;
+				} else {
+					return false;
+				}
+			]
+			
+			val referencesWithSupertype = backwardReferenceMetaclass.EAllReferences.filter[i |
+				val refType = i.EReferenceType;
+				if (KampRuleLanguageScopeProviderDelegate.isSubtype(refType, previousMetaclass)) {
+					return true;
+				} else {
+					return false;
+				}
+			]
+			
+			if(!referenceWithSubtypeExists) {
+				var message = "The source of the lookup does not provide any reference with the target type or its subtype: " + backwardReferenceMetaclassSource.mclass.metaclass.instanceClass.simpleName + ".";
+				if(referencesWithSupertype.length > 0) {
+					message += "The source contains " + referencesWithSupertype.length + " references with supertype instead.";
+					warning(message, 
+						backwardReferenceMetaclassSource, 
+						KampRuleLanguagePackage.Literals.BACKWARD_REFERENCE_METACLASS_SOURCE__MCLASS,
+						INVALID_BACKWARD_REFERENCE_METACLASS_SOURCE
+					);
+					
+					// if a feature is set, highlight the feature with a warning, too
+					if(backwardReferenceMetaclassSource.feature !== null) {
+						warning("The feature references a supertype. The reference does not guarantee to contain the desired type '" + previousMetaclass.instanceClass.simpleName 
+							+ "'. It contains '" + backwardReferenceMetaclassSource.feature.EType.instanceClass.simpleName + "' instead.", 
+							backwardReferenceMetaclassSource, 
+							KampRuleLanguagePackage.Literals.BACKWARD_REFERENCE_METACLASS_SOURCE__FEATURE,
+							INVALID_BACKWARD_REFERENCE_METACLASS_SOURCE__FEATURE
+						);
+					}
+				} else {
+					error(message + " There is also no reference with the target supertype. This lookup is very unlikely to match anything.", 
+						backwardReferenceMetaclassSource, 
+						KampRuleLanguagePackage.Literals.BACKWARD_REFERENCE_METACLASS_SOURCE__MCLASS,
+						INVALID_BACKWARD_REFERENCE_METACLASS_SOURCE
+					);
+				}
+			}
+		}
+	}
+
+	@Check(FAST)
+	def checkValidMetaclassForwardReferenceTarget(MetaclassForwardReferenceTarget metaclassForwardReferenceTarget) {
+		val lookup = EcoreUtil2.getContainerOfType(metaclassForwardReferenceTarget, Lookup);
+		val previousMetaclass = KampRuleLanguageEcoreUtil.getPreviousMetaclass(lookup);
+		
+		val forwardReferenceMetaclass = metaclassForwardReferenceTarget.metaclassReference?.metaclass;
+		if(forwardReferenceMetaclass !== null) {
+			val referenceWithSubtypeExists = previousMetaclass.EAllReferences.exists[i |
+				val refType = i.EReferenceType;
+				if (KampRuleLanguageScopeProviderDelegate.isSubtype(forwardReferenceMetaclass, refType)) {
+					return true;
+				} else {
+					return false;
+				}
+			]
+			
+			val referencesWithSupertype = previousMetaclass.EAllReferences.filter[i |
+				val refType = i.EReferenceType;
+				if (KampRuleLanguageScopeProviderDelegate.isSubtype(refType, forwardReferenceMetaclass)) {
+					return true;
+				} else {
+					return false;
+				}
+			]
+			
+			if(!referenceWithSubtypeExists) {
+				var message = "The source of the lookup does not provide any reference with the target type or its subtype: " + forwardReferenceMetaclass.instanceClass.simpleName + ".";
+				
+				if(referencesWithSupertype.length > 0) {
+					message += " The source contains " + referencesWithSupertype.length + " references with supertype instead: ";
+					for (var i = 0; i < referencesWithSupertype.length; i++) {
+						val reference = referencesWithSupertype.get(i); 
+						if(i > 0) {
+							message += ", "
+						}
+						message += "'" + reference.name + "'";
+					}
+					message += ". You should create a feature(...)-lookup if you know want to narrow down the lookup's target set."
+					
+					warning(message, 
+						metaclassForwardReferenceTarget, 
+						KampRuleLanguagePackage.Literals.METACLASS_FORWARD_REFERENCE_TARGET__METACLASS_REFERENCE,
+						INVALID_METACLASS_FORWARD_REFERENCE_TARGET
+					);
+				} else {
+					error(message + " There is also no reference with the target supertype. This lookup is very unlikely to match anything.", 
+						metaclassForwardReferenceTarget, 
+						KampRuleLanguagePackage.Literals.METACLASS_FORWARD_REFERENCE_TARGET__METACLASS_REFERENCE,
+						INVALID_METACLASS_FORWARD_REFERENCE_TARGET
+					);
+				}
+			}
+		}
+	}
+
+	@Check(FAST)
+	def checkValidModelImport(ModelImport modelImport) {
+		val filePath = modelImport.file;
+		val alias = modelImport.name;
+		try {
+			KarlModelLoader.INSTANCE.loadModelFromFile(filePath, alias, false);
+		} catch(Exception e) {
+			if(e instanceof IOWrappedException) {
+				val wrappedException = e.cause;
+				if(wrappedException instanceof PackageNotFoundException) {
+					error('This is not a valid model file', 
+						KampRuleLanguagePackage.Literals.MODEL_IMPORT__FILE,
+						INVALID_IMPORT_WRONG_TYPE)	
+				} else if(wrappedException instanceof ResourceException) {
+					error('Could not find the specified file', 
+						KampRuleLanguagePackage.Literals.MODEL_IMPORT__FILE,
+						INVALID_IMPORT_FILE_NOT_FOUND)	
+				} else {
+					error('Could not import model', 
+						KampRuleLanguagePackage.Literals.MODEL_IMPORT__FILE,
+						INVALID_IMPORT_UNCAUGHT_ERROR,
+						e.message)	
+				}
+			} else {
+				error('Could not import model', 
+					KampRuleLanguagePackage.Literals.MODEL_IMPORT__FILE,
+					INVALID_IMPORT_UNCAUGHT_ERROR,
+					e.message)	
+			}
+		}
+	}
+	
+	// disable mir base check for vitruvius: not working correctly for CPRL
+	override checkVitruviusDependencies(MirBaseFile mirBaseFile) {}
 }

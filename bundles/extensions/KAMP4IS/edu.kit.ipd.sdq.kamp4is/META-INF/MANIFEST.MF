@@ -17,7 +17,8 @@ Require-Bundle: org.eclipse.ui,
  edu.kit.ipd.sdq.kamp4is.model.fieldofactivityannotations,
  edu.kit.ipd.sdq.kamp4is.model.modificationmarks,
  edu.kit.ipd.sdq.kamp4is.model.modificationmarks.edit,
- de.uhd.ifi.se.pcm.bppcm
+ de.uhd.ifi.se.pcm.bppcm,
+ Xtend_Evaluation
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8

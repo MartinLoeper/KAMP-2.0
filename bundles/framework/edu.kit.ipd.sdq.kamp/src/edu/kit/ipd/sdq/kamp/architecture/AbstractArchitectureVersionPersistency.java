@@ -143,7 +143,15 @@ public abstract class AbstractArchitectureVersionPersistency<T extends AbstractA
 	 */
 	public EObject loadEmfModelFromResource(String folderPath, String filePath, ResourceSet resourceSet) {
     	this.registerEPackages(resourceSet);	
-    	URI loadURI = URI.createPlatformResourceURI(folderPath, true);
+    	Resource resource = loadEmfModelFromResourceWithoutPackageRegistering(folderPath, filePath, resourceSet);
+    	if (!resource.getContents().isEmpty())
+    		return resource.getContents().get(0);
+    	else
+    		return null;
+	}
+	
+	public static Resource loadEmfModelFromResourceWithoutPackageRegistering(String folderPath, String filePath, ResourceSet resourceSet) {
+		URI loadURI = URI.createPlatformResourceURI(folderPath, true);
     	if (filePath != null)
     		loadURI = loadURI.appendSegment(filePath);       
         try {	
@@ -151,14 +159,11 @@ public abstract class AbstractArchitectureVersionPersistency<T extends AbstractA
         	((ResourceImpl) resource).setIntrinsicIDToEObjectMap(new HashMap<String, EObject>());      	
         	Map<Object, Object> loadOptions = setupLoadOptions(resource);
         	resource.load(loadOptions);      	
-        	if (!resource.getContents().isEmpty())
-        		return resource.getContents().get(0);
+        	return resource;
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-        
-        return null;
-    }
+	}
 	
 	/**
 	 * Registers all relevant EPackages for loading resources.
@@ -167,7 +172,7 @@ public abstract class AbstractArchitectureVersionPersistency<T extends AbstractA
 		resourceSet.getPackageRegistry().put(ModificationmarksPackage.eNS_URI, ModificationmarksPackage.eINSTANCE);
 	}
 	
-	protected static Map<Object, Object> setupLoadOptions(Resource resource) {
+	public static Map<Object, Object> setupLoadOptions(Resource resource) {
 		Map<Object, Object> loadOptions = ((XMLResourceImpl)resource).getDefaultLoadOptions();
         loadOptions.put(XMLResource.OPTION_DEFER_ATTACHMENT, Boolean.TRUE);
         loadOptions.put(XMLResource.OPTION_DEFER_IDREF_RESOLUTION, Boolean.TRUE);

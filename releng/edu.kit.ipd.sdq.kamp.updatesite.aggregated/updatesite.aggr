@@ -5,19 +5,21 @@
       <repositories location="../edu.kit.ipd.sdq.kamp.updatesite/target/repository"/>
     </contributions>
     <contributions label="externals">
-      <repositories location="https://sdqbuild.ipd.kit.edu/nexus/content/groups/eclipse-oxygen-complete/" mirrorArtifacts="false">
-        <features name="org.eclipse.emf.ecore.edit.feature.group" versionRange="2.9.0"/>
+      <repositories location="http://download.eclipse.org/eclipse/updates/4.7" mirrorArtifacts="false">
         <features name="org.eclipse.emf.ecore.feature.group" versionRange="2.12.0"/>
         <features name="org.eclipse.emf.common.feature.group" versionRange="2.12.0"/>
-        <features name="org.eclipse.emf.transaction.feature.group" versionRange="1.10.0"/>
-        <features name="org.eclipse.xtend.sdk.feature.group" versionRange="2.12.0"/>
       </repositories>
       <repositories location="https://sdqweb.ipd.kit.edu/eclipse/palladiosimulator/nightly">
         <categories name="org.palladiosimulator.corefeatures.category" versionRange="0.0.0.7R21cPpsE67gKWDLOfyVBrs"/>
         <mapRules xsi:type="aggregator:ExclusionRule" name="de.uka.ipd.sdq.dsexplore.feature.feature.group" versionRange="4.0.1.201712071438"/>
       </repositories>
-      <repositories location="http://vitruv.tools/updatesite/nightly">
-        <categories name="201806280844.Vitruv Application Development" versionRange="1.0.0.077-cZrbnh7E7Ac7UEc7cMM"/>
+      <repositories location="https://vitruv-tools.github.io/updatesite/release/">
+        <categories name="Vitruv Application Development" versionRange="1.0.0.077-cZrbnh"/>
+      </repositories>
+      <repositories location="http://download.eclipse.org/releases/oxygen/">
+        <features name="org.eclipse.emf.ecore.edit.feature.group" versionRange="2.9.0"/>
+        <features name="org.eclipse.emf.transaction.feature.group" versionRange="1.10.0"/>
+        <features name="org.eclipse.xtend.sdk.feature.group" versionRange="2.12.0"/>
       </repositories>
     </contributions>
   </validationSets>

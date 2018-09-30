@@ -10,6 +10,7 @@ import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.BackwardEReference
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.Block
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.CausingEntityMarker
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.ForwardEReference
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InlineInstancePredicateProjection
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.Instruction
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.KampRule
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.Lookup
@@ -17,17 +18,23 @@ import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.RecursiveBlock
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.RuleFile
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.RuleReference
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.StandardBlock
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.StructuralFeatureForwardReferenceTarget
 import edu.kit.ipd.sdq.kamp.ruledsl.support.CausingEntityMapping
 import edu.kit.ipd.sdq.kamp.ruledsl.support.ChangePropagationStepRegistry
 import edu.kit.ipd.sdq.kamp.ruledsl.support.IRecursiveRule
 import edu.kit.ipd.sdq.kamp.ruledsl.support.IRule
-import edu.kit.ipd.sdq.kamp.ruledsl.util.EcoreUtil
+import edu.kit.ipd.sdq.kamp.ruledsl.support.RuleResult
+import edu.kit.ipd.sdq.kamp.ruledsl.support.lookup.AbstractLookup
+import edu.kit.ipd.sdq.kamp.ruledsl.support.lookup.EmptyLookup
+import edu.kit.ipd.sdq.kamp.ruledsl.support.lookup.RuleReferenceLookup
+import edu.kit.ipd.sdq.kamp.ruledsl.support.lookup.StructuralFeatureForwardReferenceLookup
 import edu.kit.ipd.sdq.kamp.ruledsl.util.ErrorHandlingUtil
 import edu.kit.ipd.sdq.kamp.util.LookupUtil
 import java.util.ArrayList
 import java.util.HashMap
 import java.util.List
 import java.util.Map
+import java.util.UUID
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.stream.Stream
 import org.eclipse.emf.common.util.BasicEList
@@ -37,9 +44,10 @@ import org.eclipse.jface.dialogs.ErrorDialog
 import org.eclipse.swt.widgets.Shell
 import org.eclipse.ui.PlatformUI
 import org.eclipse.xtend2.lib.StringConcatenationClient
-import org.eclipse.xtext.common.types.JvmDeclaredType
 import org.eclipse.xtext.common.types.JvmGenericType
+import org.eclipse.xtext.common.types.JvmOperation
 import org.eclipse.xtext.common.types.JvmTypeReference
+import org.eclipse.xtext.common.types.JvmVisibility
 import org.eclipse.xtext.xbase.jvmmodel.AbstractModelInferrer
 import org.eclipse.xtext.xbase.jvmmodel.IJvmDeclaredTypeAcceptor
 import org.eclipse.xtext.xbase.jvmmodel.JvmTypesBuilder
@@ -48,6 +56,29 @@ import org.osgi.framework.FrameworkUtil
 import static edu.kit.ipd.sdq.kamp.ruledsl.util.EcoreUtil.*
 
 import static extension edu.kit.ipd.sdq.kamp.ruledsl.util.KampRuleLanguageEcoreUtil.*
+import edu.kit.ipd.sdq.kamp.ruledsl.support.Result
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.PropagationReference
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.MetaclassForwardReferenceTarget
+import edu.kit.ipd.sdq.kamp.ruledsl.support.lookup.MetaclassForwardReferenceLookup
+import edu.kit.ipd.sdq.kamp.ruledsl.support.lookup.InstanceForwardReferenceLookup
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceForwardReferenceTarget
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceIdDeclaration
+import edu.kit.ipd.sdq.kamp.ruledsl.support.lookup.InstanceIdPredicate
+import org.eclipse.emf.ecore.util.EcoreUtil
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstancePredicateDeclaration
+import edu.kit.ipd.sdq.kamp.ruledsl.support.lookup.InstanceProjectionLookup
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceProjection
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceDeclaration
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.TypeProjection
+import edu.kit.ipd.sdq.kamp.ruledsl.support.lookup.TypeProjectionLookup
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.RuleSource
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.ExternalRuleSource
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.MetaclassRuleSource
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceRuleSource
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.BackwardReferenceMetaclassSource
+import edu.kit.ipd.sdq.kamp.ruledsl.support.lookup.BackwardReferenceMetaclassLookup
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.BackwardReferenceInstanceSource
+import edu.kit.ipd.sdq.kamp.ruledsl.support.lookup.BackwardReferenceInstanceLookup
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -62,37 +93,15 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 	 */
 	@Inject extension JvmTypesBuilder
 	
-
-	/** associates a variable name with a {@link Lookup} */
-	private Map<Lookup, String> nameForLookup;
+	private static String INSTANCE_LOOKUP_HELPER_CLASS_NAME = "InstanceLookupHelper";
+	private static String INSTANCE_LOOKUP_HELPER_PACKAGE_NAME = "gen.utils";
+	
+	private Map<InlineInstancePredicateProjection, String> inlineInstancePredicateProjectionNames = new HashMap<InlineInstancePredicateProjection, String>();
 	
 	/** track the index of the currently inserted rule */
 	private AtomicInteger currentRuleIndex = new AtomicInteger();
 	
-	/**
-	 * The dispatch method {@code infer} is called for each instance of the
-	 * given element's type that is contained in a resource.
-	 * 
-	 * @param element
-	 *            the model to create one or more
-	 *            {@link JvmDeclaredType declared
-	 *            types} from.
-	 * @param acceptor
-	 *            each created
-	 *            {@link JvmDeclaredType type}
-	 *            without a container should be passed to the acceptor in order
-	 *            get attached to the current resource. The acceptor's
-	 *            {@link IJvmDeclaredTypeAcceptor#accept(org.eclipse.xtext.common.types.JvmDeclaredType)
-	 *            accept(..)} method takes the constructed empty type for the
-	 *            pre-indexing phase. This one is further initialized in the
-	 *            indexing phase using the lambda you pass as the last argument.
-	 * @param isPreIndexingPhase
-	 *            whether the method is called in a pre-indexing phase, i.e.
-	 *            when the global index is not yet fully updated. You must not
-	 *            rely on linking using the index if isPreIndexingPhase is
-	 *            <code>true</code>.
-	 */
-	def dispatch void infer(Block block, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {		
+	def void inferBlock(Block block, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {		
 		if(block instanceof StandardBlock) {
 			createRule(block as KampRule, acceptor, isPreIndexingPhase, -1, currentRuleIndex);
 		} else if(block instanceof RecursiveBlock) {
@@ -100,6 +109,61 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 				createRule(rule, acceptor, isPreIndexingPhase, getBlockNumber(rule, block.eContainer as RuleFile), currentRuleIndex);
 			}
 		}	
+	}
+	
+	def String generateInstancePredicateMethodName(String predicateName) {
+		return "find" + predicateName.toFirstUpper
+	}
+	
+	def dispatch void infer(RuleFile ruleFile, IJvmDeclaredTypeAcceptor acceptor, boolean isPreIndexingPhase) {
+		val clazz = ruleFile.toClass(INSTANCE_LOOKUP_HELPER_CLASS_NAME);
+		clazz.packageName = INSTANCE_LOOKUP_HELPER_PACKAGE_NAME;
+		
+		acceptor.accept(clazz) [
+			for(predicate : ruleFile.intancePredicates) {
+				members += predicate.toMethod(generateInstancePredicateMethodName(predicate.name), typeRef(boolean)) [
+ 					val context = predicate.toParameter('it', typeRef(predicate.type.metaclass.instanceClass))
+ 					parameters += context
+ 					static = true
+ 					if (predicate.body !== null) { 
+ 						body = predicate.body
+ 					} else {
+ 						body = ''''''
+ 					}
+				]
+			}
+			
+			for(block : ruleFile.blocks) {
+				val rules = newArrayList()
+				if(block instanceof KampRule) {
+					rules.add(block as KampRule)
+				} else {
+					rules += (rules as RecursiveBlock).rules;
+				}
+
+				for(inlinePredicate : rules.map[rule | rule.instructions].flatten.filter[i | i instanceof InlineInstancePredicateProjection]) {
+					val type = inlinePredicate.metaclass;
+					val inlineMethodName = "findInline" + UUID.randomUUID().toString().replace("-", "");
+					val predicate = inlinePredicate as InlineInstancePredicateProjection;
+					inlineInstancePredicateProjectionNames.put(predicate, inlineMethodName);
+
+					members += predicate.toMethod(inlineMethodName, typeRef(boolean)) [
+	 					val context = predicate.toParameter('it', typeRef(type.instanceClass))
+	 					parameters += context
+	 					static = true
+	 					if (predicate.body !== null) { 
+	 						body = predicate.body
+	 					} else {
+	 						body = ''''''
+	 					}
+					]
+				}
+			}
+		]
+		
+		for(block : ruleFile.blocks) {
+			inferBlock(block, acceptor, isPreIndexingPhase);
+		}
 	}
 	
 	def int getBlockNumber(KampRule rule, RuleFile ruleFile) {
@@ -122,9 +186,171 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 		val className = rule.getClassName();
 		val clazz = rule.toClass(className);
 		clazz.packageName = "gen.rule";
+
+		// First check if the project has the JRE on classpath
+		ensureJreIsOnClasspath();
 		
-		val List<CausingEntityMarker> causingEntityMarkers = getCausingEntityMarkers(rule.instructions);
-		val Map<CausingEntityMarker, Lookup> causingEntityLookups = getCausingEntityLookups(rule.instructions, causingEntityMarkers);
+		acceptor.accept(clazz,
+			[ theClass |
+				try {
+					// determine formal parameter types
+					val returnType = typeRef(getReturnType(rule.lookups.last));
+					val sourceType = typeRef(getSourceTypeForRuleSource(rule.source));
+					val List<CausingEntityMarker> causingEntityMarkers = getCausingEntityMarkers(rule.instructions);
+					val Map<CausingEntityMarker, Lookup> causingEntityLookups = getCausingEntityLookups(rule.instructions, causingEntityMarkers);
+					val hasSourceMarker = checkIfRuleHasSourceMarker(causingEntityMarkers, causingEntityLookups);
+					
+					// create fields, setters and getters
+					theClass.members += rule.toField("architectureVersion", typeRef(AbstractArchitectureVersion, typeRef(AbstractModificationRepository, wildcard(), wildcard())));
+					theClass.members += rule.toField("changePropagationStepRegistry", typeRef(ChangePropagationStepRegistry));
+					
+					val architectureVersionGetter = rule.toGetter("architectureVersion", "architectureVersion", typeRef(AbstractArchitectureVersion, typeRef(AbstractModificationRepository, wildcard(), wildcard())));
+					theClass.members += architectureVersionGetter
+					architectureVersionGetter.annotations += annotationRef(Override)
+					
+					val changePropagationStepRegistryGetter = rule.toGetter("changePropagationStepRegistry", "changePropagationStepRegistry", typeRef(ChangePropagationStepRegistry));			
+					theClass.members += changePropagationStepRegistryGetter
+					changePropagationStepRegistryGetter.annotations += annotationRef(Override)
+					
+					val architectureVersionSetter = rule.toSetter("architectureVersion", "architectureVersion", typeRef(AbstractArchitectureVersion, typeRef(AbstractModificationRepository, wildcard(), wildcard())))
+					theClass.members += architectureVersionSetter
+					architectureVersionSetter.annotations += annotationRef(Override)
+					
+					val changePropagationStepRegistrySetter = rule.toSetter("changePropagationStepRegistry", "changePropagationStepRegistry", typeRef(ChangePropagationStepRegistry))
+					theClass.members += changePropagationStepRegistrySetter
+					changePropagationStepRegistrySetter.annotations += annotationRef(Override)
+					
+					// choose correct implementing interface and add special methods
+					var JvmTypeReference currentInterface = null;
+					if(blockId > -1) {
+						currentInterface = IRecursiveRule.typeRef(sourceType, returnType, typeRef(AbstractArchitectureVersion, typeRef(AbstractModificationRepository, wildcard(), wildcard())), typeRef(AbstractModificationRepository, wildcard(), wildcard()))
+					} else {
+						currentInterface = IRule.typeRef(sourceType, returnType, typeRef(AbstractArchitectureVersion, typeRef(AbstractModificationRepository, wildcard(), wildcard())), typeRef(AbstractModificationRepository, wildcard(), wildcard()));
+					}
+					
+					// create lookups method
+					val lookupsType = typeRef(AbstractLookup, wildcard(), wildcard()).addArrayTypeDimension;
+					val lookupForSource = getLookupsForRuleSource(rule.source);
+		
+					val createLookupsMethod = rule.toMethod("createLookups", lookupsType)[
+						body = '''return new «AbstractLookup»[] {
+								«IF lookupForSource !== null»
+									«lookupForSource»,
+								«ELSE»
+									/* no lookup for rule source */
+								«ENDIF»
+								«FOR lookup : rule.lookups»
+									«createLookup(lookup, getLookupSourceType(lookup, rule.lookups, rule.source), getLookupReturnType(lookup), isLookupMarkedForCausingEntities(lookup, causingEntityLookups, hasSourceMarker, rule.instructions), rule)»«IF rule.lookups.last !== lookup»,«ENDIF»
+								«ENDFOR»
+							};'''
+					];
+					createLookupsMethod.static = true;
+					createLookupsMethod.visibility = JvmVisibility.PRIVATE;
+					createLookupsMethod.parameters += createLookupsMethod.toParameter("version", typeRef(AbstractArchitectureVersion, typeRef(AbstractModificationRepository, wildcard(), wildcard())))
+					theClass.members += createLookupsMethod
+					
+					// add formal type parameters to implementing interface
+					theClass.superTypes += currentInterface;
+					
+					//theClass.members += createApplyMethod(rule);
+				
+					// create the static lookup method	
+					val lookupMethod = createLookupMethod(rule, theClass, sourceType, returnType, hasSourceMarker, causingEntityLookups);
+					theClass.members += lookupMethod;
+				
+					// create the lookup member method
+					val lookupMemberMethod = createLookupMemberMethod(rule, lookupMethod, sourceType, returnType);
+					theClass.members += lookupMemberMethod;	
+				
+					// create class getter methods
+					val sourceElementClassGetter = rule.toMethod("getSourceElementClass", Class.typeRef(sourceType)) [
+						body = '''
+								return «sourceType».class;
+							'''
+					]
+					sourceElementClassGetter.annotations += annotationRef(Override)
+					theClass.members += sourceElementClassGetter
+					
+					val affectedElementClassGetter = rule.toMethod("getAffectedElementClass", Class.typeRef(returnType)) [
+						body = '''
+								return «returnType».class;
+							'''
+					]
+					affectedElementClassGetter.annotations += annotationRef(Override)	
+					theClass.members += affectedElementClassGetter
+					
+					// create the getPosition method
+					val positionMethod = rule.toMethod("getPosition", typeRef("int")) [
+						body = '''
+								return «currentRuleIndex.getAndIncrement() * 10»;
+							'''
+					]
+					positionMethod.annotations += annotationRef(Override)	
+					theClass.members += positionMethod
+				} catch(Exception e) {
+					e.printStackTrace
+					// TODO replace with proper exception handling
+					System.err.println("Rule could not be created. Not fully defined? Name: " + rule.name)
+				}
+			]
+		);
+	}
+	
+	def Class<?> getLookupSourceType(Lookup lookup, List<Lookup> lookups, RuleSource ruleSource) {
+		// retrieve previous lookup
+		var index = -1;
+		for(var i = 0; i < lookups.length; i++) {
+			val currentLookup = lookups.get(i);
+			if(currentLookup === lookup) {
+				index = i - 1;
+			}
+		}
+		
+		if(index >= 0) {
+			return getReturnType(lookups.get(index))	
+		} else {
+			// retrieve the type of rule source
+			return getReturnTypeForRuleSource(ruleSource);
+		}
+	}
+	
+	def Class<?> getLookupReturnType(Lookup lookup) {
+		getReturnType(lookup)
+	}
+	
+	def dispatch CharSequence getLookupsForRuleSource(RuleSource source) {
+		return null;
+	}
+	
+	def dispatch Class<?> getSourceTypeForRuleSource(RuleSource source) {
+		return getReturnTypeForRuleSource(source);	// by default source == return type
+	}
+	
+	def dispatch Class<?> getSourceTypeForRuleSource(ExternalRuleSource source) {
+		return getSourceTypeForRuleSource(source.rule.source);
+	}
+	
+	def Class<?> getReturnTypeForRuleSource(RuleSource source) {
+		return source.metaclass.instanceClass;
+	}
+	
+	def dispatch CharSequence getLookupsForRuleSource(ExternalRuleSource source) {
+		val sourceType = getSourceTypeForRuleSource(source);
+		val returnType = getReturnTypeForRuleSource(source);
+
+		return '''new «RuleReferenceLookup.canonicalName»<«sourceType.canonicalName», «returnType.canonicalName»>(version, «source.rule.className»::lookup)''';
+	}
+	
+	def dispatch CharSequence getLookupsForRuleSource(InstanceRuleSource source) {
+		val sourceType = getSourceTypeForRuleSource(source);
+		val returnType = getReturnTypeForRuleSource(source);
+		val referenceType = source.instanceReference;
+		var CharSequence predicate = generatePredicate(referenceType, returnType);
+
+		return '''new «InstanceProjectionLookup.canonicalName»<«sourceType.canonicalName», «returnType.canonicalName»>(«predicate», «returnType.canonicalName».class)''';
+	}
+	
+	def checkIfRuleHasSourceMarker(List<CausingEntityMarker> causingEntityMarkers, Map<CausingEntityMarker, Lookup> causingEntityLookups) {
 		var boolean hasSourceMarker = false;
 		
 		// determine the data type of causing elements...
@@ -140,72 +366,60 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 			hasSourceMarker = true;
 		}
 		
-		val hasSourceMarkerFinal = hasSourceMarker;
+		return hasSourceMarker;
+	}
+	
+	def createLookupMemberMethod(KampRule rule, JvmOperation lookupMethod, JvmTypeReference sourceType, JvmTypeReference returnType) {
+		val lookupMemberMethod = rule.toMethod("lookup", null) [
+		parameters += rule.toParameter("previousRuleResult", typeRef(Result, wildcard(), sourceType));
+		// Stream.typeRef(typeRef(CausingEntityMapping, sourceType, typeRef(EObject)))
 		
-		// First check if the project has the JRE on classpath
-		ensureJreIsOnClasspath();
+			val StringConcatenationClient strategy = '''								
+						return «lookupMethod.simpleName»(previousRuleResult, this.getArchitectureVersion());
+					''';
 		
-		acceptor.accept(clazz,
-			[ theClass |
-				// determine formal parameter types
-				val returnType = typeRef(getReturnType(rule.lookups.last));
-				val sourceType = typeRef(rule.source.metaclass.instanceTypeName);
-				
-				nameForLookup = newHashMap
-				
-				// create fields, setters and getters
-				theClass.members += rule.toField("architectureVersion", typeRef(AbstractArchitectureVersion, typeRef(AbstractModificationRepository, wildcard(), wildcard())));
-				theClass.members += rule.toField("changePropagationStepRegistry", typeRef(ChangePropagationStepRegistry));
-				
-				val architectureVersionGetter = rule.toGetter("architectureVersion", "architectureVersion", typeRef(AbstractArchitectureVersion, typeRef(AbstractModificationRepository, wildcard(), wildcard())));
-				theClass.members += architectureVersionGetter
-				architectureVersionGetter.annotations += annotationRef(Override)
-				
-				val changePropagationStepRegistryGetter = rule.toGetter("changePropagationStepRegistry", "changePropagationStepRegistry", typeRef(ChangePropagationStepRegistry));			
-				theClass.members += changePropagationStepRegistryGetter
-				changePropagationStepRegistryGetter.annotations += annotationRef(Override)
-				
-				val architectureVersionSetter = rule.toSetter("architectureVersion", "architectureVersion", typeRef(AbstractArchitectureVersion, typeRef(AbstractModificationRepository, wildcard(), wildcard())))
-				theClass.members += architectureVersionSetter
-				architectureVersionSetter.annotations += annotationRef(Override)
-				
-				val changePropagationStepRegistrySetter  = rule.toSetter("changePropagationStepRegistry", "changePropagationStepRegistry", typeRef(ChangePropagationStepRegistry))
-				theClass.members += changePropagationStepRegistrySetter
-				changePropagationStepRegistrySetter.annotations += annotationRef(Override)
-				
-				// choose correct implementing interface and add special methods
-				var JvmTypeReference currentInterface = null;
-				if(blockId > -1) {
-					currentInterface = IRecursiveRule.typeRef(sourceType, returnType, typeRef(AbstractArchitectureVersion, typeRef(AbstractModificationRepository, wildcard(), wildcard())), typeRef(AbstractModificationRepository, wildcard(), wildcard()))
-					
-					// we do not need this information at runtime right now
-					// the way we build blocks is based on rule position
-//					val getStepIdMethod = rule.toMethod("getRecursiveBlockId", typeRef("int")) [
-//						body = '''
-//							return «blockId»;
-//						'''
-//					];
-//					
-//					getStepIdMethod.annotations += annotationRef(Override)					
-//					theClass.members += getStepIdMethod
-				} else {
-					currentInterface = IRule.typeRef(sourceType, returnType, typeRef(AbstractArchitectureVersion, typeRef(AbstractModificationRepository, wildcard(), wildcard())), typeRef(AbstractModificationRepository, wildcard(), wildcard()));
-				}
-				
-				// add formal type parameters to implementing interface
-				theClass.superTypes += currentInterface;
-				
-				// create the apply method
-				val applyMethod = rule.toMethod(getMethodName(), typeRef("void")) [
-					// parameters += rule.toParameter("version", typeRef(AbstractArchitectureVersion, wildcard()))
-					// parameters += rule.toParameter("registry", typeRef(ChangePropagationStepRegistry))
-					parameters += rule.toParameter("affectedElements", Stream.typeRef(typeRef(CausingEntityMapping, returnType, typeRef(EObject))));
-					
-					nameForLookup.put(null, "input")
-					if(rule.modificationMark !== null) {
+			setBody(it, strategy);
+		];
+		
+		lookupMemberMethod.annotations += annotationRef(Override)
+		lookupMemberMethod.returnType = typeRef(RuleResult, sourceType, returnType)
+		// Stream.typeRef(typeRef(CausingEntityMapping, returnType, typeRef(EObject)));
+		
+		return lookupMemberMethod;
+	}
+	
+	def createLookupMethod(KampRule rule, JvmGenericType  theClass, JvmTypeReference sourceType, JvmTypeReference returnType, boolean hasSourceMarker, Map<CausingEntityMarker, Lookup> causingEntityLookups) {
+		val lookupMethod = rule.toMethod("lookup", null) [
+			parameters += rule.toParameter("previousRuleResult", typeRef(Result, wildcard(), sourceType))		
+			parameters += rule.toParameter("version", typeRef(AbstractArchitectureVersion, typeRef(AbstractModificationRepository, wildcard(), wildcard())))
+
+			val StringConcatenationClient strategy = '''
+					«AbstractLookup»[] lookups = createLookups(version);
+					RuleResult<«sourceType.qualifiedName», «returnType.qualifiedName»> result = «LookupUtil».runLookups(previousRuleResult, lookups, "«rule.name»");
+					return result;
+					''';
+
+			setBody(it, strategy);
+		];
+
+		lookupMethod.returnType = typeRef(RuleResult, sourceType, returnType)			
+		lookupMethod.static = true;
+		lookupMethod.final = true;
+		
+		return lookupMethod;
+	}
+	
+	def createApplyMethod(KampRule rule) {
+		// create the apply method
+		val applyMethod = rule.toMethod("apply", typeRef("void")) [
+			// parameters += rule.toParameter("version", typeRef(AbstractArchitectureVersion, wildcard()))
+			// parameters += rule.toParameter("registry", typeRef(ChangePropagationStepRegistry))
+			parameters += rule.toParameter("affectedElements", Stream.typeRef(typeRef(CausingEntityMapping, returnType, typeRef(EObject))));
 						
-						// TODO reimplement this stuff to match new return type of lookup method
-						body = '''
+			if(rule.modificationMark !== null) {
+							
+					// TODO reimplement this stuff to match new return type of lookup method
+					body = '''
 «««							«LookupUtil».lookup(architectureVersion, «typeRef(rule.source.metaclass.instanceTypeName)».class, «rule.getClassName»::«rule.getLookupMethodName(rule.lookups.last)»)
 «««								.forEach((result) -> {
 «««									if(«PropagationStepUtil».isNewEntry(result, «stepId», changePropagationRegistry)) {
@@ -216,90 +430,14 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 «««										«PropagationStepUtil».addToExistingModificationMark(result, «stepId», changePropagationRegistry);
 «««									}
 «««								});
-						'''
-					} else {
-						body = ''''''
-					}
-				];
-				applyMethod.annotations += annotationRef(Override)
-				theClass.members += applyMethod;
-			
-				// create the static lookup method
-				val lookupMethodName = rule.getLookupMethodName(rule.lookups.last);
-				try {
-					val lookupMethod = rule.toMethod(lookupMethodName, null) [
-					parameters += rule.toParameter(rule.source.metaclass.name.toFirstLower + "Mapping", Stream.typeRef(typeRef(CausingEntityMapping, sourceType, typeRef(EObject))))		
-					//if(rule.isVersionParameterRequired()) {	// pass it always as we would have the BiFunction declaration in the utility method of apply
-						parameters += rule.toParameter("version", typeRef(AbstractArchitectureVersion, wildcard()))
-					//}
-	
-					nameForLookup.put(null, "input")
-					
-					//«generateSourceMarkerParameter(hasSourceMarkerFinal, rule.source.metaclass.name.toFirstLower)»
-					val StringConcatenationClient strategy = '''
-								«typeRef(Stream, typeRef(CausingEntityMapping, typeRef(rule.source.metaclass.instanceClass), typeRef(EObject)))» input = «rule.source.metaclass.name.toFirstLower + "Mapping"»«IF hasSourceMarkerFinal».peek(e -> e.addCausingEntityDistinct(e.getAffectedElement()));«ELSE»;«ENDIF»
-								
-								«FOR x : rule.lookups»
-									«x.generateCodeForRule(theClass, isRuleMarkedForCausingEntities(x, causingEntityLookups))»
-								«ENDFOR»
-								
-								return «nameForLookup.get(rule.lookups.last)»;
-							''';
-
-					setBody(it, strategy);
-				];
-
-				lookupMethod.returnType = Stream.typeRef(typeRef(CausingEntityMapping, returnType, typeRef(EObject)))			
-				lookupMethod.static = true;
-				lookupMethod.final = true;
-				theClass.members += lookupMethod
-				
-				// create the lookup member method
-				val lookupMemberMethod = rule.toMethod("lookup", null) [
-					parameters += rule.toParameter("sourceElements", Stream.typeRef(typeRef(CausingEntityMapping, sourceType, typeRef(EObject))));
-					
-					val StringConcatenationClient strategy = '''								
-								return «lookupMethodName»(sourceElements, architectureVersion);
-							''';
-
-					setBody(it, strategy);
-				];
-
-				lookupMemberMethod.annotations += annotationRef(Override)
-				lookupMemberMethod.returnType = Stream.typeRef(typeRef(CausingEntityMapping, returnType, typeRef(EObject)));
-				theClass.members += lookupMemberMethod
-			} catch(Exception e) {
-				e.printStackTrace
-				// TODO replace with proper exception handling
-				System.err.println("Rule could not be created. Not fully defined? Name: " + rule.name)
-			}	
-			
-			// create class getter methods
-			val sourceElementClassGetter = rule.toMethod("getSourceElementClass", Class.typeRef(sourceType)) [
-				body = '''
-						return «sourceType».class;
 					'''
-			]
-			sourceElementClassGetter.annotations += annotationRef(Override)
-			theClass.members += sourceElementClassGetter
-			
-			val affectedElementClassGetter = rule.toMethod("getAffectedElementClass", Class.typeRef(returnType)) [
-				body = '''
-						return «returnType».class;
-					'''
-			]
-			affectedElementClassGetter.annotations += annotationRef(Override)	
-			theClass.members += affectedElementClassGetter
-			
-			// create the getPosition method
-			val positionMethod = rule.toMethod("getPosition", typeRef("int")) [
-				body = '''
-						return «currentRuleIndex.getAndIncrement() * 10»;
-					'''
-			]
-			positionMethod.annotations += annotationRef(Override)	
-			theClass.members += positionMethod
-		]);
+			} else {
+				body = ''''''
+			}
+		];
+		applyMethod.annotations += annotationRef(Override)
+		
+		return applyMethod;
 	}
 	
 	// TODO this might not be the best way to do this, but it works
@@ -322,7 +460,16 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 		}
 	}
 	
-	def boolean isRuleMarkedForCausingEntities(Lookup lookup, Map<CausingEntityMarker, Lookup> causingEntityLookups) {
+	def boolean isLookupMarkedForCausingEntities(Lookup lookup, Map<CausingEntityMarker, Lookup> causingEntityLookups, boolean hasSourceMarker, List<Instruction> instructions) {
+		if(hasSourceMarker) {
+			val PropagationReference lastPropagationReference = instructions.filter[i | return i instanceof PropagationReference].last as PropagationReference;
+			if(lastPropagationReference !== null && lastPropagationReference == lookup) {
+				return true;
+			} else {
+				// TODO: if there is no PropagationReference, we should select the source
+			}
+		}
+
 		return causingEntityLookups.containsValue(lookup)
 	}
 	
@@ -371,115 +518,98 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 	}
 	
 	def Class<?> getReturnType(Lookup lastLookup) {
-		if(lastLookup instanceof ForwardEReference) {
-			lastLookup.metaclass.instanceClass
-		} else if(lastLookup instanceof BackwardEReference) {
-			lastLookup.mclass.metaclass.instanceClass
-		} else if(lastLookup instanceof RuleReference) {
-			lastLookup.rule.lookups.last.returnType
-		} else {
-			throw new UnsupportedOperationException("Missing return type determination for lookup type: " + lastLookup.class);
+		lastLookup.metaclass.instanceClass
+	}
+	
+	def dispatch CharSequence createLookup(Lookup lookup, Class<?> sourceType, Class<?> returnType, boolean addToCausingEntities, KampRule rule) {
+		return '''new «EmptyLookup.canonicalName»(/* implementation missing */)''';
+	}
+	
+	def dispatch CharSequence createLookup(BackwardReferenceMetaclassSource lookup, Class<?> sourceType, Class<?> returnType, boolean addToCausingEntities, KampRule rule) {
+		var String featureName = "null";
+		if(lookup.feature !== null) {
+			featureName = lookup.feature.name;
 		}
+		
+		return '''new «BackwardReferenceMetaclassLookup.canonicalName»<«sourceType.canonicalName», «returnType.canonicalName»>(«addToCausingEntities», «returnType.canonicalName».class, "«featureName»", version)''';
 	}
 	
-	def dispatch String getLookupMethodName(KampRule rule, Lookup lookup) {
-		'lookup'
+	def dispatch CharSequence createLookup(BackwardReferenceInstanceSource lookup, Class<?> sourceType, Class<?> returnType, boolean addToCausingEntities, KampRule rule) {
+		val referenceType = lookup.instanceReference;
+		var CharSequence predicate = generatePredicate(referenceType, returnType);
+
+		return '''new «BackwardReferenceInstanceLookup.canonicalName»<«sourceType.canonicalName», «returnType.canonicalName»>(«addToCausingEntities», «returnType.canonicalName».class, «predicate», version)''';
 	}
 	
-	def dispatch String getLookupMethodName(KampRule rule, ForwardEReference reference) {
-		'lookup' + reference.metaclass.name + 'from' + rule.source.metaclass.name
+	def dispatch CharSequence createLookup(RuleReference lookup, Class<?> sourceType, Class<?> returnType, boolean addToCausingEntities, KampRule rule) {
+		return '''new «RuleReferenceLookup.canonicalName»<«sourceType.canonicalName», «returnType.canonicalName»>(version, «lookup.rule.className»::lookup)''';
 	}
 	
-	def dispatch String getLookupMethodName(KampRule rule, BackwardEReference reference) {
-		'lookup' + reference.mclass.metaclass.name.toFirstUpper + 'from' + rule.source.metaclass.name
+	def dispatch CharSequence createLookup(StructuralFeatureForwardReferenceTarget lookup, Class<?> sourceType, Class<?> returnType, boolean addToCausingEntities, KampRule rule) {
+		return '''new «StructuralFeatureForwardReferenceLookup.canonicalName»<«sourceType.canonicalName», «returnType.canonicalName»>(«addToCausingEntities», «lookup.feature.many», "«lookup.feature.name»")''';
 	}
 	
-	// this one is the entry point and must address the interface method which must be overridden
-	def String getMethodName() {
-		'''apply'''
+	def dispatch CharSequence createLookup(MetaclassForwardReferenceTarget lookup, Class<?> sourceType, Class<?> returnType, boolean addToCausingEntities, KampRule rule) {
+		return '''new «MetaclassForwardReferenceLookup.canonicalName»<«sourceType.canonicalName», «returnType.canonicalName»>(«addToCausingEntities», «returnType.canonicalName».class)''';
 	}
 	
-	/**
-	 * <p>Generates the code that is embedded in the method if the given lookup
-	 * is found in a chain of lookups of one rule.
-	 * 
-	 * <p>The rule file can be navigated using the given lookup and methods in
-	 * {@link EcoreUtil}.
-	 * 
-	 * @param lookup the Lookup to generate the code for. There should be a
-	 * dispatch method for every sub type. Otherwise the generator will throw
-	 * a runtime exception.
-	 * 
-	 * @param typeToAddTo the class that is currently generated. Can be used to add further
-	 * methods or fields with the injected extension {@link JvmTypesBuilder}.
-	 */	
-	def dispatch generateCodeForRule(Lookup lookup, JvmGenericType typeToAddTo, boolean addToCausingEntities) {
-		'''// rule: «lookup?.toString», pre: «getPreviousSiblingOfType(lookup, Lookup)?.toString»'''
+	def dispatch CharSequence createLookup(InstanceForwardReferenceTarget lookup, Class<?> sourceType, Class<?> returnType, boolean addToCausingEntities, KampRule rule) {
+		val referenceType = lookup.instanceReference;
+		var CharSequence predicate = generatePredicate(referenceType, returnType);
+
+		return '''new «InstanceForwardReferenceLookup.canonicalName»<«sourceType.canonicalName», «returnType.canonicalName»>(«addToCausingEntities», «returnType.canonicalName».class, «predicate»)''';
 	}
 	
-	/**
-	 * @see #generateCodeForRule(Lookup, JvmGenericType)
-	 */
-	def dispatch generateCodeForRule(ForwardEReference ref, JvmGenericType typeToAddTo, boolean addToCausingEntities) {
-		var varName = '''marked«ref.metaclass.name.toFirstUpper»__''' + getLookupNumber(ref)
-		nameForLookup.put(ref, varName)
+	def dispatch CharSequence createLookup(InstanceProjection lookup, Class<?> sourceType, Class<?> returnType, boolean addToCausingEntities, KampRule rule) {
+		val referenceType = lookup.instanceDeclarationReference;
+		var CharSequence predicate = generatePredicate(referenceType, returnType);
+
+		return '''new «InstanceProjectionLookup.canonicalName»<«sourceType.canonicalName», «returnType.canonicalName»>(«predicate», «returnType.canonicalName».class)''';
+	}
+	
+	def dispatch CharSequence createLookup(InlineInstancePredicateProjection lookup, Class<?> sourceType, Class<?> returnType, boolean addToCausingEntities, KampRule rule) {
+		val predicateMethodName = inlineInstancePredicateProjectionNames.get(lookup);
+		var CharSequence predicate = INSTANCE_LOOKUP_HELPER_PACKAGE_NAME + "." + INSTANCE_LOOKUP_HELPER_CLASS_NAME + "::" + predicateMethodName;
+
+		return '''new «InstanceProjectionLookup.canonicalName»<«sourceType.canonicalName»>(«predicate»)''';
+	}
+	
+	def dispatch CharSequence createLookup(TypeProjection lookup, Class<?> sourceType, Class<?> returnType, boolean addToCausingEntities, KampRule rule) {
+		val types = lookup.types;
 		var String projectionClasses = null;
-		if(ref.projections !== null && ref.projections.length > 0) {
-			for(projection : ref.projections) {
+		if(types !== null && types.length > 0) {
+			for(type : types) {
 				if(projectionClasses === null) {
-					projectionClasses = projection.qualifiedName + ".class";
+					projectionClasses = type.qualifiedName + ".class";
 				} else {
-					projectionClasses = projectionClasses + ", " +  projection.qualifiedName + ".class";
+					projectionClasses = projectionClasses + ", " +  type.qualifiedName + ".class";
 				}
 			} 
 		} else {
 			projectionClasses= "null";
 		}
 		
-		'''
-			«Stream.canonicalName»<CausingEntityMapping<«ref.metaclass.instanceTypeName», EObject>> «varName» = «LookupUtil.canonicalName».lookupForwardReference(«nameForLookup.get(getPreviousSiblingOfType(ref, Lookup))», «ref.feature.many», "«ref.feature.name»", «ref.metaclass.instanceTypeName».class, «addToCausingEntities», «projectionClasses»);
-		'''
+		return '''new «TypeProjectionLookup.canonicalName»<«sourceType.canonicalName», «returnType.canonicalName»>(«projectionClasses»)''';
+	}
+	
+	def generatePredicate(InstanceDeclaration referenceType, Class<?> returnType) {
+		var CharSequence predicate = null;
+		if(referenceType instanceof InstanceIdDeclaration) {
+			val instanceId = EcoreUtil.getID(referenceType.instanceReference.instance);
+			predicate = '''new «InstanceIdPredicate.canonicalName»<«returnType.canonicalName»>("«instanceId»")''';
+		} else if(referenceType instanceof InstancePredicateDeclaration) {
+			val instancePredicate = INSTANCE_LOOKUP_HELPER_PACKAGE_NAME + "." + INSTANCE_LOOKUP_HELPER_CLASS_NAME + "::" + generateInstancePredicateMethodName(referenceType.name);
+			predicate = instancePredicate;
+		}
+		
+		return predicate;
 	}
 
-	/**
-	 * @see #generateCodeForRule(Lookup, JvmGenericType)
-	 */
-	def dispatch generateCodeForRule(BackwardEReference ref, JvmGenericType typeToAddTo, boolean addToCausingEntities) {
-		var varName = '''backmarked«ref.mclass.metaclass.name.toFirstUpper»__''' + getLookupNumber(ref); 
-		nameForLookup.put(ref, varName)
-		var String projectionClasses = null;
-		if(ref.projections !== null && ref.projections.length > 0) {
-			for(projection : ref.projections) {
-				if(projectionClasses === null) {
-					projectionClasses = projection.qualifiedName + ".class";
-				} else {
-					projectionClasses = projectionClasses + ", " +  projection.qualifiedName + ".class";
-				}
-			} 
-		} else {
-			projectionClasses= "null";
-		}
-		
-		'''
-			«Stream.canonicalName»<CausingEntityMapping<«ref.metaclass.instanceTypeName», EObject>> «varName» = «LookupUtil.canonicalName».lookupBackwardReference(version, «ref.mclass.metaclass.instanceTypeName».class, ''' + getFeatureName(ref) + ''', «nameForLookup.get(getPreviousSiblingOfType(ref, Lookup))», «addToCausingEntities», «projectionClasses»).stream();
-		'''
-	}
+//	def dispatch generateCodeForRule(BackwardReferenceMetaclassSource ref, JvmGenericType typeToAddTo, boolean addToCausingEntities) {
+//		'''
+//			«Stream.canonicalName»<CausingEntityMapping<«ref.metaclass.instanceTypeName», EObject>> «varName» = «LookupUtil.canonicalName».lookupBackwardReference(version, «ref.metaclass.instanceTypeName».class, ''' + getFeatureName(ref) + ''', «nameForLookup.get(getPreviousSiblingOfType(ref, Lookup))», «addToCausingEntities»).stream();
+//		'''
 	
-	/**
-	 * @see #generateCodeForRule(Lookup, JvmGenericType)
-	 */
-	def dispatch generateCodeForRule(RuleReference ref, JvmGenericType typeToAddTo, boolean addToCausingEntities) {
-		var varName = '''rulerefmarked«ref.metaclass.name.toFirstUpper»__''' + getLookupNumber(ref)
-		nameForLookup.put(ref, varName)
-		
-		'''
-			«Stream.canonicalName»<CausingEntityMapping<«ref.metaclass.instanceTypeName», EObject>> «varName» = «nameForLookup.get(getPreviousSiblingOfType(ref, Lookup))».flatMap(e -> «ref.rule.className».«getLookupMethodName(ref.rule, ref.rule.lookups.last)»(e, version).stream());
-		'''
-	}
-	
-	def getFeatureName(BackwardEReference reference) {
-		return if(reference.feature !== null) "\"" + reference.feature.name + "\"" else null;
-	}
 	
 	def getLookupNumber(Lookup reference) {
 		val list = reference.eContainer.eContents;
@@ -489,10 +619,5 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 				return i;
 			}
 		}
-	}
-	
-	// we do not use this anymore because we always pass the version parameter
-	def isVersionParameterRequired(KampRule rule) {
-		rule.lookups.exists[r | r instanceof BackwardEReference];	
 	}
 }

@@ -1,44 +1,125 @@
 package edu.kit.ipd.sdq.kamp.ruledsl.util
 
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.BackwardEReference
-//import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.CollectElements
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.ForwardEReference
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.BackwardReferenceInstanceSource
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.BackwardReferenceMetaclassSource
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.ExternalRuleSource
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InlineInstancePredicateProjection
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceDeclaration
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceForwardReferenceTarget
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceIdDeclaration
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstancePredicateDeclaration
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceProjection
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceRuleSource
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.Lookup
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.MetaclassForwardReferenceTarget
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.MetaclassRuleSource
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.PropagationReference
-import org.eclipse.emf.ecore.EClass
-import tools.vitruv.dsls.mirbase.mirBase.MetaclassReference
-import static edu.kit.ipd.sdq.kamp.ruledsl.util.EcoreUtil.*
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.RuleReference
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.RuleSource
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.StructuralFeatureForwardReferenceTarget
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.SubTypeProjection
+import edu.kit.ipd.sdq.kamp.ruledsl.scoping.KampRuleLanguageScopeProviderDelegate
+import org.eclipse.emf.ecore.EClass
+import org.eclipse.xtext.EcoreUtil2
+
+import static edu.kit.ipd.sdq.kamp.ruledsl.util.EcoreUtil.*
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.GeneralTypeProjection
 
 final class KampRuleLanguageEcoreUtil {
-	private new() {
-		
+	private new() {}
+	
+	/**
+	 * Returns the type of the forward reference's feature.
+	 */
+	def static dispatch EClass getMetaclass(StructuralFeatureForwardReferenceTarget refTarget) {
+		return refTarget?.feature?.EType as EClass;
 	}
 	
 	/**
-	 * <p>Returns the Metaclass ({@link EClass}) that is associated with a
-	 * grammar element.
-	 * 
-	 * <p>The 'associated' Metaclass is the class referenced by a {@link MetaclassReference},
-	 * or the type of the (set of) Metaclass(es) returned by a {@link PropagationReference}. 
+	 * Returns the type of the type projection.
+	 * Please note: Only the first type of a type projection is used for the typing.
+	 * Please note: Only imported metaclasses are found
 	 */
-	def static dispatch EClass getMetaclass(ForwardEReference ref) {
-		ref.feature.EType as EClass
+	def static dispatch EClass getMetaclass(SubTypeProjection typeProjection) {
+		val eClass = KampRuleLanguageScopeProviderDelegate.getEClassForInstanceClass(typeProjection.eResource, typeProjection.types?.head?.qualifiedName);
+	
+		return eClass
 	}
 	
-	/** see #getMetaclass(ForwardEReference) */
-	def static dispatch EClass getMetaclass(MetaclassReference ref) {
-		ref.metaclass
+	def static dispatch EClass getMetaclass(GeneralTypeProjection typeProjection) {
+		val eClass = KampRuleLanguageScopeProviderDelegate.getEClassForInstanceClass(typeProjection.eResource, typeProjection.types?.head?.qualifiedName);
+	
+		return eClass
 	}
 	
-	def static dispatch EClass getMetaclass(BackwardEReference ref) {
-		// TODO is this cast risky?? which of those subclasses of eclassifier is possible? EClassifierImpl, EClassImpl, EDataTypeImpl, EEnumImpl
-		ref.mclass.metaclass as EClass;
+	def static dispatch EClass getMetaclass(InstanceProjection instanceProjection) {
+		getMetaclass(instanceProjection.instanceDeclarationReference)
+	} 
+	
+	def static dispatch EClass getMetaclass(InstanceDeclaration instanceDeclaration) {
+		if(instanceDeclaration instanceof InstanceIdDeclaration) {
+			getMetaclass(instanceDeclaration as InstanceIdDeclaration)
+		} else if(instanceDeclaration instanceof InstancePredicateDeclaration) {
+			getMetaclass(instanceDeclaration as InstancePredicateDeclaration)
+		}
+	} 
+	
+	def static dispatch EClass getMetaclass(MetaclassForwardReferenceTarget metaclassTarget) {
+		metaclassTarget.metaclassReference.metaclass
 	}
 	
+	/**
+	 * Returns the metaclass of the given metaclass rule source.
+	 */
+	def static dispatch EClass getMetaclass(MetaclassRuleSource metaclassRuleSource) {
+		metaclassRuleSource.metaclassReference.metaclass;
+	}
+	
+	def static dispatch EClass getMetaclass(InstanceRuleSource instanceRuleSource) {
+		getMetaclass(instanceRuleSource.instanceReference)
+	}
+	
+	def static dispatch EClass getMetaclass(InstanceIdDeclaration instanceIdDeclaration) {
+		return instanceIdDeclaration.instanceReference.instance.eClass;
+	}
+	
+	def static dispatch EClass getMetaclass(InstancePredicateDeclaration instancePredicateDeclaration) {
+		return instancePredicateDeclaration.type.metaclass;
+	}
+	
+	def static dispatch EClass getMetaclass(InlineInstancePredicateProjection inlineInstancePredicateProjection) {
+		// has the same type as preceding lookup
+		return getPreviousMetaclass(EcoreUtil2.getContainerOfType(inlineInstancePredicateProjection, Lookup));
+	}
+	
+	def static dispatch EClass getMetaclass(BackwardReferenceInstanceSource instanceSource) {
+		getMetaclass(instanceSource.instanceReference)
+	}
+	
+	def static dispatch EClass getMetaclass(InstanceForwardReferenceTarget instanceForwardReferenceTarget) {
+		getMetaclass(instanceForwardReferenceTarget.instanceReference)
+	}
+	
+	/**
+	 * Returns the metaclass of the given backward reference metaclass source.
+	 */
+	def static dispatch EClass getMetaclass(BackwardReferenceMetaclassSource metaclassSource) {
+		metaclassSource.mclass.metaclass
+	}
+	
+	/**
+	 * Returns the metaclass of the last lookup of the given RuleReference's target rule.
+	 */
 	def static dispatch EClass getMetaclass(RuleReference ref) {
 		val Lookup lastLookup = ref.rule.instructions.filter[i | i instanceof Lookup].map(i | Lookup.cast(i)).last;
-		getMetaclass(lastLookup);
+		
+		return getMetaclass(lastLookup);
+	}
+	
+	def static dispatch EClass getMetaclass(ExternalRuleSource ruleSource) {
+		val Lookup lastLookup = ruleSource.rule.instructions.filter[i | i instanceof Lookup].map(i | Lookup.cast(i)).last;
+		
+		return getMetaclass(lastLookup);
 	}
 	
 	/**
@@ -46,7 +127,15 @@ final class KampRuleLanguageEcoreUtil {
 	 */
 	def static getPreviousMetaclass(Lookup ref) {
 		getMetaclass(
-			getPreviousSiblingOfType(ref, MetaclassReference, Lookup)
+			getPreviousSiblingOfType(ref, getLookupChainTypes())
 		)
+	}
+	
+	def static getPreviousInstanceClass(Lookup ref) {
+		getPreviousMetaclass(ref).instanceClass
 	}	
+	
+	def static getLookupChainTypes() {
+		return newArrayList(RuleSource, Lookup);
+	}
 }

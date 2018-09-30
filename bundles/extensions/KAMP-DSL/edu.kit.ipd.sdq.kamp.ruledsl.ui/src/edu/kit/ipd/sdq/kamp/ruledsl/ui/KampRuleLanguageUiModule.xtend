@@ -4,10 +4,47 @@
 package edu.kit.ipd.sdq.kamp.ruledsl.ui
 
 import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
+import org.eclipse.xtext.resource.ILocationInFileProvider
+import org.eclipse.xtext.ui.editor.hyperlinking.IHyperlinkHelper
+import org.eclipse.xtext.common.types.ui.navigation.IDerivedMemberAwareEditorOpener
+import org.eclipse.xtext.ui.LanguageSpecific
+import org.eclipse.xtext.xbase.ui.jvmmodel.navigation.DerivedMemberAwareEditorOpener
+import com.google.inject.Binder
+import org.eclipse.ui.PlatformUI
+import org.eclipse.xtext.ui.editor.IURIEditorOpener
+import org.eclipse.jface.viewers.ILabelProvider
+import edu.kit.ipd.sdq.kamp.ruledsl.ui.labeling.KampRuleLanguageDescriptionLabelProvider
+import org.eclipse.xtext.ui.editor.contentassist.ContentProposalLabelProvider
+import org.eclipse.xtext.ui.resource.ResourceServiceDescriptionLabelProvider
+import edu.kit.ipd.sdq.kamp.ruledsl.ui.labeling.KampRuleLanguageLabelProvider
 
 /**
  * Use this class to register components to be used within the Eclipse IDE.
  */
 @FinalFieldsConstructor
 class KampRuleLanguageUiModule extends AbstractKampRuleLanguageUiModule {
+	override Class<? extends IHyperlinkHelper> bindIHyperlinkHelper() {
+		KarlHyperlinkHelper
+	}
+	
+	override configureLanguageSpecificURIEditorOpener(Binder binder) {
+		if (PlatformUI.isWorkbenchRunning()) {
+			binder.bind(IURIEditorOpener).to(GlobalKarlURIEditorOpener);
+			
+			binder.bind(IURIEditorOpener).annotatedWith(LanguageSpecific).to(DerivedMemberAwareEditorOpener);
+			binder.bind(IDerivedMemberAwareEditorOpener).to(DerivedMemberAwareEditorOpener);
+		}
+	}
+	
+	override configureResourceUIServiceLabelProvider(Binder binder) {
+	  binder.bind(ILabelProvider)
+	    .annotatedWith(ResourceServiceDescriptionLabelProvider)
+	    .to(KampRuleLanguageDescriptionLabelProvider);
+	}
+	
+	override configureContentProposalLabelProvider(Binder binder) {
+	  binder.bind(ILabelProvider)
+	    .annotatedWith(ContentProposalLabelProvider)
+	    .to(KampRuleLanguageLabelProvider);
+	}
 }

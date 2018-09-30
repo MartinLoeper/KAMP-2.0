@@ -20,8 +20,8 @@ import edu.kit.ipd.sdq.kamp.model.modificationmarks.AbstractModificationReposito
  * @param <M> the type of modification mark repository which is contained in the architecture version
  */
 public interface IRule<S extends EObject, A extends EObject, T extends AbstractArchitectureVersion<M>, M extends AbstractModificationRepository<?, ?>> {
-	void apply(Stream<CausingEntityMapping<A, EObject>> affectedElements);
-	Stream<CausingEntityMapping<A, EObject>> lookup(Stream<CausingEntityMapping<S, EObject>> sourceElements);
+	//void apply(Stream<CausingEntityMapping<A, EObject>> affectedElements);
+	RuleResult<S, A> lookup(Result<?, S> input);
 
 	void setArchitectureVersion(T architectureVersion);
 	void setChangePropagationStepRegistry(ChangePropagationStepRegistry registry);

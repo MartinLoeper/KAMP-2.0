@@ -6,6 +6,7 @@ package edu.kit.ipd.sdq.kamp.ruledsl.ui.labeling
 import com.google.inject.Inject
 import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider
 import org.eclipse.xtext.xbase.ui.labeling.XbaseLabelProvider
+import org.eclipse.emf.ecore.EObject
 
 /**
  * Provides labels for EObjects.
