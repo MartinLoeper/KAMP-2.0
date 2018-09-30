@@ -146,7 +146,7 @@ class KampRuleLanguageProposalProvider extends AbstractKampRuleLanguageProposalP
 		super.complete_TypeProjection(model, ruleCall, context, acceptor)
 	}
 
-	override completeTypeProjection_Types(EObject model, Assignment assignment, ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
+	override completeSubTypeProjection_Types(EObject model, Assignment assignment, ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
 		var container = EcoreUtil2.getContainerOfType(context.previousModel, TypeProjection);
 		
 		// TODO why is this never invoked?

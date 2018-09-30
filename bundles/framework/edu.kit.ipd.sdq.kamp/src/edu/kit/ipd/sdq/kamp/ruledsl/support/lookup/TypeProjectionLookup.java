@@ -10,12 +10,12 @@ import edu.kit.ipd.sdq.kamp.ruledsl.support.CausingEntityMapping;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.LookupResult;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.Result;
 
-public class TypeProjectionLookup<T extends EObject> extends AbstractLookup<T, T> {
+public class TypeProjectionLookup<I extends EObject, O extends EObject> extends AbstractLookup<I, O> {
 	private static String LOOKUP_NAME = "Type Projection";
 	private final Class<?>[] moreTargetClasses;
-	private final Class<? extends T> targetClass;
+	private final Class<? extends O> targetClass;
 
-	public TypeProjectionLookup(Class<? extends T> targetClass, Class<?> ...moreTargetClasses) {
+	public TypeProjectionLookup(Class<? extends O> targetClass, Class<?> ...moreTargetClasses) {
 		this.moreTargetClasses = (moreTargetClasses == null) ? new Class[0] : moreTargetClasses;
 		this.targetClass = targetClass;
 	}
@@ -40,12 +40,12 @@ public class TypeProjectionLookup<T extends EObject> extends AbstractLookup<T, T
 	}
 
 	@Override
-	public LookupResult<T, T> invoke(Result<EObject, T> previousLookupResult) {
-		Set<CausingEntityMapping<T, EObject>> outputElements = new HashSet<>();
+	public LookupResult<I, O> invoke(Result<EObject, I> previousLookupResult) {
+		Set<CausingEntityMapping<O, EObject>> outputElements = new HashSet<>();
 		Class<?>[] allTargetClasses = concat(this.moreTargetClasses, new Class[] { this.targetClass });
 		
 		outer:
-		for(CausingEntityMapping<T, EObject> element : previousLookupResult.getOutputElements()) {
+		for(CausingEntityMapping<I, EObject> element : previousLookupResult.getOutputElements()) {
 			Class<?> elementClass = element.getAffectedElement().eClass().getInstanceClass();
 			for(Class<?> targetClass : allTargetClasses) {
 				if(!targetClass.isAssignableFrom(elementClass)) {
@@ -53,9 +53,10 @@ public class TypeProjectionLookup<T extends EObject> extends AbstractLookup<T, T
 				}
 			}
 			
-			outputElements.add(element);
+			// cast is allowed because it is checked above using targetClass.isAssignableFrom(elementClass)
+			outputElements.add((CausingEntityMapping<O, EObject>) element);
 		}
 		
-		return new LookupResult<T, T>(previousLookupResult.getOutputElements(), outputElements, null, getLookupName(allTargetClasses));
+		return new LookupResult<I, O>(previousLookupResult.getOutputElements(), outputElements, null, getLookupName(allTargetClasses));
 	}
 }

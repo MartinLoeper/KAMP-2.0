@@ -97,7 +97,15 @@ InstanceProjection:
 ;
 
 TypeProjection:
+	GeneralTypeProjection | SubTypeProjection
+;
+	
+GeneralTypeProjection:
 	'<' types+=[jvmTypes::JvmType|QualifiedName] ('AND' types+=[jvmTypes::JvmType|QualifiedName])* '>'
+;
+
+SubTypeProjection:
+	'<!' types+=[jvmTypes::JvmType|QualifiedName] ('AND' types+=[jvmTypes::JvmType|QualifiedName])* '>'
 ;
 
 RuleReference:

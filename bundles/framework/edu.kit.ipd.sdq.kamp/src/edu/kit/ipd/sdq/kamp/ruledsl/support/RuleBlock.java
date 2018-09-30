@@ -58,7 +58,7 @@ public class RuleBlock {
 				RuleResult<EObject, EObject> ruleResult = cRule.lookup(source);
 				ruleResults.add(ruleResult);
 				ruleResult.getOutputElements().forEach((e) -> {
-					newElements.add(e);					
+					newElements.add(e);
 				});
 
 				// batch insert

@@ -71,6 +71,10 @@ import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceProjection
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceDeclaration
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.TypeProjection
 import edu.kit.ipd.sdq.kamp.ruledsl.support.lookup.TypeProjectionLookup
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.RuleSource
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.ExternalRuleSource
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.MetaclassRuleSource
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceRuleSource
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -187,7 +191,7 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 				try {
 					// determine formal parameter types
 					val returnType = typeRef(getReturnType(rule.lookups.last));
-					val sourceType = typeRef(rule.source.metaclass.instanceTypeName);
+					val sourceType = typeRef(getSourceTypeForRuleSource(rule.source));
 					val List<CausingEntityMarker> causingEntityMarkers = getCausingEntityMarkers(rule.instructions);
 					val Map<CausingEntityMarker, Lookup> causingEntityLookups = getCausingEntityLookups(rule.instructions, causingEntityMarkers);
 					val hasSourceMarker = checkIfRuleHasSourceMarker(causingEntityMarkers, causingEntityLookups);
@@ -222,10 +226,17 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 					
 					// create lookups method
 					val lookupsType = typeRef(AbstractLookup, wildcard(), wildcard()).addArrayTypeDimension;
+					val lookupForSource = getLookupsForRuleSource(rule.source);
+		
 					val createLookupsMethod = rule.toMethod("createLookups", lookupsType)[
 						body = '''return new «AbstractLookup»[] {
+								«IF lookupForSource !== null»
+									«lookupForSource»,
+								«ELSE»
+									/* no lookup for rule source */
+								«ENDIF»
 								«FOR lookup : rule.lookups»
-									«createLookup(lookup, sourceType, returnType, isLookupMarkedForCausingEntities(lookup, causingEntityLookups, hasSourceMarker, rule.instructions), rule)»«IF rule.lookups.last !== lookup»,«ENDIF»
+									«createLookup(lookup, getLookupSourceType(lookup, rule.lookups, rule.source), getLookupReturnType(lookup), isLookupMarkedForCausingEntities(lookup, causingEntityLookups, hasSourceMarker, rule.instructions), rule)»«IF rule.lookups.last !== lookup»,«ENDIF»
 								«ENDFOR»
 							};'''
 					];
@@ -279,6 +290,60 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 				}
 			]
 		);
+	}
+	
+	def Class<?> getLookupSourceType(Lookup lookup, List<Lookup> lookups, RuleSource ruleSource) {
+		// retrieve previous lookup
+		var index = -1;
+		for(var i = 0; i < lookups.length; i++) {
+			val currentLookup = lookups.get(i);
+			if(currentLookup === lookup) {
+				index = i - 1;
+			}
+		}
+		
+		if(index >= 0) {
+			return getReturnType(lookups.get(index))	
+		} else {
+			// retrieve the type of rule source
+			return getReturnTypeForRuleSource(ruleSource);
+		}
+	}
+	
+	def Class<?> getLookupReturnType(Lookup lookup) {
+		getReturnType(lookup)
+	}
+	
+	def dispatch CharSequence getLookupsForRuleSource(RuleSource source) {
+		return null;
+	}
+	
+	def dispatch Class<?> getSourceTypeForRuleSource(RuleSource source) {
+		return getReturnTypeForRuleSource(source);	// by default source == return type
+	}
+	
+	def dispatch Class<?> getSourceTypeForRuleSource(ExternalRuleSource source) {
+		return getSourceTypeForRuleSource(source.rule.source);
+	}
+	
+	def Class<?> getReturnTypeForRuleSource(RuleSource source) {
+		return source.metaclass.instanceClass;
+	}
+	
+	def dispatch CharSequence getLookupsForRuleSource(ExternalRuleSource source) {
+		val sourceType = getSourceTypeForRuleSource(source);
+		val returnType = getReturnTypeForRuleSource(source);
+
+		return '''new «RuleReferenceLookup.canonicalName»<«sourceType.canonicalName», «returnType.canonicalName»>(version, «source.rule.className»::lookup)''';
+	}
+	
+	def dispatch CharSequence getLookupsForRuleSource(InstanceRuleSource source) {
+		val sourceType = getSourceTypeForRuleSource(source);
+		val returnType = getReturnTypeForRuleSource(source);
+		val referenceType = source.instanceReference;
+		var CharSequence predicate = generatePredicate(referenceType, returnType);
+
+		return '''new «InstanceProjectionLookup.canonicalName»<«sourceType.canonicalName», «returnType.canonicalName»>(«predicate», «returnType.canonicalName».class)''';
 	}
 	
 	def checkIfRuleHasSourceMarker(List<CausingEntityMarker> causingEntityMarkers, Map<CausingEntityMarker, Lookup> causingEntityLookups) {
@@ -452,44 +517,44 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 		lastLookup.metaclass.instanceClass
 	}
 	
-	def dispatch CharSequence createLookup(Lookup lookup, JvmTypeReference sourceType, JvmTypeReference returnType, boolean addToCausingEntities, KampRule rule) {
-		return '''new «EmptyLookup.canonicalName»()''';
+	def dispatch CharSequence createLookup(Lookup lookup, Class<?> sourceType, Class<?> returnType, boolean addToCausingEntities, KampRule rule) {
+		return '''new «EmptyLookup.canonicalName»(/* implementation missing */)''';
 	}
 	
-	def dispatch CharSequence createLookup(RuleReference lookup, JvmTypeReference sourceType, JvmTypeReference returnType, boolean addToCausingEntities, KampRule rule) {
-		return '''new «RuleReferenceLookup.canonicalName»<«sourceType.qualifiedName», «returnType.qualifiedName»>(version, «lookup.rule.className»::lookup)''';
+	def dispatch CharSequence createLookup(RuleReference lookup, Class<?> sourceType, Class<?> returnType, boolean addToCausingEntities, KampRule rule) {
+		return '''new «RuleReferenceLookup.canonicalName»<«sourceType.canonicalName», «returnType.canonicalName»>(version, «lookup.rule.className»::lookup)''';
 	}
 	
-	def dispatch CharSequence createLookup(StructuralFeatureForwardReferenceTarget lookup, JvmTypeReference sourceType, JvmTypeReference returnType, boolean addToCausingEntities, KampRule rule) {
-		return '''new «StructuralFeatureForwardReferenceLookup.canonicalName»<«sourceType.qualifiedName», «returnType.qualifiedName»>(«addToCausingEntities», «lookup.feature.many», "«lookup.feature.name»")''';
+	def dispatch CharSequence createLookup(StructuralFeatureForwardReferenceTarget lookup, Class<?> sourceType, Class<?> returnType, boolean addToCausingEntities, KampRule rule) {
+		return '''new «StructuralFeatureForwardReferenceLookup.canonicalName»<«sourceType.canonicalName», «returnType.canonicalName»>(«addToCausingEntities», «lookup.feature.many», "«lookup.feature.name»")''';
 	}
 	
-	def dispatch CharSequence createLookup(MetaclassForwardReferenceTarget lookup, JvmTypeReference sourceType, JvmTypeReference returnType, boolean addToCausingEntities, KampRule rule) {
-		return '''new «MetaclassForwardReferenceLookup.canonicalName»<«sourceType.qualifiedName», «returnType.qualifiedName»>(«addToCausingEntities», «returnType.qualifiedName».class)''';
+	def dispatch CharSequence createLookup(MetaclassForwardReferenceTarget lookup, Class<?> sourceType, Class<?> returnType, boolean addToCausingEntities, KampRule rule) {
+		return '''new «MetaclassForwardReferenceLookup.canonicalName»<«sourceType.canonicalName», «returnType.canonicalName»>(«addToCausingEntities», «returnType.canonicalName».class)''';
 	}
 	
-	def dispatch CharSequence createLookup(InstanceForwardReferenceTarget lookup, JvmTypeReference sourceType, JvmTypeReference returnType, boolean addToCausingEntities, KampRule rule) {
+	def dispatch CharSequence createLookup(InstanceForwardReferenceTarget lookup, Class<?> sourceType, Class<?> returnType, boolean addToCausingEntities, KampRule rule) {
 		val referenceType = lookup.instanceReference;
 		var CharSequence predicate = generatePredicate(referenceType, returnType);
 
-		return '''new «InstanceForwardReferenceLookup.canonicalName»<«sourceType.qualifiedName», «returnType.qualifiedName»>(«addToCausingEntities», «returnType.qualifiedName».class, «predicate»)''';
+		return '''new «InstanceForwardReferenceLookup.canonicalName»<«sourceType.canonicalName», «returnType.canonicalName»>(«addToCausingEntities», «returnType.canonicalName».class, «predicate»)''';
 	}
 	
-	def dispatch CharSequence createLookup(InstanceProjection lookup, JvmTypeReference sourceType, JvmTypeReference returnType, boolean addToCausingEntities, KampRule rule) {
+	def dispatch CharSequence createLookup(InstanceProjection lookup, Class<?> sourceType, Class<?> returnType, boolean addToCausingEntities, KampRule rule) {
 		val referenceType = lookup.instanceDeclarationReference;
 		var CharSequence predicate = generatePredicate(referenceType, returnType);
 
-		return '''new «InstanceProjectionLookup.canonicalName»<«sourceType.qualifiedName»>(«predicate»)''';
+		return '''new «InstanceProjectionLookup.canonicalName»<«sourceType.canonicalName», «returnType.canonicalName»>(«predicate», «returnType.canonicalName».class)''';
 	}
 	
-	def dispatch CharSequence createLookup(InlineInstancePredicateProjection lookup, JvmTypeReference sourceType, JvmTypeReference returnType, boolean addToCausingEntities, KampRule rule) {
+	def dispatch CharSequence createLookup(InlineInstancePredicateProjection lookup, Class<?> sourceType, Class<?> returnType, boolean addToCausingEntities, KampRule rule) {
 		val predicateMethodName = inlineInstancePredicateProjectionNames.get(lookup);
 		var CharSequence predicate = INSTANCE_LOOKUP_HELPER_PACKAGE_NAME + "." + INSTANCE_LOOKUP_HELPER_CLASS_NAME + "::" + predicateMethodName;
 
-		return '''new «InstanceProjectionLookup.canonicalName»<«sourceType.qualifiedName»>(«predicate»)''';
+		return '''new «InstanceProjectionLookup.canonicalName»<«sourceType.canonicalName»>(«predicate»)''';
 	}
 	
-	def dispatch CharSequence createLookup(TypeProjection lookup, JvmTypeReference sourceType, JvmTypeReference returnType, boolean addToCausingEntities, KampRule rule) {
+	def dispatch CharSequence createLookup(TypeProjection lookup, Class<?> sourceType, Class<?> returnType, boolean addToCausingEntities, KampRule rule) {
 		val types = lookup.types;
 		var String projectionClasses = null;
 		if(types !== null && types.length > 0) {
@@ -504,14 +569,14 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 			projectionClasses= "null";
 		}
 		
-		return '''new «TypeProjectionLookup.canonicalName»<«sourceType.qualifiedName»>(«projectionClasses»)''';
+		return '''new «TypeProjectionLookup.canonicalName»<«sourceType.canonicalName», «returnType.canonicalName»>(«projectionClasses»)''';
 	}
 	
-	def generatePredicate(InstanceDeclaration referenceType, JvmTypeReference returnType) {
+	def generatePredicate(InstanceDeclaration referenceType, Class<?> returnType) {
 		var CharSequence predicate = null;
 		if(referenceType instanceof InstanceIdDeclaration) {
 			val instanceId = EcoreUtil.getID(referenceType.instanceReference.instance);
-			predicate = '''new «InstanceIdPredicate.canonicalName»<«returnType.qualifiedName»>("«instanceId»")''';
+			predicate = '''new «InstanceIdPredicate.canonicalName»<«returnType.canonicalName»>("«instanceId»")''';
 		} else if(referenceType instanceof InstancePredicateDeclaration) {
 			val instancePredicate = INSTANCE_LOOKUP_HELPER_PACKAGE_NAME + "." + INSTANCE_LOOKUP_HELPER_CLASS_NAME + "::" + generateInstancePredicateMethodName(referenceType.name);
 			predicate = instancePredicate;

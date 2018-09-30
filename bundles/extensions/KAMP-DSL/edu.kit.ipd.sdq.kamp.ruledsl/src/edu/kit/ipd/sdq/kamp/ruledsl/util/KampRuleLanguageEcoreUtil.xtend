@@ -17,12 +17,13 @@ import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.PropagationReference
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.RuleReference
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.RuleSource
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.StructuralFeatureForwardReferenceTarget
-import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.TypeProjection
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.SubTypeProjection
 import edu.kit.ipd.sdq.kamp.ruledsl.scoping.KampRuleLanguageScopeProviderDelegate
 import org.eclipse.emf.ecore.EClass
 import org.eclipse.xtext.EcoreUtil2
 
 import static edu.kit.ipd.sdq.kamp.ruledsl.util.EcoreUtil.*
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.GeneralTypeProjection
 
 final class KampRuleLanguageEcoreUtil {
 	private new() {}
@@ -39,11 +40,17 @@ final class KampRuleLanguageEcoreUtil {
 	 * Please note: Only the first type of a type projection is used for the typing.
 	 * Please note: Only imported metaclasses are found
 	 */
-	def static dispatch EClass getMetaclass(TypeProjection typeProjection) {
+	def static dispatch EClass getMetaclass(SubTypeProjection typeProjection) {
 		val eClass = KampRuleLanguageScopeProviderDelegate.getEClassForInstanceClass(typeProjection.eResource, typeProjection.types?.head?.qualifiedName);
 	
 		return eClass
-	} 
+	}
+	
+	def static dispatch EClass getMetaclass(GeneralTypeProjection typeProjection) {
+		val eClass = KampRuleLanguageScopeProviderDelegate.getEClassForInstanceClass(typeProjection.eResource, typeProjection.types?.head?.qualifiedName);
+	
+		return eClass
+	}
 	
 	def static dispatch EClass getMetaclass(InstanceProjection instanceProjection) {
 		getMetaclass(instanceProjection.instanceDeclarationReference)
