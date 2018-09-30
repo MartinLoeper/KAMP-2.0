@@ -29,8 +29,7 @@
 		<repository>
 			<id>Eclipse Oxygen</id>
 			<layout>p2</layout>
-			<!--<url>http://download.eclipse.org/releases/oxygen</url>-->
-			<url>https://sdqbuild.ipd.kit.edu/nexus/content/repositories/eclipse-oxygen-complete/</url>
+			<url>http://download.eclipse.org/releases/oxygen/</url>
 		</repository>
 		<repository>
 			<id>SDQ Commons</id>
@@ -55,12 +54,17 @@
 		<repository>
 			<id>Vitruvius</id>
 			<layout>p2</layout>
-			<url>http://vitruv.tools/updatesite/nightly</url>
+			<url>https://vitruv-tools.github.io/updatesite/release/</url>
 		</repository>
 		<repository>
 			<id>Palladio</id>
 			<layout>p2</layout>
-			<url>https://sdqweb.ipd.kit.edu/eclipse/palladiosimulator/nightly/</url>
+			<url>https://sdqweb.ipd.kit.edu/eclipse/palladiosimulator/releases/</url>
+		</repository>
+		<repository>
+			<id>Eclipse Updates</id>
+			<layout>p2</layout>
+			<url>http://download.eclipse.org/eclipse/updates/4.7</url>
 		</repository>
 	</repositories>
 
