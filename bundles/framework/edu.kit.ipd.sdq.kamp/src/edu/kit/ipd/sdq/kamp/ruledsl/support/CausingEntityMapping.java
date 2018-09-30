@@ -120,7 +120,8 @@ public final class CausingEntityMapping<U extends EObject, V extends EObject> ex
 
 	@Override
 	public String getName() {
-		return getNameFromEObject(this.getAffectedElement());
+		String eClassName = this.getAffectedElement().eClass().getName();
+		return getNameFromEObject(this.getAffectedElement()) + " (" + eClassName + ")";
 	}
 	
 	@Override

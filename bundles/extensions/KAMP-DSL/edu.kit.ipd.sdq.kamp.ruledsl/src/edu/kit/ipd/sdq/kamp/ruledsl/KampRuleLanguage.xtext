@@ -92,7 +92,6 @@ InlineInstancePredicateProjection:
 	'[' body=XBlockExpression ']'
 ;
 
-
 InstanceProjection:
 	'[' instanceDeclarationReference=[InstanceDeclaration|ID] ']'
 ;

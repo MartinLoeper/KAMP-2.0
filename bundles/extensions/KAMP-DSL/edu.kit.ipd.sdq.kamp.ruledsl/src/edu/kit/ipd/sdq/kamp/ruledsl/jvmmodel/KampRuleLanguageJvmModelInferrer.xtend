@@ -58,6 +58,13 @@ import static edu.kit.ipd.sdq.kamp.ruledsl.util.EcoreUtil.*
 import static extension edu.kit.ipd.sdq.kamp.ruledsl.util.KampRuleLanguageEcoreUtil.*
 import edu.kit.ipd.sdq.kamp.ruledsl.support.Result
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.PropagationReference
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.MetaclassForwardReferenceTarget
+import edu.kit.ipd.sdq.kamp.ruledsl.support.lookup.MetaclassForwardReferenceLookup
+import edu.kit.ipd.sdq.kamp.ruledsl.support.lookup.InstanceForwardReferenceLookup
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceForwardReferenceTarget
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceIdDeclaration
+import edu.kit.ipd.sdq.kamp.ruledsl.support.lookup.InstanceIdPredicate
+import org.eclipse.emf.ecore.util.EcoreUtil
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -198,10 +205,7 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 					val createLookupsMethod = rule.toMethod("createLookups", lookupsType)[
 						body = '''return new «AbstractLookup»[] {
 								«FOR lookup : rule.lookups»
-									«createLookup(lookup, sourceType, returnType, isLookupMarkedForCausingEntities(lookup, causingEntityLookups, hasSourceMarker, rule.instructions), rule)»
-									«IF rule.lookups.last !== lookup»
-										,
-									«ENDIF»
+									«createLookup(lookup, sourceType, returnType, isLookupMarkedForCausingEntities(lookup, causingEntityLookups, hasSourceMarker, rule.instructions), rule)»«IF rule.lookups.last !== lookup»,«ENDIF»
 								«ENDFOR»
 							};'''
 					];
@@ -438,6 +442,21 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 	
 	def dispatch CharSequence createLookup(StructuralFeatureForwardReferenceTarget lookup, JvmTypeReference sourceType, JvmTypeReference returnType, boolean addToCausingEntities, KampRule rule) {
 		return '''new «StructuralFeatureForwardReferenceLookup.canonicalName»<«sourceType.qualifiedName», «returnType.qualifiedName»>(«addToCausingEntities», «lookup.feature.many», "«lookup.feature.name»")''';
+	}
+	
+	def dispatch CharSequence createLookup(MetaclassForwardReferenceTarget lookup, JvmTypeReference sourceType, JvmTypeReference returnType, boolean addToCausingEntities, KampRule rule) {
+		return '''new «MetaclassForwardReferenceLookup.canonicalName»<«sourceType.qualifiedName», «returnType.qualifiedName»>(«addToCausingEntities», «returnType.qualifiedName».class)''';
+	}
+	
+	def dispatch CharSequence createLookup(InstanceForwardReferenceTarget lookup, JvmTypeReference sourceType, JvmTypeReference returnType, boolean addToCausingEntities, KampRule rule) {
+		val referenceType = lookup.instanceReference;
+		var CharSequence predicate = null;
+		if(referenceType instanceof InstanceIdDeclaration) {
+			val instanceId = EcoreUtil.getID(referenceType.instanceReference.instance);
+			predicate = '''new «InstanceIdPredicate.canonicalName»<«returnType.qualifiedName»>("«instanceId»")''';
+		}
+
+		return '''new «InstanceForwardReferenceLookup.canonicalName»<«sourceType.qualifiedName», «returnType.qualifiedName»>(«addToCausingEntities», «returnType.qualifiedName».class, «predicate»)''';
 	}
 
 //	def dispatch generateCodeForRule(BackwardReferenceMetaclassSource ref, JvmGenericType typeToAddTo, boolean addToCausingEntities) {

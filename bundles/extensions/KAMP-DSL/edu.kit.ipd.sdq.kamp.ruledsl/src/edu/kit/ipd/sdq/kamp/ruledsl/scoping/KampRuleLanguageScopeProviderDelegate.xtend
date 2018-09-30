@@ -245,7 +245,8 @@ class KampRuleLanguageScopeProviderDelegate extends MirBaseScopeProviderDelegate
 							userData.put("name", name);
 						}
 						
-						var qualifiedName = EcoreUtil.getID(object);
+						// the replace is just a temporary fix!
+						var qualifiedName = EcoreUtil.getID(object).replace("-", "$");
 						if(qualifiedName === null) {
 							if(object instanceof CDOWithID && object !== null) {
 								val cdoId = (object as CDOWithID).cdoID;

@@ -50,6 +50,9 @@ import org.eclipse.xtext.scoping.IScope
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.KampRule
 import org.eclipse.xtext.CrossReference
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.TypeProjection
+import org.eclipse.core.resources.IProject
+import org.eclipse.core.resources.IFolder
+import org.eclipse.core.resources.IContainer
 
 /**
  * See https://www.eclipse.org/Xtext/documentation/304_ide_concepts.html#content-assist
@@ -175,6 +178,35 @@ class KampRuleLanguageProposalProvider extends AbstractKampRuleLanguageProposalP
 	}
 	*/
 	
+	def createProposalForFolder(IContainer container, ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
+		container.members(IResource.FILE).forEach[resource |
+			if(resource instanceof IFile) {
+				val replacementOffset = context.getReplaceRegion().getOffset();
+				val replacementLength = context.getReplaceRegion().getLength();
+				val proposal = "\"" + resource.fullPath.toString + "\"";
+				var Image img = null;
+				var imageDescriptor = getBaseImage(resource);
+				if(imageDescriptor !== null) {
+					img = imageDescriptor.createImage();
+				}
+				val ConfigurableCompletionProposal result = new ConfigurableCompletionProposal(proposal, replacementOffset, replacementLength, proposal.length(),
+						img, new StyledString(resource.fullPath.toString), null, null);
+				result.setPriority(400);
+				result.setMatcher(context.getMatcher());
+				result.setReplaceContextLength(getReplacementContextLength(context));
+				if(proposal.contains(context.prefix)) {
+					acceptor.accept(result)
+				}
+			}
+		]
+
+		container.members(IResource.FOLDER).forEach[subFolder |
+			if(subFolder instanceof IFolder) {
+				createProposalForFolder(subFolder as IContainer, context, acceptor);
+			}
+		]
+	}
+	
 	override completeModelImport_File(EObject model, Assignment assignment, ContentAssistContext context, ICompletionProposalAcceptor acceptor) {
 		super.completeModelImport_File(model, assignment,context, acceptor);
 		val workspace = ResourcesPlugin.getWorkspace();
@@ -183,26 +215,7 @@ class KampRuleLanguageProposalProvider extends AbstractKampRuleLanguageProposalP
 				return;				
 			}
 
-			project.members(IResource.FILE).forEach[resource |
-				if(resource instanceof IFile) {
-					val replacementOffset = context.getReplaceRegion().getOffset();
-					val replacementLength = context.getReplaceRegion().getLength();
-					val proposal = "\"" + resource.fullPath.toString + "\"";
-					var Image img = null;
-					var imageDescriptor = getBaseImage(resource);
-					if(imageDescriptor !== null) {
-						img = imageDescriptor.createImage();
-					}
-					val ConfigurableCompletionProposal result = new ConfigurableCompletionProposal(proposal, replacementOffset, replacementLength, proposal.length(),
-							img, new StyledString(resource.fullPath.toString), null, null);
-					result.setPriority(400);
-					result.setMatcher(context.getMatcher());
-					result.setReplaceContextLength(getReplacementContextLength(context));
-					if(proposal.contains(context.prefix)) {
-						acceptor.accept(result)
-					}
-				}
-			]
+			createProposalForFolder(project as IContainer, context, acceptor);
 		]
 	}
 	
