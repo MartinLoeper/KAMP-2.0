@@ -59,7 +59,7 @@
 		<repository>
 			<id>Palladio</id>
 			<layout>p2</layout>
-			<url>https://sdqweb.ipd.kit.edu/eclipse/palladiosimulator/releases/</url>
+			<url>https://sdqweb.ipd.kit.edu/eclipse/palladiosimulator/releases/latest/</url>
 		</repository>
 		<repository>
 			<id>Eclipse Updates</id>
