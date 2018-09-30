@@ -13,13 +13,16 @@
         <categories name="org.palladiosimulator.corefeatures.category" versionRange="0.0.0.7R21cPpsE67gKWDLOfyVBrs"/>
         <mapRules xsi:type="aggregator:ExclusionRule" name="de.uka.ipd.sdq.dsexplore.feature.feature.group" versionRange="4.0.1.201709290946"/>
       </repositories>
-      <repositories location="https://vitruv-tools.github.io/updatesite/release/">
+      <repositories location="https://vitruv-tools.github.io/updatesite/release/" mirrorArtifacts="false">
         <categories name="Vitruv Application Development" versionRange="1.0.0.077-cZrbnh"/>
       </repositories>
       <repositories location="http://download.eclipse.org/releases/oxygen/">
         <features name="org.eclipse.emf.ecore.edit.feature.group" versionRange="2.9.0"/>
         <features name="org.eclipse.emf.transaction.feature.group" versionRange="1.10.0"/>
         <features name="org.eclipse.xtend.sdk.feature.group" versionRange="2.12.0"/>
+      </repositories>
+      <repositories location="http://kit-sdq.github.io/updatesite/nightly/commons">
+        <bundles name="edu.kit.ipd.sdq.commons.util.java" versionRange="1.3.0.201809291546"/>
       </repositories>
     </contributions>
   </validationSets>
