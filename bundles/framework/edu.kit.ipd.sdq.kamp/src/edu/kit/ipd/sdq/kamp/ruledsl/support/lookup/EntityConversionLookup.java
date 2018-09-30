@@ -4,8 +4,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentHashMap.KeySetView;
+import java.util.function.Predicate;
 
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.emf.ecore.util.EcoreUtil.EqualityHelper;
 
 import edu.kit.ipd.sdq.kamp.ruledsl.support.CausingEntityMapping;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.LookupResult;
@@ -43,4 +48,25 @@ public abstract class EntityConversionLookup<I extends EObject, O extends EObjec
 	}
 	
 	protected abstract Transition<I, O> convert(CausingEntityMapping<I, EObject> element);
+	
+	public static <T extends EObject> Predicate<T> distinctByEqualityHelper() {
+	    Predicate<T> p = new Predicate<T>() {
+	    	EqualityHelper eqHelper = new EcoreUtil.EqualityHelper();
+	    	KeySetView<EObject, Boolean> seen = ConcurrentHashMap.newKeySet();
+		    
+			@Override
+			public boolean test(T t) {
+				for(EObject eobj : seen) {
+			    	if(eqHelper.equals(eobj, t)) {
+			    		return false;
+			    	}
+			    }
+				
+				seen.add(t);
+				return true;
+			}
+		};
+		
+		return p;
+	}
 }

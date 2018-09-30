@@ -75,6 +75,10 @@ import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.RuleSource
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.ExternalRuleSource
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.MetaclassRuleSource
 import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.InstanceRuleSource
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.BackwardReferenceMetaclassSource
+import edu.kit.ipd.sdq.kamp.ruledsl.support.lookup.BackwardReferenceMetaclassLookup
+import edu.kit.ipd.sdq.kamp.ruledsl.kampRuleLanguage.BackwardReferenceInstanceSource
+import edu.kit.ipd.sdq.kamp.ruledsl.support.lookup.BackwardReferenceInstanceLookup
 
 /**
  * <p>Infers a JVM model from the source model.</p> 
@@ -519,6 +523,22 @@ class KampRuleLanguageJvmModelInferrer extends AbstractModelInferrer {
 	
 	def dispatch CharSequence createLookup(Lookup lookup, Class<?> sourceType, Class<?> returnType, boolean addToCausingEntities, KampRule rule) {
 		return '''new «EmptyLookup.canonicalName»(/* implementation missing */)''';
+	}
+	
+	def dispatch CharSequence createLookup(BackwardReferenceMetaclassSource lookup, Class<?> sourceType, Class<?> returnType, boolean addToCausingEntities, KampRule rule) {
+		var String featureName = "null";
+		if(lookup.feature !== null) {
+			featureName = lookup.feature.name;
+		}
+		
+		return '''new «BackwardReferenceMetaclassLookup.canonicalName»<«sourceType.canonicalName», «returnType.canonicalName»>(«addToCausingEntities», «returnType.canonicalName».class, "«featureName»", version)''';
+	}
+	
+	def dispatch CharSequence createLookup(BackwardReferenceInstanceSource lookup, Class<?> sourceType, Class<?> returnType, boolean addToCausingEntities, KampRule rule) {
+		val referenceType = lookup.instanceReference;
+		var CharSequence predicate = generatePredicate(referenceType, returnType);
+
+		return '''new «BackwardReferenceInstanceLookup.canonicalName»<«sourceType.canonicalName», «returnType.canonicalName»>(«addToCausingEntities», «returnType.canonicalName».class, «predicate», version)''';
 	}
 	
 	def dispatch CharSequence createLookup(RuleReference lookup, Class<?> sourceType, Class<?> returnType, boolean addToCausingEntities, KampRule rule) {
