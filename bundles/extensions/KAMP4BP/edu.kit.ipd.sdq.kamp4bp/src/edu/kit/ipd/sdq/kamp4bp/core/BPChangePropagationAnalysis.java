@@ -13,7 +13,6 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.handlers.HandlerUtil;
 import org.palladiosimulator.pcm.core.entity.Entity;
 import org.palladiosimulator.pcm.repository.DataType;
 import org.palladiosimulator.pcm.repository.Interface;
@@ -30,30 +29,30 @@ import de.uhd.ifi.se.pcm.bppcm.organizationenvironmentmodel.DeviceResource;
 import de.uhd.ifi.se.pcm.bppcm.organizationenvironmentmodel.Role;
 import edu.kit.ipd.sdq.kamp.architecture.ArchitectureModelLookup;
 import edu.kit.ipd.sdq.kamp.model.modificationmarks.AbstractModification;
-import edu.kit.ipd.sdq.kamp.ruledsl.support.KampRuleLanguageFacade;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.ChangePropagationResult;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.ChangePropagationStepRegistry;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.DefaultConfiguration;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.IConfiguration;
+import edu.kit.ipd.sdq.kamp.ruledsl.support.IKampRuleLanguageViewer;
+import edu.kit.ipd.sdq.kamp.ruledsl.support.IRuleProvider;
+import edu.kit.ipd.sdq.kamp.ruledsl.support.KampRuleLanguageFacade;
 import edu.kit.ipd.sdq.kamp.ruledsl.support.KampRuleLanguageFacade.KampLanguageService;
-import edu.kit.ipd.sdq.kamp.ruledsl.viewer.views.KampRuleLanguageView;
-import edu.kit.ipd.sdq.kamp4is.model.modificationmarks.ISModifyDataType;
-import edu.kit.ipd.sdq.kamp4is.model.modificationmarks.ISModifyInterface;
-import edu.kit.ipd.sdq.kamp4is.model.modificationmarks.ISModifySignature;
-import edu.kit.ipd.sdq.kamp4is.model.modificationmarks.ISModificationmarksFactory;
 import edu.kit.ipd.sdq.kamp.util.MapUtil;
-import edu.kit.ipd.sdq.kamp4is.core.AbstractISChangePropagationAnalysis;
-import edu.kit.ipd.sdq.kamp4is.core.ISArchitectureModelLookup;
 import edu.kit.ipd.sdq.kamp4bp.model.modificationmarks.BPChangePropagationDueToDataDependencies;
-import edu.kit.ipd.sdq.kamp4bp.model.modificationmarks.BPModificationmarksFactory;
 import edu.kit.ipd.sdq.kamp4bp.model.modificationmarks.BPInterBusinessProcessPropagation;
+import edu.kit.ipd.sdq.kamp4bp.model.modificationmarks.BPModificationmarksFactory;
 import edu.kit.ipd.sdq.kamp4bp.model.modificationmarks.BPModifyAbstractUserAction;
 import edu.kit.ipd.sdq.kamp4bp.model.modificationmarks.BPModifyAcquireDeviceResourceAction;
 import edu.kit.ipd.sdq.kamp4bp.model.modificationmarks.BPModifyActorStep;
 import edu.kit.ipd.sdq.kamp4bp.model.modificationmarks.BPModifyDataObject;
 import edu.kit.ipd.sdq.kamp4bp.model.modificationmarks.BPModifyEntryLevelSystemCall;
 import edu.kit.ipd.sdq.kamp4bp.model.modificationmarks.BPModifyReleaseDeviceResourceAction;
-import edu.kit.ipd.sdq.kamp.ruledsl.support.IRuleProvider;
+import edu.kit.ipd.sdq.kamp4is.core.AbstractISChangePropagationAnalysis;
+import edu.kit.ipd.sdq.kamp4is.core.ISArchitectureModelLookup;
+import edu.kit.ipd.sdq.kamp4is.model.modificationmarks.ISModificationmarksFactory;
+import edu.kit.ipd.sdq.kamp4is.model.modificationmarks.ISModifyDataType;
+import edu.kit.ipd.sdq.kamp4is.model.modificationmarks.ISModifyInterface;
+import edu.kit.ipd.sdq.kamp4is.model.modificationmarks.ISModifySignature;
 
 /**
  * The change propagation analysis of KAMP+IntBIIS
@@ -118,8 +117,8 @@ public class BPChangePropagationAnalysis extends AbstractISChangePropagationAnal
 				
 				// update the CPRL view
 				IWorkbenchPage page = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-				IViewPart viewPart = page.showView(KampRuleLanguageView.ID);
-				KampRuleLanguageView view = (KampRuleLanguageView) viewPart;
+				IViewPart viewPart = page.showView(IKampRuleLanguageViewer.ID);
+				IKampRuleLanguageViewer view = (IKampRuleLanguageViewer) viewPart;
 				view.update(result);
 			}
 		} catch (Exception e) {

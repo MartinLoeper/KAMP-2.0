@@ -16,8 +16,7 @@ Require-Bundle: org.eclipse.ui,
  edu.kit.ipd.sdq.kamp4is,
  edu.kit.ipd.sdq.kamp4bp.model.modificationmarks,
  edu.kit.ipd.sdq.kamp4is.model.fieldofactivityannotations,
- edu.kit.ipd.sdq.kamp4bp.model.fieldofactivityannotations,
- edu.kit.ipd.sdq.kamp.ruledsl.viewer;bundle-version="0.2.0.qualifier"
+ edu.kit.ipd.sdq.kamp4bp.model.fieldofactivityannotations
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8

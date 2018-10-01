@@ -1,44 +1,30 @@
 package edu.kit.ipd.sdq.kamp.ruledsl.viewer.views;
 
-import edu.kit.ipd.sdq.kamp.ruledsl.support.ViewerTreeObject;
-import edu.kit.ipd.sdq.kamp.ruledsl.support.ViewerTreeParent;
-import edu.kit.ipd.sdq.kamp.ruledsl.support.ChangePropagationResult;
-import edu.kit.ipd.sdq.kamp.ruledsl.support.EcoreObjectContaining;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.part.*;
-import org.eclipse.jface.viewers.*;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.jface.action.*;
-import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.ui.*;
-import org.eclipse.ui.ide.IDE;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.SWT;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.QualifiedName;
-import org.eclipse.core.runtime.content.IContentType;
-import org.eclipse.emf.common.notify.AdapterFactory;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.util.EcoreAdapterFactory;
-import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.emf.edit.provider.IItemLabelProvider;
-import org.eclipse.emf.edit.ui.provider.AdapterFactoryLabelProvider;
-
 import javax.inject.Inject;
 
-public class KampRuleLanguageView extends ViewPart {
+import org.eclipse.core.runtime.QualifiedName;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.ITreeSelection;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.TreePath;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.part.ViewPart;
 
-	/**
-	 * The ID of the view as specified by the extension.
-	 */
-	public static final String ID = "edu.kit.ipd.sdq.kamp.ruledsl.viewer.views.KampRuleLanguageView";
+import edu.kit.ipd.sdq.kamp.ruledsl.support.ChangePropagationResult;
+import edu.kit.ipd.sdq.kamp.ruledsl.support.EcoreObjectContaining;
+import edu.kit.ipd.sdq.kamp.ruledsl.support.IKampRuleLanguageViewer;
+import edu.kit.ipd.sdq.kamp.ruledsl.support.ViewerTreeObject;
+import edu.kit.ipd.sdq.kamp.ruledsl.support.ViewerTreeParent;
+
+public class KampRuleLanguageView extends ViewPart implements IKampRuleLanguageViewer {
 
 	@Inject IWorkbench workbench;
 	

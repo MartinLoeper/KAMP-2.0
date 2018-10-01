@@ -262,7 +262,6 @@
       <import plugin="org.palladiosimulator.analyzer.workflow" version="1.0.0" match="greaterOrEqual"/>
       <import feature="edu.kit.ipd.sdq.kamp.framework.feature" version="1.0.0.qualifier"/>
       <import feature="edu.kit.ipd.sdq.kamp.extensions.kamp4is.feature" version="1.0.0.qualifier"/>
-      <import plugin="edu.kit.ipd.sdq.kamp.ruledsl.viewer" version="0.2.0.qualifier" match="greaterOrEqual"/>
    </requires>
 
    <plugin
@@ -337,13 +336,6 @@
 
    <plugin
          id="de.uhd.ifi.se.pcm.bppcm.ui"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="edu.kit.ipd.sdq.kamp.ruledsl.viewer"
          download-size="0"
          install-size="0"
          version="0.0.0"
