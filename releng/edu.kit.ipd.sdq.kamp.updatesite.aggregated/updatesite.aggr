@@ -5,7 +5,7 @@
       <repositories location="../edu.kit.ipd.sdq.kamp.updatesite/target/repository"/>
     </contributions>
     <contributions label="externals">
-      <repositories location="http://download.eclipse.org/eclipse/updates/4.7" mirrorArtifacts="false">
+      <repositories location="http://download.eclipse.org/eclipse/updates/4.7">
         <features name="org.eclipse.emf.ecore.feature.group" versionRange="2.12.0"/>
         <features name="org.eclipse.emf.common.feature.group" versionRange="2.12.0"/>
       </repositories>
@@ -13,7 +13,7 @@
         <categories name="org.palladiosimulator.corefeatures.category" versionRange="0.0.0.7R21cPpsE67gKWDLOfyVBrs"/>
         <mapRules xsi:type="aggregator:ExclusionRule" name="de.uka.ipd.sdq.dsexplore.feature.feature.group" versionRange="4.0.1.201709290946"/>
       </repositories>
-      <repositories location="https://vitruv-tools.github.io/updatesite/release/" mirrorArtifacts="false">
+      <repositories location="https://vitruv-tools.github.io/updatesite/release/">
         <categories name="Vitruv Application Development" versionRange="1.0.0.077-cZrbnh"/>
       </repositories>
       <repositories location="http://download.eclipse.org/releases/oxygen/">
