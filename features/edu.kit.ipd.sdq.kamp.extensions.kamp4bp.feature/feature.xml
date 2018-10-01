@@ -223,8 +223,6 @@
          name="KAMP4IS"/>
 
    <requires>
-      <import feature="edu.kit.ipd.sdq.kamp.framework.feature" version="1.0.0.qualifier"/>
-      <import feature="edu.kit.ipd.sdq.kamp.extensions.kamp4is.feature" version="1.0.0.qualifier"/>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.junit"/>
@@ -262,6 +260,9 @@
       <import plugin="de.uhd.ifi.se.pcm.bppcm" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="de.uka.ipd.sdq.workflow.launchconfig" version="1.1.0" match="greaterOrEqual"/>
       <import plugin="org.palladiosimulator.analyzer.workflow" version="1.0.0" match="greaterOrEqual"/>
+      <import feature="edu.kit.ipd.sdq.kamp.framework.feature" version="1.0.0.qualifier"/>
+      <import feature="edu.kit.ipd.sdq.kamp.extensions.kamp4is.feature" version="1.0.0.qualifier"/>
+      <import plugin="edu.kit.ipd.sdq.kamp.ruledsl.viewer" version="0.2.0.qualifier" match="greaterOrEqual"/>
    </requires>
 
    <plugin

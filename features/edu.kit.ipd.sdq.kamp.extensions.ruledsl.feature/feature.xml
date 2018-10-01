@@ -256,6 +256,7 @@ limitations under the License.
       <import plugin="org.eclipse.jdt.core" version="3.12.3" match="greaterOrEqual"/>
       <import plugin="edu.kit.ipd.sdq.kamp.model.modificationmarks"/>
       <import plugin="org.apache.log4j"/>
+      <import plugin="org.eclipse.jdt.ui" version="3.13.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.xtext"/>
       <import plugin="org.eclipse.xtext.xbase"/>
       <import plugin="org.eclipse.equinox.common" version="3.5.0" match="greaterOrEqual"/>
@@ -275,7 +276,8 @@ limitations under the License.
       <import plugin="org.eclipse.xtext.ui" version="2.11.0" match="greaterOrEqual"/>
       <import plugin="edu.kit.ipd.sdq.kamp" version="1.0.0" match="greaterOrEqual"/>
       <import plugin="edu.kit.ipd.sdq.kamp.model.modificationmarks" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.jdt.ui" version="3.13.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.cdo" version="4.6.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.emf.edit.ui"/>
    </requires>
 
    <plugin
