@@ -122,6 +122,7 @@ public class BPChangePropagationAnalysis extends AbstractISChangePropagationAnal
 				view.update(result);
 			}
 		} catch (Exception e) {
+			System.err.println("CPRL seems not to be installed...");
 			// should be only thrown if service is not available or bundle could not be installed
 			e.printStackTrace();
 		};
