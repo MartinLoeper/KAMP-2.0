@@ -18,6 +18,12 @@ Workflow {
 				eclipsePlugin = {
 					enabled = true
 				}
+				runtimeTest = {
+					enabled = true
+				}
+				eclipsePluginTest = {
+					enabled = true
+				}
 				createEclipseMetaData = true
 			}
 			code = {
