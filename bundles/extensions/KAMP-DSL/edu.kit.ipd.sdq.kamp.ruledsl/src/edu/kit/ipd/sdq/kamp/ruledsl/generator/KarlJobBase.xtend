@@ -214,6 +214,7 @@ abstract class KarlJobBase extends Job {
 				cFile.delete(true, monitor);
 			}
 			
+			println("move file from: " + sourceFile)
 			cFile.create(new FileInputStream(srcFile), false, monitor)
 			cFile.setDerived(true, monitor)
 		}

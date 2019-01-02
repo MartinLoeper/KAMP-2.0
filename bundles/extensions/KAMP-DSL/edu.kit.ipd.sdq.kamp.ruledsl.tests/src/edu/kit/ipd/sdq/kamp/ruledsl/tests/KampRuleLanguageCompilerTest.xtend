@@ -11,6 +11,7 @@ import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.eclipse.xtext.xbase.lib.util.ReflectExtensions
 
 // this file contais some exemplary tests 
 // to check if the Java code is generated correctly out of the CPRL file
@@ -29,61 +30,69 @@ class KampRuleLanguageCompilerTest {
 		val expectedRuleFile = '''
 			package gen.rule;
 			
+			import edu.kit.ipd.sdq.kamp.architecture.AbstractArchitectureVersion;
+			import edu.kit.ipd.sdq.kamp.model.modificationmarks.AbstractModificationRepository;
+			import edu.kit.ipd.sdq.kamp.ruledsl.support.ChangePropagationStepRegistry;
+			import edu.kit.ipd.sdq.kamp.ruledsl.support.IRule;
+			import edu.kit.ipd.sdq.kamp.ruledsl.support.Result;
+			import edu.kit.ipd.sdq.kamp.ruledsl.support.RuleResult;
 			import edu.kit.ipd.sdq.kamp.ruledsl.support.lookup.AbstractLookup;
 			import edu.kit.ipd.sdq.kamp.util.LookupUtil;
+			import org.palladiosimulator.pcm.core.composition.AssemblyContext;
+			import org.palladiosimulator.pcm.repository.CompositeComponent;
 			
 			@SuppressWarnings("all")
-			public class ARule implements edu.kit.ipd.sdq.kamp.ruledsl.support.IRule {
-			  private edu.kit.ipd.sdq.kamp.architecture.AbstractArchitectureVersion architectureVersion;
+			public class ARule implements IRule<CompositeComponent, AssemblyContext, AbstractArchitectureVersion<AbstractModificationRepository<?, ?>>, AbstractModificationRepository<?, ?>> {
+			  private AbstractArchitectureVersion<AbstractModificationRepository<?, ?>> architectureVersion;
 			  
-			  private edu.kit.ipd.sdq.kamp.ruledsl.support.ChangePropagationStepRegistry changePropagationStepRegistry;
+			  private ChangePropagationStepRegistry changePropagationStepRegistry;
 			  
 			  @Override
-			  public edu.kit.ipd.sdq.kamp.architecture.AbstractArchitectureVersion getArchitectureVersion() {
+			  public AbstractArchitectureVersion<AbstractModificationRepository<?, ?>> getArchitectureVersion() {
 			    return this.architectureVersion;
 			  }
 			  
 			  @Override
-			  public edu.kit.ipd.sdq.kamp.ruledsl.support.ChangePropagationStepRegistry getChangePropagationStepRegistry() {
+			  public ChangePropagationStepRegistry getChangePropagationStepRegistry() {
 			    return this.changePropagationStepRegistry;
 			  }
 			  
 			  @Override
-			  public void setArchitectureVersion(final edu.kit.ipd.sdq.kamp.architecture.AbstractArchitectureVersion architectureVersion) {
+			  public void setArchitectureVersion(final AbstractArchitectureVersion<AbstractModificationRepository<?, ?>> architectureVersion) {
 			    this.architectureVersion = architectureVersion;
 			  }
 			  
 			  @Override
-			  public void setChangePropagationStepRegistry(final edu.kit.ipd.sdq.kamp.ruledsl.support.ChangePropagationStepRegistry changePropagationStepRegistry) {
+			  public void setChangePropagationStepRegistry(final ChangePropagationStepRegistry changePropagationStepRegistry) {
 			    this.changePropagationStepRegistry = changePropagationStepRegistry;
 			  }
 			  
-			  private static Object/* type is 'null' */ createLookups(final edu.kit.ipd.sdq.kamp.architecture.AbstractArchitectureVersion version) {
+			  private static AbstractLookup<?, ?>[] createLookups(final AbstractArchitectureVersion<AbstractModificationRepository<?, ?>> version) {
 			    return new AbstractLookup[] {
 			    								/* no lookup for rule source */
 			    								new edu.kit.ipd.sdq.kamp.ruledsl.support.lookup.StructuralFeatureForwardReferenceLookup<org.palladiosimulator.pcm.repository.CompositeComponent, org.palladiosimulator.pcm.core.composition.AssemblyContext>(true, true, "assemblyContexts__ComposedStructure")
 			    							};
 			  }
 			  
-			  public static final edu.kit.ipd.sdq.kamp.ruledsl.support.RuleResult lookup(final edu.kit.ipd.sdq.kamp.ruledsl.support.Result previousRuleResult, final edu.kit.ipd.sdq.kamp.architecture.AbstractArchitectureVersion version) {
+			  public static final RuleResult<CompositeComponent, AssemblyContext> lookup(final Result<?, CompositeComponent> previousRuleResult, final AbstractArchitectureVersion<AbstractModificationRepository<?, ?>> version) {
 			    AbstractLookup[] lookups = createLookups(version);
 			    RuleResult<org.palladiosimulator.pcm.repository.CompositeComponent, org.palladiosimulator.pcm.core.composition.AssemblyContext> result = LookupUtil.runLookups(previousRuleResult, lookups, "A");
 			    return result;
 			  }
 			  
 			  @Override
-			  public edu.kit.ipd.sdq.kamp.ruledsl.support.RuleResult lookup(final edu.kit.ipd.sdq.kamp.ruledsl.support.Result previousRuleResult) {
+			  public RuleResult<CompositeComponent, AssemblyContext> lookup(final Result<?, CompositeComponent> previousRuleResult) {
 			    return lookup(previousRuleResult, this.getArchitectureVersion());
 			  }
 			  
 			  @Override
-			  public /* Class<org.palladiosimulator.pcm.repository.CompositeComponent> */Object getSourceElementClass() {
-			    return org.palladiosimulator.pcm.repository.CompositeComponent.class;
+			  public Class<CompositeComponent> getSourceElementClass() {
+			    return CompositeComponent.class;
 			  }
 			  
 			  @Override
-			  public /* Class<org.palladiosimulator.pcm.core.composition.AssemblyContext> */Object getAffectedElementClass() {
-			    return org.palladiosimulator.pcm.core.composition.AssemblyContext.class;
+			  public Class<AssemblyContext> getAffectedElementClass() {
+			    return AssemblyContext.class;
 			  }
 			  
 			  @Override

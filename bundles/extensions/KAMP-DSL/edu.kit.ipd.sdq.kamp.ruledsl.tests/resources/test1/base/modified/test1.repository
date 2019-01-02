@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<repository:Repository xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:repository="http://palladiosimulator.org/PalladioComponentModel/Repository/5.2" id="_HggsMA5SEemiC6tVnfIaGw">
+  <interfaces__Repository xsi:type="repository:OperationInterface" id="_H_kmxw5SEemiC6tVnfIaGw">
+    <signatures__OperationInterface id="_JCm7oA5TEemiC6tVnfIaGw" entityName="aSignature"/>
+  </interfaces__Repository>
+  <interfaces__Repository xsi:type="repository:OperationInterface" id="_PqiuZw5SEemiC6tVnfIaGw" entityName="bName" parentInterfaces__Interface="_H_kmxw5SEemiC6tVnfIaGw"/>
+</repository:Repository>

@@ -74,6 +74,7 @@ public class BPChangePropagationAnalysis extends AbstractISChangePropagationAnal
 	private Collection<DataType> markedDataTypes;
 	private Collection<DataObject<?>> markedDataObjects;
 	private IProject project;
+	private ChangePropagationResult changePropagationResult;
 	
 	/**
 	 * Creates a new instance of BPChangePropagationAnalysis which is aware of the location it is run.
@@ -120,6 +121,7 @@ public class BPChangePropagationAnalysis extends AbstractISChangePropagationAnal
 				IViewPart viewPart = page.showView(IKampRuleLanguageViewer.ID);
 				IKampRuleLanguageViewer view = (IKampRuleLanguageViewer) viewPart;
 				view.update(result);
+				this.changePropagationResult = result;
 			}
 		} catch (Exception e) {
 			System.err.println("CPRL seems not to be installed...");
@@ -132,6 +134,10 @@ public class BPChangePropagationAnalysis extends AbstractISChangePropagationAnal
 			//this.calculateInterfaceAndComponentPropagation(version);
 			this.calculateInterBusinessProcessPropagation(version);
 		}
+	}
+	
+	public ChangePropagationResult getChangePropagationResult() {
+		return this.changePropagationResult;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -164,22 +170,22 @@ public class BPChangePropagationAnalysis extends AbstractISChangePropagationAnal
 		Map<EObject, AbstractModification<?,EObject>> elementsMarkedInThisStep = 
 				new HashMap<EObject, AbstractModification<?,EObject>>();
 		
-//		// 1 DataType -> Composite/CollectionDataType
-//		calculateAndMarkDataTypeToDataTypePropagation(version, elementsMarkedInThisStep);		
-//		// 2 DataType -> DataObject
-//		calculateAndMarkDataTypeToDataObjectPropagation(version, elementsMarkedInThisStep);	
-//		// 3 DataObject -> Composite/CollectionDataObject
-//		calculateAndMarkDataObjectToDataObjectPropagation(version, elementsMarkedInThisStep);
-//		// 4 DataObject -> ActorStep
-//		calculateAndMarkDataObjectToActorStepPropagation(version);	
-//		// 5 DataObject -> DataType
-//		calculateAndMarkDataObjectToDataTypePropagation(version, elementsMarkedInThisStep);	
-//		// 6 DataType -> Composite/CollectionDataType
-		// calculateAndMarkDataTypeToDataTypePropagation(version, elementsMarkedInThisStep);	
+		// 1 DataType -> Composite/CollectionDataType
+		calculateAndMarkDataTypeToDataTypePropagation(version, elementsMarkedInThisStep);		
+		// 2 DataType -> DataObject
+		calculateAndMarkDataTypeToDataObjectPropagation(version, elementsMarkedInThisStep);	
+		// 3 DataObject -> Composite/CollectionDataObject
+		calculateAndMarkDataObjectToDataObjectPropagation(version, elementsMarkedInThisStep);
+		// 4 DataObject -> ActorStep
+		calculateAndMarkDataObjectToActorStepPropagation(version);	
+		// 5 DataObject -> DataType
+		calculateAndMarkDataObjectToDataTypePropagation(version, elementsMarkedInThisStep);	
+		// 6 DataType -> Composite/CollectionDataType
+		 calculateAndMarkDataTypeToDataTypePropagation(version, elementsMarkedInThisStep);	
 		// 7 DataType -> EntryLevelSystemCall
 		calculateAndMarkDataTypeToEntryLevelSystemCallPropagation(version);	
-//		// 8 DataType/EntryLevelSystemCall/Signature -> Interface
-//		calculateAndMarkToInterfacePropagation(version);
+		// 8 DataType/EntryLevelSystemCall/Signature -> Interface
+		calculateAndMarkToInterfacePropagation(version);
 		
 		//If no at all changes: remove top-level element from tree
 		if (this.getChangePropagationDueToDataDependencies().eContents().isEmpty()) {			
@@ -196,12 +202,12 @@ public class BPChangePropagationAnalysis extends AbstractISChangePropagationAnal
 		Map<EObject, AbstractModification<?,EObject>> elementsMarkedInThisStep = 
 				new HashMap<EObject, AbstractModification<?,EObject>>();
 		
-//		// 1 Role (OrganizationEnvironmentModel) -> ActorStep
-//		calculateAndMarkRoleToActorStepPropagation(version, elementsMarkedInThisStep);
-//		// 2 ActorStep -> ActorStep/EntryLevelSystemCall
-//		calculateAndMarkActorStepToActorStepAndELSCPropagation(version, elementsMarkedInThisStep);
-//		// 3 DeviceResource -> Acquire-/ReleaseDeviceResourceAction and actions between
-//		calculateAndMarkDeviceResourceToDeviceResourceActionPropagation(version, elementsMarkedInThisStep);
+		// 1 Role (OrganizationEnvironmentModel) -> ActorStep
+		calculateAndMarkRoleToActorStepPropagation(version, elementsMarkedInThisStep);
+		// 2 ActorStep -> ActorStep/EntryLevelSystemCall
+		calculateAndMarkActorStepToActorStepAndELSCPropagation(version, elementsMarkedInThisStep);
+		// 3 DeviceResource -> Acquire-/ReleaseDeviceResourceAction and actions between
+		calculateAndMarkDeviceResourceToDeviceResourceActionPropagation(version, elementsMarkedInThisStep);
 		// 4 Signature -> EntryLevelSystemCall
 		calculateAndMarkSignatureToEntryLevelSystemCallPropagation(version, elementsMarkedInThisStep);
 		

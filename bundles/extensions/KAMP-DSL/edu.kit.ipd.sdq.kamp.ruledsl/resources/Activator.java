@@ -152,6 +152,7 @@ public class Activator extends AbstractUIPlugin implements BundleActivator {
         });
 
         System.out.println("KAMP-RuleDSL bundle successfully activated.");
+        System.out.println("Bundle-Name:" + context.getBundle().getSymbolicName() + " [state: " + context.getBundle().getState() + "]");
         context.registerService(IRuleProvider.class.getName(), ruleProvider, null);
     }
     

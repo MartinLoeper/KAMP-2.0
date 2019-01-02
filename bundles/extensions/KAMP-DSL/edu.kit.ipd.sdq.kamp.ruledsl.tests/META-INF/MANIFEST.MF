@@ -18,12 +18,37 @@ Require-Bundle: edu.kit.ipd.sdq.kamp.ruledsl,
  org.eclipse.ui.workbench.texteditor,
  org.eclipse.jdt.core,
  org.eclipse.xtext.xbase.junit,
- org.eclipse.xtext.generator
+ org.eclipse.xtext.generator,
+ org.eclipse.emf.ecore,
+ edu.kit.ipd.sdq.kamp,
+ edu.kit.ipd.sdq.kamp.ruledsl.ui,
+ tools.vitruv.framework.correspondence,
+ com.google.guava,org.eclipse.emf.compare,
+ tools.vitruv.framework.change.processing,
+ org.eclipse.xtend.lib,
+ tools.vitruv.framework.userinteraction,
+ edu.kit.ipd.sdq.kamp.ruledsl,
+ org.eclipse.ui,org.palladiosimulator.pcm,
+ org.eclipse.xtend.lib.macro,
+ org.eclipse.core.resources,
+ tools.vitruv.framework.
+ change,de.uhd.ifi.se.pcm.bppcm,
+ tools.vitruv.framework.util,
+ org.apache.log4j
 Export-Package: edu.kit.ipd.sdq.kamp.ruledsl.tests;x-internal=true
 Import-Package: org.hamcrest.core,
  org.junit;version="4.5.0",
- org.junit.runners.model;version="4.5.0",
  org.junit.runner;version="4.5.0",
- org.junit.runners;version="4.5.0",
  org.junit.runner.manipulation;version="4.5.0",
- org.junit.runner.notification;version="4.5.0"
+ org.junit.runner.notification;version="4.5.0",
+ org.junit.runners;version="4.5.0",
+ org.junit.runners.model;version="4.5.0",
+ edu.kit.ipd.sdq.kamp.architecture,edu.kit.ipd.sdq.kamp
+ .ruledsl.support.lookup,edu.kit.ipd.sdq.kamp.propagation,edu.kit.ipd.
+ sdq.kamp.model.modificationmarks,edu.kit.ipd.sdq.kamp4is.model.modifi
+ cationmarks,org.eclipse.xtext.xbase.lib,org.palladiosimulator.pcm.rep
+ ository,edu.kit.ipd.sdq.kamp.util,edu.kit.ipd.sdq.kamp4bp.model.modif
+ icationmarks,org.palladiosimulator.pcm.seff,edu.kit.ipd.sdq.kamp4bp.c
+ ore,de.uhd.ifi.se.pcm.bppcm.datamodel,edu.kit.ipd.sdq.kamp4is.core,ed
+ u.kit.ipd.sdq.kamp.ruledsl.support,de.uhd.ifi.se.pcm.bppcm.bpusagemod
+ el

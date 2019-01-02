@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="ASCII"?>
+<modificationmarks:BPModificationRepository xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:modificationmarks="http://sdq.ipd.kit.edu/KAMP4BPModificationmarks/1.0" xmlns:repository="http://palladiosimulator.org/PalladioComponentModel/Repository/5.2" xmlns:usagemodel="http://palladiosimulator.org/PalladioComponentModel/UsageModel/5.2">
+  <seedModifications xsi:type="modificationmarks:BPSeedModifications">
+    <signatureModifications>
+      <affectedElement xsi:type="repository:OperationSignature" href="test1.repository#_JCm7oA5TEemiC6tVnfIaGw"/>
+    </signatureModifications>
+  </seedModifications>
+</modificationmarks:BPModificationRepository>
