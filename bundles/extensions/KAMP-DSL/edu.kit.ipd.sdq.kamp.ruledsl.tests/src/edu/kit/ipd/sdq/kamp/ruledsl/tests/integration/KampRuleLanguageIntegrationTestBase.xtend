@@ -94,7 +94,7 @@ abstract class KampRuleLanguageIntegrationTestBase extends AbstractWorkbenchTest
 	}
 	
 	/**
-	 * Runs an A-B test which evaluates to true if both results match.
+	 * Runs an A-B test and returns the result.
 	 * 
 	 * @param testName the name of the test to run. This must match the test's resource directory name.
 	 * @param filePaths a list of files to use for the test (relative to test base folder without leading slash)
