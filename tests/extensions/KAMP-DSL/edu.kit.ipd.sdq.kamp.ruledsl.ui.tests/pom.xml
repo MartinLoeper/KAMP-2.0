@@ -3,13 +3,18 @@
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>edu.kit.ipd.sdq.kamp</groupId>
-		<artifactId>KAMP-DSL</artifactId>
+		<artifactId>KAMPDSL-tests</artifactId>
 		<version>0.2.0-SNAPSHOT</version>
 		<relativePath>../</relativePath>
 	</parent>
 	<artifactId>edu.kit.ipd.sdq.kamp.ruledsl.ui.tests</artifactId>
-	<packaging>eclipse-test-plugin</packaging>
-
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<xtextVersion>2.12.0</xtextVersion>
+		<tycho-version>1.0.0</tycho-version>
+	</properties>
+	
 	<build>
 		<plugins>
 			<plugin>
