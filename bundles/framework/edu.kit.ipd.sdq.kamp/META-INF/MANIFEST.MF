@@ -5,6 +5,7 @@ Bundle-SymbolicName: edu.kit.ipd.sdq.kamp;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: edu.kit.ipd.sdq.kamp.Activator
 Require-Bundle: org.eclipse.ui,
+ org.eclipse.swt,
  org.eclipse.core.runtime,
  org.eclipse.emf.ecore,
  org.eclipse.emf.ecore.xmi,

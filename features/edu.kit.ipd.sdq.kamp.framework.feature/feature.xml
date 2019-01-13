@@ -243,6 +243,7 @@ limitations under the License.
       <import plugin="org.eclipse.ui.ide"/>
       <import plugin="org.palladiosimulator.pcm.editor"/>
       <import plugin="org.palladiosimulator.pcm.resources"/>
+      <import plugin="org.eclipse.swt"/>
    </requires>
 
    <plugin
