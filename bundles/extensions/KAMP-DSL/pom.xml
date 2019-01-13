@@ -18,7 +18,6 @@
 		<module>edu.kit.ipd.sdq.kamp.ruledsl.ide</module>
 		<module>edu.kit.ipd.sdq.kamp.ruledsl.ui</module>
 		<module>edu.kit.ipd.sdq.kamp.ruledsl.viewer</module>
-		<module>edu.kit.ipd.sdq.kamp.ruledsl.tests</module>
 	</modules>
 	
 	<build>
