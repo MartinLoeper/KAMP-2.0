@@ -6,8 +6,10 @@
     </contributions>
     <contributions label="externals">
       <repositories location="http://download.eclipse.org/eclipse/updates/4.7">
+        <bundles name="org.eclipse.swt" versionRange="3.106.3.v20180329-0507"/>
         <features name="org.eclipse.emf.ecore.feature.group" versionRange="2.12.0"/>
         <features name="org.eclipse.emf.common.feature.group" versionRange="2.12.0"/>
+        <features name="org.eclipse.swt.tools.feature.feature.group" versionRange="3.106.0.v20170503-0851"/>
       </repositories>
       <repositories location="https://sdqweb.ipd.kit.edu/eclipse/palladiosimulator/releases/latest/">
         <categories name="org.palladiosimulator.corefeatures.category" versionRange="0.0.0.7R21cPpsE67gKWDLOfyVBrs"/>
