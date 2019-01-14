@@ -32,6 +32,10 @@
 			<url>http://download.eclipse.org/releases/oxygen/</url>
 		</repository>
 		<repository>
+			<id>maven-eclipse-repo</id>
+			<url>http://maven-eclipse.github.io/maven</url>
+		</repository>
+		<repository>
 			<id>SDQ Commons</id>
 			<layout>p2</layout>
 			<url>http://kit-sdq.github.io/updatesite/nightly/commons</url>
@@ -103,6 +107,33 @@
 						<artifactId>plexus-compiler-eclipse</artifactId>
 						<version>2.7</version>
 						<scope>runtime</scope>
+					</dependency>
+					<dependency>
+						<groupId>org.eclipse.swt</groupId>
+						<artifactId>org.eclipse.swt.win32.win32.x86</artifactId>
+						<version>${swt.version}</version>
+						<!-- To use the debug jar, add this -->
+						<classifier>debug</classifier>
+					</dependency>
+					<dependency>
+						<groupId>org.eclipse.swt</groupId>
+						<artifactId>org.eclipse.swt.win32.win32.x86_64</artifactId>
+						<version>${swt.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>org.eclipse.swt</groupId>
+						<artifactId>org.eclipse.swt.gtk.linux.x86</artifactId>
+						<version>${swt.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>org.eclipse.swt</groupId>
+						<artifactId>org.eclipse.swt.gtk.linux.x86_64</artifactId>
+						<version>${swt.version}</version>
+					</dependency>
+					<dependency>
+						<groupId>org.eclipse.swt</groupId>
+						<artifactId>org.eclipse.swt.cocoa.macosx.x86_64</artifactId>
+						<version>${swt.version}</version>
 					</dependency>
 				</dependencies>
 			</plugin>
