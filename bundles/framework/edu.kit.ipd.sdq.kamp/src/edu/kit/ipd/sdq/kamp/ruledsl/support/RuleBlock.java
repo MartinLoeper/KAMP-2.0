@@ -56,6 +56,11 @@ public class RuleBlock {
 				List<CausingEntityMapping<EObject, EObject>> newElements = new ArrayList<>();
 				Result<EObject, EObject> source = new Result<>(sourceElements);
 				RuleResult<EObject, EObject> ruleResult = cRule.lookup(source);
+				
+				// TODO: the following is a quickfix which is necessary until there is
+				// a mapping language for CPRL
+				cRule.apply(source);				
+				
 				ruleResults.add(ruleResult);
 				ruleResult.getOutputElements().forEach((e) -> {
 					newElements.add(e);
